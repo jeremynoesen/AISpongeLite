@@ -1,0 +1,7 @@
+services:
+  aispongelite:
+    container_name: aispongelite
+    build:
+      context: .
+    restart: unless-stopped
+    network_mode: host
