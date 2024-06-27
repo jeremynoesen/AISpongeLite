@@ -31,7 +31,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         global busy
         if not busy:
             busy = True
-            await inter.response.send_message(embed=discord.Embed(title="0%", description="# <a:generating:1255322126966063245>", color=0xffde30))
+            await inter.response.send_message(embed=discord.Embed(title="0%", description="# <a:generating:1255738228946898984>", color=0xffe55e))
             response = await inter.original_response()
             message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
             try:
@@ -46,7 +46,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 remaining = len(lines)
                 title = lines.pop(0)[6:]
                 progress = 1
-                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", description="# <a:generating:1255322126966063245>", color=0xffde30))
+                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", description="# <a:generating:1255738228946898984>", color=0xffe55e))
                 transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
@@ -80,7 +80,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     transcript.append(line)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
-                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", description="# <a:generating:1255322126966063245>", color=0xffde30))
+                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", description="# <a:generating:1255738228946898984>", color=0xffe55e))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
