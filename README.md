@@ -54,3 +54,7 @@ FAKEYOU_PASSWORD=fakeyou_password_here
 ## Troubleshooting
 
 FakeYou sometimes breaks and gives no reason as to why. Simply restart the bot if it gets stuck.
+
+## Disclaimer
+
+This bot is not affiliated with AI Sponge Rehydrated. This bot also falls under fair use since it is a parody of SpongeBob SquarePants.
