@@ -4,8 +4,8 @@
 
 ## About
 
-AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes with transcripts. It exists due to my
-liking of AI Sponge and its inner workings. I wanted to try to make a similar project for the fun of it.
+AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes with transcripts. The episodes generated
+are mostly inspired by the original AI Sponge with a little inspiration from AI Sponge Rehydrated.
 
 ## Usage
 
