@@ -53,25 +53,25 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 for line in lines:
                     lower = line.lower()
                     if lower.startswith("spongebob:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[10:], "weight_tq6pwerrbr4mvbjmtyhbsqe6t")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_tq6pwerrbr4mvbjmtyhbsqe6t"), 300)
                     elif lower.startswith("patrick:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[8:], "weight_154man2fzg19nrtc15drner7t")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:], "weight_154man2fzg19nrtc15drner7t"), 300)
                     elif lower.startswith("squidward:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[10:], "weight_y9arhnd7wjamezhqd27ksvmaz")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 300)
                     elif lower.startswith("loudward:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[9:], "weight_y9arhnd7wjamezhqd27ksvmaz")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 300)
                     elif lower.startswith("gary:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[5:], "weight_ednbwdjmcvr92pa455n8cc5cs")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[5:], "weight_ednbwdjmcvr92pa455n8cc5cs"), 300)
                     elif lower.startswith("plankton:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[9:], "weight_ahxbf2104ngsgyegncaefyy6j")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_ahxbf2104ngsgyegncaefyy6j"), 300)
                     elif lower.startswith("mr. krabs:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[10:], "weight_5bxbp9xqy61svfx03b25ezmwx")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_5bxbp9xqy61svfx03b25ezmwx"), 300)
                     elif lower.startswith("karen:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[6:], "weight_eckp92cd68r4yk68n6re3fwcb")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_eckp92cd68r4yk68n6re3fwcb"), 300)
                     elif lower.startswith("sandy:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[6:], "weight_tzgp5df2xzwz7y7jzz7at96jf")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_tzgp5df2xzwz7y7jzz7at96jf"), 300)
                     elif lower.startswith("mrs. puff:"):
-                        tts = await loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a")
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a"), 300)
                     else:
                         remaining -= 1
                         continue
