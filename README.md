@@ -21,7 +21,9 @@ to allow other users a chance to use the bot. Only one episode can be generated 
     <img src="img/output.png" alt="Output" title="Output" />
 </div>
 
-## Disclaimer
+## Notice
 
-This bot is not affiliated with AI Sponge Rehydrated. This bot also falls under fair use since it is a parody of
-SpongeBob SquarePants.
+- No instructions for setting up this project will be provided, as my intent is that you add the public bot to your
+servers.
+- This bot is not affiliated with the official AI Sponge Rehydrated.  
+- This project is considered fair use since it is a parody of SpongeBob SquarePants.
