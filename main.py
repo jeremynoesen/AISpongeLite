@@ -19,7 +19,7 @@ client = discord.Client(intents=discord.Intents.default(), activity=discord.Game
 tree = app_commands.CommandTree(client)
 music = AudioSegment.from_wav("audio/closing_theme.wav").apply_gain(-10)
 music = music[:len(music)-4000].append(music, 0)
-sfx = AudioSegment.from_wav("audio/steel_sting.wav").apply_gain(-5)
+sfx = AudioSegment.from_wav("audio/steel_sting.wav")
 busy = False
 cooldown = {}
 
