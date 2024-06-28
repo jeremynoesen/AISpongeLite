@@ -9,21 +9,33 @@ are mostly inspired by the original AI Sponge with a little inspiration from AI 
 
 ## Usage
 
-This bot adds the `/generate` command, which takes a topic as an argument. The bot will then generate the episode,
-providing status updates as it does. If generation completes successfully, the user will be put on a 30-minute cooldown
-to allow other users a chance to use the bot. Only one episode can be generated at a time.
+This bot adds two commands:
+
+- `/generate <topic>`: Generates an episode with the given topic. Only one episode can be generated at a time globally.
+  Upon successful generation, the user who ran the command will be put on a 30-minute cooldown. Since this is AI
+  Sponge "Lite", not everything is available from other versions of AI Sponge. Worth noting is the list of available
+  characters:
+    - SpongeBob
+    - Patrick
+    - Squidward (can be referred to as Loudward)
+    - Gary
+    - Sandy
+    - Mr. Krabs
+    - Plankton
+    - Karen
+    - Mrs. Puff
+- `/status`: Checks whether the user can generate an episode at that time.
 
 ## Demonstration
 
 <div align="center">
-    <img src="img/generating.png" alt="Generating" title="Generating" width="40%" /> <img src="img/error.png" alt="Error" title="Error" width="40%" />
-    <img src="img/cooldown.png" alt="Cooldown" title="Cooldown" width="40%" /> <img src="img/busy.png" alt="Busy" title="Busy" width="40% "/>
+    <img src="img/generating.png" alt="Generating" title="Generating" />
     <img src="img/output.png" alt="Output" title="Output" />
 </div>
 
 ## Notice
 
 - No instructions for setting up this project will be provided, as my intent is that you add the public bot to your
-servers.
-- This bot is not affiliated with the official AI Sponge Rehydrated.  
+  servers.
+- This bot is not affiliated with the official AI Sponge Rehydrated.
 - This project is considered fair use since it is a parody of SpongeBob SquarePants.
