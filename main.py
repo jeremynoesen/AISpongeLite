@@ -28,10 +28,12 @@ cooldown = {}
 @app_commands.describe(topic="Topic of the episode that follows Discord, OpenAI, and FakeYou Terms of Services.")
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 1800:
+        cooldown[inter.user.id] = time.time()
+
         global busy
         if not busy:
             busy = True
-            await inter.response.send_message(embed=discord.Embed(title="0%", description="# <a:generating:1255749319844302899>", color=0xffe55e))
+            await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take around 15 minutes."))
             response = await inter.original_response()
             message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
             try:
@@ -46,7 +48,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 remaining = len(lines)
                 title = lines.pop(0)[6:]
                 progress = 1
-                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", description="# <a:generating:1255749319844302899>", color=0xffe55e))
+                await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take around 15 minutes."))
                 transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
@@ -82,20 +84,19 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     transcript.append(line)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
-                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", description="# <a:generating:1255749319844302899>", color=0xffe55e))
+                    await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take around 15 minutes."))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
-                    await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript), color=discord.Color.blurple()), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
+                    await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript), color=0xf4f24f), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
                 cooldown[inter.user.id] = time.time()
-            except Exception as e:
-                print(e)
-                await message.edit(embed=discord.Embed(title="Error", description="# <:error:1255365485583667261>", color=0xee293e))
+            except:
+                await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
             busy = False
         else:
-            await inter.response.send_message(embed=discord.Embed(title="Busy", description="# <:busy:1255367586670055444>", color=0xde867b))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Generating*", color=0xef7f8b).set_footer(text="Only one episode can generate at a time globally."))
     else:
-        await inter.response.send_message(embed=discord.Embed(title=f"{int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}:{int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}", description="# <:cooldown:1255363933703770162>", color=0xb8ddd0))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @client.event
