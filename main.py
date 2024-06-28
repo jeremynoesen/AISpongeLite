@@ -15,7 +15,7 @@ load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
 fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
-client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate"))
+client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Episodes"))
 tree = app_commands.CommandTree(client)
 music = AudioSegment.from_wav("audio/closing_theme.wav").apply_gain(-10)
 music = music[:len(music)-4000].append(music, 0)
@@ -28,8 +28,6 @@ cooldown = {}
 @app_commands.describe(topic="Topic of the episode that follows Discord, OpenAI, and FakeYou Terms of Services.")
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 1800:
-        cooldown[inter.user.id] = time.time()
-
         global busy
         if not busy:
             busy = True
@@ -95,6 +93,17 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
             busy = False
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Generating*", color=0xef7f8b).set_footer(text="Only one episode can generate at a time globally."))
+    else:
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+
+
+@tree.command(name="status", description="Check whether or not you can generate a new episode.")
+async def slash_generate(inter: discord.Interaction) -> None:
+    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 1800:
+        if busy:
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Generating*", color=0xef7f8b).set_footer(text="Only one episode can generate at a time globally."))
+        else:
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="You can generate a new episode at this time."))
     else:
         await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
