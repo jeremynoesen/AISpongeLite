@@ -24,10 +24,10 @@ busy = False
 cooldown = {}
 
 
-@tree.command(name="generate", description="Generate an audio-only episode with a 30-minute cooldown upon completion.")
+@tree.command(name="generate", description="Generate an audio-only episode with a 10-minute cooldown upon completion.")
 @app_commands.describe(topic="Topic of the episode that follows Discord, OpenAI, and FakeYou Terms of Services.")
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 1800:
+    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         global busy
         if not busy:
             busy = True
@@ -94,18 +94,18 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @tree.command(name="status", description="Check whether a new episode can be generated right now.")
 async def slash_generate(inter: discord.Interaction) -> None:
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 1800:
+    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         if busy:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="A new episode can be generated at this time."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @client.event

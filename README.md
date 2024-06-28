@@ -12,7 +12,7 @@ are mostly inspired by the original AI Sponge with a little inspiration from AI 
 This bot adds two commands:
 
 - `/generate <topic>`: Generates an episode with the given topic. Only one episode can be generated at a time globally.
-  Upon successful generation, the user who ran the command will be put on a 30-minute cooldown. Since this is AI
+  Upon successful generation, the user who ran the command will be put on a 10-minute cooldown. Since this is AI
   Sponge "Lite", not everything is available from other versions of AI Sponge. Worth noting is the list of available
   characters:
     - SpongeBob
