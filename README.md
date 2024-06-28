@@ -24,7 +24,7 @@ This bot adds two commands:
     - Plankton
     - Karen
     - Mrs. Puff
-- `/status`: Checks whether the user can generate an episode at that time.
+- `/status`: Checks whether a new episode can be generated at the time the user sent the command.
 
 ## Demonstration
 

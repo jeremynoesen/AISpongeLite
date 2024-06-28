@@ -92,18 +92,18 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
             busy = False
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Generating*", color=0xef7f8b).set_footer(text="Only one episode can generate at a time globally."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
     else:
         await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
-@tree.command(name="status", description="Check whether you can generate a new episode right now.")
+@tree.command(name="status", description="Check whether a new episode can be generated right now.")
 async def slash_generate(inter: discord.Interaction) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 1800:
         if busy:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Generating*", color=0xef7f8b).set_footer(text="Only one episode can generate at a time globally."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="You can generate a new episode at this time."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="A new episode can be generated at this time."))
     else:
         await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((1800 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((1800 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
