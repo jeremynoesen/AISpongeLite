@@ -72,8 +72,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     elif lower.startswith("mrs. puff:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a"), 300)
                     else:
-                        remaining -= 1
-                        continue
+                        tts = None
                     with BytesIO(tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
                     seg = seg.apply_gain(-20-seg.dBFS)
