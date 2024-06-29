@@ -16,7 +16,7 @@ Since no user data is stored, you can not request data deletion.
 
 ## How can I contact you about privacy concerns?
 
-If you have any privacy concerns, you can join the support server: https://discord.gg/RQcVqKGU5D.
+If you have any privacy concerns, you can open an issue in this repository.
 
 ## Note about external APIs
 
