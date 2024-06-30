@@ -14,7 +14,6 @@ from pydub import AudioSegment
 load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
-fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Episodes"))
 tree = app_commands.CommandTree(client)
 music = AudioSegment.from_wav("audio/closing_theme.wav").apply_gain(-10)
