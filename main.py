@@ -30,10 +30,10 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         global busy
         if not busy:
             busy = True
-            await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
-            response = await inter.original_response()
-            message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
             try:
+                await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                response = await inter.original_response()
+                message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
                 completion = await gpt.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
@@ -85,7 +85,10 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     await message.edit(embed=discord.Embed(title=title, description="\n".join(lines), color=0xf4f24f), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
                 cooldown[inter.user.id] = time.time()
             except:
-                await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
+                try:
+                    await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
+                except:
+                    await inter.edit_original_response(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
             busy = False
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
