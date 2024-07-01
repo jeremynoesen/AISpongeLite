@@ -75,7 +75,9 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     with BytesIO(tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
                     seg = seg.apply_gain(-20-seg.dBFS)
-                    combined = combined.append(seg, 0).append(AudioSegment.silent(500), 0)
+                    combined = combined.append(seg, 0)
+                    if random.randrange(10) > 0:
+                        combined = combined.append(AudioSegment.silent(500), 0)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
                     await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
