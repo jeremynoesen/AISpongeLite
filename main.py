@@ -90,7 +90,10 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 try:
                     await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
                 except:
-                    await inter.edit_original_response(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
+                    try:
+                        await inter.edit_original_response(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
+                    except:
+                        pass
             busy = False
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
