@@ -14,7 +14,7 @@ from pydub import AudioSegment
 load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
-client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Episodes"))
+client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
 tree = app_commands.CommandTree(client)
 music = AudioSegment.from_wav("audio/closing_theme.wav").apply_gain(-10)
 music = music[:len(music)-4000].append(music, 0)
@@ -23,8 +23,8 @@ busy = False
 cooldown = {}
 
 
-@tree.command(name="generate", description="Generate an episode.")
-@app_commands.describe(topic="Topic of episode.")
+@tree.command(name="generate", description="Generate an audio-only episode with a transcript.")
+@app_commands.describe(topic="Topic of the episode.")
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         global busy
@@ -96,20 +96,20 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         pass
             busy = False
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is generating at the moment."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate an episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
-@tree.command(name="status", description="Check bot status.")
+@tree.command(name="status", description="Check if an episode can be generated.")
 async def slash_generate(inter: discord.Interaction) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         if busy:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is currently generating elsewhere."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is generating at the moment."))
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="A new episode can be generated at this time."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="A new episode can be generated now."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate another episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate an episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @client.event
