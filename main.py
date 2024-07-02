@@ -85,7 +85,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 with BytesIO() as episode:
                     final.export(episode, "wav")
                     await message.edit(embed=discord.Embed(title=discord.utils.escape_markdown(title), description=discord.utils.escape_markdown("\n".join(lines)), color=0xf4f24f), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
-                # cooldown[inter.user.id] = time.time()
+                cooldown[inter.user.id] = time.time()
             except:
                 try:
                     await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
