@@ -31,7 +31,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         if not busy:
             busy = True
             try:
-                await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
                 response = await inter.original_response()
                 message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
                 completion = await gpt.chat.completions.create(
@@ -45,31 +45,31 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 remaining = len(lines)
                 title = lines.pop(0)[6:]
                 progress = 1
-                await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
                 for line in lines:
                     lower = line.lower()
                     if lower.startswith("spongebob:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_tq6pwerrbr4mvbjmtyhbsqe6t"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_tq6pwerrbr4mvbjmtyhbsqe6t"), 180)
                     elif lower.startswith("patrick:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:], "weight_154man2fzg19nrtc15drner7t"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:], "weight_154man2fzg19nrtc15drner7t"), 180)
                     elif lower.startswith("squidward:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
                     elif lower.startswith("loudward:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
                     elif lower.startswith("gary:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[5:], "weight_ednbwdjmcvr92pa455n8cc5cs"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[5:], "weight_ednbwdjmcvr92pa455n8cc5cs"), 180)
                     elif lower.startswith("plankton:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_ahxbf2104ngsgyegncaefyy6j"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
                     elif lower.startswith("mr. krabs:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_5bxbp9xqy61svfx03b25ezmwx"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
                     elif lower.startswith("karen:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_eckp92cd68r4yk68n6re3fwcb"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
                     elif lower.startswith("sandy:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_tzgp5df2xzwz7y7jzz7at96jf"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
                     elif lower.startswith("mrs. puff:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a"), 300)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a"), 180)
                     else:
                         tts = None
                     with BytesIO(tts.content) as wav:
@@ -80,7 +80,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         combined = combined.append(AudioSegment.silent(500), 0)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
-                    await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                    await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
