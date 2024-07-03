@@ -31,7 +31,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         if not busy:
             busy = True
             try:
-                await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
+                await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
                 response = await inter.original_response()
                 message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
                 completion = await gpt.chat.completions.create(
@@ -45,11 +45,12 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 remaining = len(lines)
                 title = lines.pop(0)[6:]
                 progress = 1
-                await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
+                await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
                 transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
                 for line in lines:
+                    loud = False
                     lower = line.lower()
                     if lower.startswith("spongebob:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_tq6pwerrbr4mvbjmtyhbsqe6t"), 180)
@@ -59,6 +60,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
                     elif lower.startswith("loudward:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                        loud = True
                     elif lower.startswith("gary:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[5:], "weight_ednbwdjmcvr92pa455n8cc5cs"), 180)
                     elif lower.startswith("plankton:"):
@@ -86,7 +88,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         combined = combined.append(AudioSegment.silent(500), 0)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
-                    await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
+                    await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
