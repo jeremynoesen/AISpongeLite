@@ -41,11 +41,12 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         {"role": "user", "content": topic}
                     ]
                 )
-                lines = [x for x in completion.choices[0].message.content.split("\n") if x]
+                lines = completion.choices[0].message.content.split("\n")
                 remaining = len(lines)
                 title = lines.pop(0)[6:]
                 progress = 1
                 await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This might take a while."))
+                transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
                 for line in lines:
@@ -71,7 +72,9 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     elif lower.startswith("mrs. puff:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a"), 180)
                     else:
-                        tts = None
+                        remaining -= 1
+                        continue
+                    transcript.append(line)
                     with BytesIO(tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
                     seg = seg.apply_gain(-20-seg.dBFS)
@@ -84,7 +87,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
-                    await message.edit(embed=discord.Embed(title=discord.utils.escape_markdown(title), description=discord.utils.escape_markdown("\n".join(lines)), color=0xf4f24f), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
+                    await message.edit(embed=discord.Embed(title=discord.utils.escape_markdown(title), description=discord.utils.escape_markdown("\n".join(transcript)), color=0xf4f24f), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
