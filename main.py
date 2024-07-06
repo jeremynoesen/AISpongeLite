@@ -9,7 +9,7 @@ from discord import app_commands
 from io import BytesIO
 from fakeyou import FakeYou  # Can't use async version as it is broken
 from openai import AsyncOpenAI
-from pydub import AudioSegment
+from pydub import AudioSegment, effects
 
 load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -79,6 +79,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     transcript.append(line)
                     with BytesIO(tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
+                    seg = effects.strip_silence(seg, silence_len=1, silence_thresh=-60, padding=0)
                     if random.randrange(20) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
