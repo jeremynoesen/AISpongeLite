@@ -93,7 +93,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
-                    await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
+                    await message.edit(content="**[Donate to keep the bot alive!](https://github.com/sponsors/jeremynoesen)**", embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
