@@ -23,15 +23,15 @@ busy = False
 cooldown = {}
 
 
-@tree.command(name="generate", description="Generate an audio-only episode with a transcript.")
-@app_commands.describe(topic="Topic of the episode.")
+@tree.command(name="generate", description="Generate an episode.")
+@app_commands.describe(topic="Topic of episode.")
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         global busy
         if not busy:
             busy = True
             try:
-                await inter.response.send_message(file=discord.File("img/generating.gif"), embed=discord.Embed(title="Generating:", description="# *0%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                await inter.response.send_message(embed=discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 response = await inter.original_response()
                 message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
                 completion = await gpt.chat.completions.create(
@@ -43,9 +43,9 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                 )
                 lines = completion.choices[0].message.content.split("\n")
                 remaining = len(lines)
-                title = lines.pop(0)[6:]
+                title = slugify(text=lines.pop(0)[6:].replace("'", ""), separator='_', lowercase=False)
                 progress = 1
-                await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
@@ -89,36 +89,36 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         combined = combined.append(AudioSegment.silent(500), 0)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
-                    await message.edit(embed=discord.Embed(title="Generating:", description=f"# *{int(100 * (progress / remaining))}%*", color=0xf4f24f).set_thumbnail(url="attachment://generating.gif").set_footer(text="This may take about 15 minutes."))
+                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
-                    await message.edit(embed=discord.Embed(title=discord.utils.escape_markdown(title), description=discord.utils.escape_markdown("\n".join(transcript)), color=0xf4f24f), attachments=[discord.File(episode, f"{slugify(text=title, separator='_', lowercase=False)}.wav")])
+                    await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
-                    await message.edit(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
+                    await message.edit(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode."))
                 except:
                     try:
-                        await inter.edit_original_response(attachments=[], embed=discord.Embed(title="Generating:", description="# *Failed*", color=0xf4f24f).set_footer(text="An error occurred during generation."))
+                        await inter.edit_original_response(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode."))
                     except:
                         pass
             busy = False
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is generating at the moment."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate an episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @tree.command(name="status", description="Check if an episode can be generated.")
 async def slash_generate(inter: discord.Interaction) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         if busy:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Busy*", color=0xef7f8b).set_footer(text="An episode is generating at the moment."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating."))
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Idle*", color=0xef7f8b).set_footer(text="A new episode can be generated now."))
+            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Status:", description="# *Cooldown*", color=0xef7f8b).set_footer(text=f"You can generate an episode in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @client.event

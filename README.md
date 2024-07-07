@@ -9,9 +9,8 @@ Rehydrated.
 
 ## Usage
 
-- `/generate topic:`: Generate an audio-only episode with a transcript. `topic:` is the topic of the episode. Only one
-  episode can be generated at a time globally. There is a 10-minute cooldown if the command succeeds. Characters that
-  can appear in episodes are:
+- `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 10-minute cooldown
+  if the command succeeds. Characters that can appear in episodes are:
     - SpongeBob
     - Patrick
     - Squidward
