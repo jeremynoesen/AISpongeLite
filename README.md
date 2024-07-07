@@ -1,4 +1,4 @@
-<img src="img/Logo.png" alt="Logo" title="Logo" align="right" width="72" height="72" />
+<img src="img/Logo.gif" alt="Logo" title="Logo" align="right" width="72" height="72" />
 
 # AI Sponge Lite
 
