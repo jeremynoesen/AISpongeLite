@@ -91,6 +91,8 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
+                if len(final) > 136531:
+                    final = final[:136531]
                 with BytesIO() as episode:
                     final.export(episode, "wav")
                     await message.edit(content="**[Donate to keep the bot alive!](https://github.com/sponsors/jeremynoesen)**", embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
