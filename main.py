@@ -80,7 +80,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     transcript.append(line)
                     with BytesIO(tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
-                    seg = effects.strip_silence(seg, silence_len=1, silence_thresh=-60, padding=0)
+                    seg = effects.strip_silence(seg, silence_len=1, silence_thresh=-70, padding=0)
                     if random.randrange(20) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
