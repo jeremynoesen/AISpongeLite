@@ -19,6 +19,7 @@ tree = app_commands.CommandTree(client)
 music = AudioSegment.from_wav("audio/closing_theme.wav").apply_gain(-10)
 music = music[:len(music)-4000].append(music, 0)
 sfx = AudioSegment.from_wav("audio/steel_sting.wav")
+silence = AudioSegment.silent(500)
 busy = False
 cooldown = {}
 
@@ -86,7 +87,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                         seg = seg.apply_gain(-seg.dBFS)
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0:
-                        combined = combined.append(AudioSegment.silent(500), 0)
+                        combined = combined.append(silence, 0)
                     await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
                     progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
