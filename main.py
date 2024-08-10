@@ -16,9 +16,10 @@ gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
 tree = app_commands.CommandTree(client)
-music = AudioSegment.from_wav("audio/closing_theme.wav").apply_gain(-10)
+music = AudioSegment.from_wav("music/closing_theme.wav").apply_gain(-10)
 music = music[:len(music)-4000].append(music, 0)
-sfx = AudioSegment.from_wav("audio/steel_sting.wav")
+steel_sting = AudioSegment.from_wav("sfx/steel_sting.wav")
+boowomp = AudioSegment.from_wav("sfx/boowomp.wav")
 silence = AudioSegment.silent(500)
 busy = False
 cooldown = {}
@@ -86,7 +87,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     transcript.append(line)
                     with BytesIO(tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
-                    seg = effects.strip_silence(seg, silence_len=1, silence_thresh=-70, padding=0)
+                    seg = effects.strip_silence(seg, silence_len=1, silence_thresh=-80, padding=0)
                     if random.randrange(20) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
@@ -97,6 +98,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     await asyncio.sleep(10)
                     progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
+                sfx = random.choice([steel_sting, boowomp])
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
