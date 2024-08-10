@@ -33,7 +33,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         except:
             pass
         return
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
+    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
         global busy
         if not busy:
             busy = True
@@ -114,18 +114,18 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @tree.command(name="status", description="Check if an episode can be generated.")
 async def slash_generate(inter: discord.Interaction) -> None:
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
+    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
         if busy:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating."))
         else:
             await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((600 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((600 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
 
 @client.event
