@@ -27,6 +27,12 @@ cooldown = {}
 @tree.command(name="generate", description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
+    if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history):
+        try:
+            await inter.response.send_message(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions."))
+        except:
+            pass
+        return
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 600:
         global busy
         if not busy:
@@ -101,7 +107,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     await message.edit(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode."))
                 except:
                     try:
-                        await inter.edit_original_response(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode."))
+                        await inter.edit_original_response(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions."))
                     except:
                         pass
             busy = False
