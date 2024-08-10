@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from slugify import slugify
 from discord import app_commands
 from io import BytesIO
-from fakeyou import FakeYou  # Can't use async version as it is broken
+from fakeyou import FakeYou
 from openai import AsyncOpenAI
 from pydub import AudioSegment, effects
 
@@ -40,7 +40,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
             try:
                 await inter.response.send_message(embed=discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 response = await inter.original_response()
-                message = await response.channel.fetch_message(response.id)  # Allow editing message past the 15 minute interaction limit
+                message = await response.channel.fetch_message(response.id)
                 completion = await gpt.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
@@ -94,7 +94,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0:
                         combined = combined.append(silence, 0)
-                    await asyncio.sleep(10)  # Prevent rate limiting from FakeYou
+                    await asyncio.sleep(10)
                     progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
