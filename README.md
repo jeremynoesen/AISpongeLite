@@ -9,7 +9,7 @@ Rehydrated.
 
 ## Usage
 
-- `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 10-minute cooldown
+- `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
   if the command succeeds. Characters that can appear in episodes are:
     - SpongeBob
     - Patrick
@@ -21,6 +21,10 @@ Rehydrated.
     - Plankton
     - Karen
     - Mrs. Puff
+    - Larry
+    - Bubble Bass
+    - Bubble Buddy
+    - French Narrator
 - `/status`: Check if an episode can be generated.
 
 ## Demonstration
