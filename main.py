@@ -16,13 +16,18 @@ gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
 tree = app_commands.CommandTree(client)
-closing_theme = AudioSegment.from_wav("music/closing_theme.wav").apply_gain(-10)
-closing_theme = closing_theme[:len(closing_theme)-4000].append(closing_theme, 0)
-tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav").apply_gain(-10)
-tip_top_polka = tip_top_polka[:len(tip_top_polka)-4000].append(tip_top_polka, 0)
-steel_sting = AudioSegment.from_wav("sfx/steel_sting.wav")
-boowomp = AudioSegment.from_wav("sfx/boowomp.wav")
+music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav").apply_gain(-10)
+music_closing_theme = music_closing_theme[:len(music_closing_theme) - 4000].append(music_closing_theme, 0)
+music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav").apply_gain(-10)
+music_tip_top_polka = music_tip_top_polka[:len(music_tip_top_polka) - 4000].append(music_tip_top_polka, 0)
+sfx_steel_sting = AudioSegment.from_wav("sfx/steel_sting.wav")
+sfx_boowomp = AudioSegment.from_wav("sfx/boowomp.wav")
 silence = AudioSegment.silent(500)
+embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
+embed_idle = discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated.")
+embed_generating = discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take 15 minutes.")
+embed_error_permissions = discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions.")
+embed_error_failed = discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode.")
 busy = False
 cooldown = {}
 
@@ -32,7 +37,7 @@ cooldown = {}
 async def slash_generate(inter: discord.Interaction, topic: str) -> None:
     if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history):
         try:
-            await inter.response.send_message(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions."))
+            await inter.response.send_message(embed=embed_error_permissions)
         except:
             pass
         return
@@ -41,7 +46,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
         if not busy:
             busy = True
             try:
-                await inter.response.send_message(embed=discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
+                await inter.response.send_message(embed=embed_generating)
                 response = await inter.original_response()
                 message = await response.channel.fetch_message(response.id)
                 completion = await gpt.chat.completions.create(
@@ -108,23 +113,23 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     await asyncio.sleep(10)
                     progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
-                sfx = random.choice([steel_sting, boowomp])
-                final = combined.overlay(random.choice([closing_theme, tip_top_polka])).overlay(sfx, random.randrange(len(combined) - len(sfx)))
+                sfx = random.choice([sfx_steel_sting, sfx_boowomp])
+                final = combined.overlay(random.choice([music_closing_theme, music_tip_top_polka])).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
                     await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
-                    await message.edit(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode."))
+                    await message.edit(embed=embed_error_failed)
                 except:
                     try:
-                        await inter.edit_original_response(embed=discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions."))
+                        await inter.edit_original_response(embed=embed_error_permissions)
                     except:
                         pass
             busy = False
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating."))
+            await inter.response.send_message(ephemeral=True, embed=embed_busy)
     else:
         await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
@@ -133,9 +138,9 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
 async def slash_generate(inter: discord.Interaction) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
         if busy:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating."))
+            await inter.response.send_message(ephemeral=True, embed=embed_busy)
         else:
-            await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated."))
+            await inter.response.send_message(ephemeral=True, embed=embed_idle)
     else:
         await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
 
