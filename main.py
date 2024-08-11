@@ -18,7 +18,7 @@ client = discord.Client(intents=discord.Intents.default(), activity=discord.Game
 tree = app_commands.CommandTree(client)
 music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav").apply_gain(-10)
 music_closing_theme = music_closing_theme[:len(music_closing_theme) - 4000].append(music_closing_theme, 0)
-music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav").apply_gain(-10)
+music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav").apply_gain(-12)
 music_tip_top_polka = music_tip_top_polka[:len(music_tip_top_polka) - 4000].append(music_tip_top_polka, 0)
 sfx_steel_sting = AudioSegment.from_wav("sfx/steel_sting.wav")
 sfx_boowomp = AudioSegment.from_wav("sfx/boowomp.wav")
