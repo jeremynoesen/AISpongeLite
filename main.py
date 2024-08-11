@@ -40,8 +40,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
             await inter.response.send_message(embed=embed_error_permissions)
         except:
             pass
-        return
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
+    elif inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
         global busy
         if not busy:
             busy = True
