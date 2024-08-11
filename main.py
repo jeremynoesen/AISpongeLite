@@ -124,7 +124,7 @@ async def slash_generate(inter: discord.Interaction, topic: str) -> None:
                     await message.edit(embed=embed_error_failed)
                 except:
                     try:
-                        await inter.edit_original_response(embed=embed_error_permissions)
+                        await inter.edit_original_response(embed=embed_error_failed)
                     except:
                         pass
             busy = False
