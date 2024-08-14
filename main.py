@@ -9,7 +9,7 @@ from discord import app_commands
 from io import BytesIO
 from fakeyou import FakeYou
 from openai import AsyncOpenAI
-from pydub import AudioSegment, effects
+from pydub import AudioSegment
 
 load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
