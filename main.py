@@ -39,6 +39,8 @@ sfx_this_guy_stinks = AudioSegment.from_wav("sfx/this_guy_stinks.wav")[:-100]
 sfx_this_guy_stinks = sfx_this_guy_stinks.apply_gain(-25-sfx_this_guy_stinks.dBFS)
 sfx_my_leg = AudioSegment.from_wav("sfx/my_leg.wav")[:-2000]
 sfx_my_leg = sfx_my_leg.apply_gain(-25-sfx_my_leg.dBFS)
+sfx_gary = AudioSegment.from_wav("sfx/gary.wav")[:6000]
+sfx_gary = sfx_gary.apply_gain(-20-sfx_gary.dBFS)
 silence = AudioSegment.silent(500)
 embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
 embed_idle = discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated.")
@@ -93,7 +95,8 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
                         loud = True
                     elif lower.startswith("gary:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[5:], "weight_ednbwdjmcvr92pa455n8cc5cs"), 180)
+                        tts = None
+                        seg = sfx_gary
                     elif lower.startswith("plankton:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
                     elif lower.startswith("mr. krabs:"):
@@ -116,8 +119,9 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         remaining -= 1
                         continue
                     transcript.append(line)
-                    with BytesIO(tts.content) as wav:
-                        seg = AudioSegment.from_wav(wav)
+                    if tts is not None:
+                        with BytesIO(tts.content) as wav:
+                            seg = AudioSegment.from_wav(wav)
                     if random.randrange(20) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
