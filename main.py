@@ -86,7 +86,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     loud = False
                     lower = line.lower()
                     if lower.startswith("spongebob:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_tq6pwerrbr4mvbjmtyhbsqe6t"), 180)
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
                     elif lower.startswith("patrick:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:], "weight_154man2fzg19nrtc15drner7t"), 180)
                     elif lower.startswith("squidward:"):
