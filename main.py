@@ -22,9 +22,9 @@ music_closing_theme = music_closing_theme.append(music_closing_theme, 0)
 music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav")[:-2000]
 music_tip_top_polka = music_tip_top_polka.apply_gain(-40-music_tip_top_polka.dBFS)
 music_tip_top_polka = music_tip_top_polka.append(music_tip_top_polka, 0)
-music_the_rake_hornpipe = AudioSegment.from_wav("music/rake_hornpipe.wav")
-music_the_rake_hornpipe = music_the_rake_hornpipe.apply_gain(-40-music_the_rake_hornpipe.dBFS)
-music_the_rake_hornpipe = music_the_rake_hornpipe.append(music_the_rake_hornpipe, 0)
+music_rake_hornpipe = AudioSegment.from_wav("music/rake_hornpipe.wav")
+music_rake_hornpipe = music_rake_hornpipe.apply_gain(-40 - music_rake_hornpipe.dBFS)
+music_rake_hornpipe = music_rake_hornpipe.append(music_rake_hornpipe, 0)
 music_seaweed = AudioSegment.from_wav("music/seaweed.wav")
 music_seaweed = music_seaweed.apply_gain(-40-music_seaweed.dBFS)
 sfx_steel_sting = AudioSegment.from_wav("sfx/steel_sting.wav")
@@ -133,8 +133,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg])
-                music = random.choice([music_closing_theme, music_tip_top_polka, music_the_rake_hornpipe, music_seaweed])
-                final = combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx)))
+                final = combined.overlay(random.choice([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed])).overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 with BytesIO() as episode:
                     final.export(episode, "wav")
                     await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
