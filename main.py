@@ -11,37 +11,41 @@ from fakeyou import FakeYou
 from openai import AsyncOpenAI
 from pydub import AudioSegment
 
+
+def load_wav(path, end, gain, repeat, fade, delay):
+    if end is None:
+        seg = AudioSegment.from_wav(path)
+    else:
+        seg = AudioSegment.from_wav(path)[:end]
+    seg = seg.apply_gain(gain-seg.dBFS)
+    if repeat:
+        seg = seg.append(seg, 0)
+    if fade:
+        seg = seg.fade_in(fade)
+    if delay:
+        seg = AudioSegment.silent(delay).append(seg, 0)
+    return seg
+
+
 load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
 tree = app_commands.CommandTree(client)
-music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav")[:-2000]
-music_closing_theme = music_closing_theme.apply_gain(-35-music_closing_theme.dBFS)
-music_closing_theme = music_closing_theme.append(music_closing_theme, 0)
-music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav")[:-2000]
-music_tip_top_polka = music_tip_top_polka.apply_gain(-35-music_tip_top_polka.dBFS)
-music_tip_top_polka = music_tip_top_polka.append(music_tip_top_polka, 0)
-music_rake_hornpipe = AudioSegment.from_wav("music/rake_hornpipe.wav")
-music_rake_hornpipe = music_rake_hornpipe.apply_gain(-35 - music_rake_hornpipe.dBFS)
-music_rake_hornpipe = music_rake_hornpipe.append(music_rake_hornpipe, 0)
-music_seaweed = AudioSegment.from_wav("music/seaweed.wav")
-music_seaweed = music_seaweed.apply_gain(-35-music_seaweed.dBFS)
-sfx_steel_sting = AudioSegment.from_wav("sfx/steel_sting.wav")
-sfx_steel_sting = sfx_steel_sting.apply_gain(-25-sfx_steel_sting.dBFS)
-sfx_boowomp = AudioSegment.from_wav("sfx/boowomp.wav")
-sfx_boowomp = sfx_boowomp.apply_gain(-25-sfx_boowomp.dBFS)
-sfx_disgusting = AudioSegment.from_wav("sfx/disgusting.wav")
-sfx_disgusting = sfx_disgusting.apply_gain(-25-sfx_disgusting.dBFS)
-sfx_vibe_link_b = AudioSegment.from_wav("sfx/vibe_link_b.wav")
-sfx_vibe_link_b = sfx_vibe_link_b.apply_gain(-25-sfx_vibe_link_b.dBFS)
-sfx_this_guy_stinks = AudioSegment.from_wav("sfx/this_guy_stinks.wav")[:-100]
-sfx_this_guy_stinks = sfx_this_guy_stinks.apply_gain(-25-sfx_this_guy_stinks.dBFS)
-sfx_my_leg = AudioSegment.from_wav("sfx/my_leg.wav")[:-2000]
-sfx_my_leg = sfx_my_leg.apply_gain(-25-sfx_my_leg.dBFS)
-sfx_gary = AudioSegment.from_wav("sfx/gary.wav")[:6000]
-sfx_gary = sfx_gary.apply_gain(-20-sfx_gary.dBFS)
-silence = AudioSegment.silent(500)
+music_closing_theme = load_wav("music/closing_theme.wav", -2000, -35, True, 10000, 1000)
+music_tip_top_polka = load_wav("music/tip_top_polka.wav", -2000, -35, True, 10000, 1000)
+music_rake_hornpipe = load_wav("music/rake_hornpipe.wav", None, -35, True, 10000, 1000)
+music_seaweed = load_wav("music/seaweed.wav", None, -35, False, 10000, 1000)
+sfx_steel_sting = load_wav("sfx/steel_sting.wav", None, -25, False, 0, 0)
+sfx_boowomp = load_wav("sfx/boowomp.wav", None, -25, False, 0, 0)
+sfx_disgusting = load_wav("sfx/disgusting.wav", None, -25, False, 0, 0)
+sfx_vibe_link_b = load_wav("sfx/vibe_link_b.wav", None, -25, False, 0, 0)
+sfx_this_guy_stinks = load_wav("sfx/this_guy_stinks.wav", -100, -25, False, 0, 0)
+sfx_my_leg = load_wav("sfx/my_leg.wav", -2000, -25, False, 0, 0)
+sfx_transition = load_wav("sfx/transition.wav", None, -25, False, 0, 0)
+sfx_gary = load_wav("sfx/gary.wav", 6000, -20, False, 0, 0)
+silence_line = AudioSegment.silent(500)
+silence_transition = AudioSegment.silent(2000)
 embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
 embed_idle = discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated.")
 embed_generating = discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take 15 minutes.")
@@ -133,10 +137,10 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         seg = seg.apply_gain(-5-seg.dBFS)
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0:
-                        combined = combined.append(silence, 0)
+                        combined = combined.append(silence_line, 0)
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg])
-                final = combined.overlay(random.choice([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed])).overlay(sfx, random.randrange(len(combined) - len(sfx)))
+                final = silence_transition.append(combined.overlay(random.choice([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed])).overlay(sfx, random.randrange(len(combined) - len(sfx)))).overlay(sfx_transition)
                 with BytesIO() as episode:
                     final.export(episode, "wav")
                     await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
