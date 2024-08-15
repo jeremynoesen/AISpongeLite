@@ -130,7 +130,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     if random.randrange(20) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
-                        seg = seg.apply_gain(-seg.dBFS)
+                        seg = seg.apply_gain(-5-seg.dBFS)
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0:
                         combined = combined.append(silence, 0)
