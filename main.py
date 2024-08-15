@@ -117,11 +117,16 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[16:], "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
                     else:
                         remaining -= 1
+                        await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                         continue
                     transcript.append(line)
-                    if tts is not None:
+                    if tts is None:
+                        remaining -= 1
+                    else:
                         with BytesIO(tts.content) as wav:
                             seg = AudioSegment.from_wav(wav)
+                        await asyncio.sleep(10)
+                        progress += 1
                     if random.randrange(20) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
@@ -129,8 +134,6 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0:
                         combined = combined.append(silence, 0)
-                    await asyncio.sleep(10)
-                    progress += 1
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg])
                 final = combined.overlay(random.choice([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed])).overlay(sfx, random.randrange(len(combined) - len(sfx)))
