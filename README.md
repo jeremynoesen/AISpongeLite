@@ -15,13 +15,14 @@ Rehydrated due to them using private models.
 
 ### Background Music
 
-The available background music is the SpongeBob SquarePants closing theme, The Tip Top Polka, The Rake Hornpipe, and 
+The available background music is the SpongeBob SquarePants closing theme, The Tip Top Polka, The Rake Hornpipe, and
 Seaweed. One of these is chosen at random per episode.
 
 ### Sound Effects
 
-The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, "My leg!", and "Oh brother 
-this guy stinks!". One of these is chosen at random to play at a random point per episode.
+The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, "My leg!", and "Oh brother
+this guy stinks!". One of these is chosen at random to play at a random point per episode. The beginning of every
+episode begins with the bubbles transition sound.
 
 ### Random Events
 
@@ -30,8 +31,8 @@ times. Loudward is always loud and will not be affected by loud events.
 
 ### Strokes
 
-Lite supports strokes, which are when FakeYou glitches out and generates abnormal audio. The volumes of characters are
-normalized, so strokes will not be full volume (unless a loud event occurs).
+Lite supports all strokes, which are when FakeYou glitches out and generates abnormal audio. The volumes of characters
+are normalized, so strokes will not be full volume (unless a loud event occurs).
 
 ## Usage
 
