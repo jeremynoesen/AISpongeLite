@@ -43,7 +43,7 @@ sfx_vibe_link_b = load_wav("sfx/vibe_link_b.wav", None, -25, False, 0, 0)
 sfx_this_guy_stinks = load_wav("sfx/this_guy_stinks.wav", -100, -25, False, 0, 0)
 sfx_my_leg = load_wav("sfx/my_leg.wav", -2000, -25, False, 0, 0)
 sfx_transition = load_wav("sfx/transition.wav", None, -25, False, 0, 0)
-sfx_gary = load_wav("sfx/gary.wav", 6000, -20, False, 0, 0)
+sfx_gary = AudioSegment.from_wav("sfx/gary.wav")[:6000]
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(2000)
 embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
