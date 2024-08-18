@@ -111,6 +111,8 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
                     elif lower.startswith("mrs. puff:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_129qhgze57zhndkkcq83e6b2a"), 180)
+                    elif lower.startswith("squilliam:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[11:], "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
                     elif lower.startswith("larry:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:], "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
                     elif lower.startswith("bubble bass:"):

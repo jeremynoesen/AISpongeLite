@@ -10,8 +10,8 @@ inspired by AI Sponge and AI Sponge Rehydrated (sometimes called "Rehydrated").
 ### Characters
 
 The available characters are SpongeBob, Patrick, Squidward, Loudward, Gary, Sandy, Mr. Krabs, Plankton, Karen,
-Mrs. Puff, Larry, Bubble Bass, Bubble Buddy, and the French Narrator. Some characters will sound different from
-Rehydrated due to them using private models.
+Mrs. Puff, Squilliam, Larry, Bubble Bass, Bubble Buddy, and the French Narrator. Some characters will sound different 
+from Rehydrated due to them using private models.
 
 ### Background Music
 
