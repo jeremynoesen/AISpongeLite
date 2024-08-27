@@ -48,7 +48,7 @@ silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1500)
 embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
 embed_idle = discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated.")
-embed_generating = discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take 15 minutes.")
+embed_generating = discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take a while.")
 embed_error_permissions = discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions.")
 embed_error_failed = discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode.")
 busy = False
@@ -82,7 +82,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 remaining = len(lines)
                 title = slugify(text=lines.pop(0)[6:].replace("'", ""), separator='_', lowercase=False)
                 progress = 1
-                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
+                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
@@ -123,7 +123,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[17:], "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
                     else:
                         remaining -= 1
-                        await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
+                        await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                         continue
                     transcript.append(line)
                     if tts is None:
@@ -140,7 +140,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0:
                         combined = combined.append(silence_line, 0)
-                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take 15 minutes."))
+                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg])
                 final = silence_transition.append(combined.overlay(random.choice([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed])).overlay(sfx, random.randrange(len(combined) - len(sfx)))).overlay(sfx_transition)
                 with BytesIO() as episode:
