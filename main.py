@@ -133,12 +133,12 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                             seg = AudioSegment.from_wav(wav)
                         await asyncio.sleep(10)
                         progress += 1
-                    if random.randrange(20) > 0 and not loud:
+                    if random.randrange(100) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
                         seg = seg.apply_gain(-5-seg.dBFS)
                     combined = combined.append(seg, 0)
-                    if random.randrange(10) > 0:
+                    if random.randrange(20) > 0:
                         combined = combined.append(silence_line, 0)
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg])
