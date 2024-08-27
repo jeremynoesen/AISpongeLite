@@ -5,7 +5,7 @@
 ## About
 
 AI Sponge Lite (sometimes called "Lite") is a Discord bot that generates audio-only AI Sponge episodes with transcripts
-inspired by AI Sponge and AI Sponge Rehydrated (sometimes called "Rehydrated").
+inspired by AI Sponge Rehydrated (sometimes called "Rehydrated").
 
 ### Characters
 
