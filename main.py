@@ -1,5 +1,6 @@
 import asyncio
 import random
+import re
 import time
 import discord
 import os
@@ -71,14 +72,12 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 await inter.response.send_message(embed=embed_generating)
                 response = await inter.original_response()
                 message = await response.channel.fetch_message(response.id)
-                completion = await gpt.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": "Create a script for a chaotic scene from SpongeBob where characters discuss a topic. Use the format Title: Title for the first line and Character: Dialogue for the rest with no extra formatting. Line length is 100 characters and script length is 10 lines of spoken dialogue only with uncensored swear words. Possible characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Sandy, and very rarely Gary, Larry, Mrs. Puff, Bubble Bass, Bubble Buddy, and French Narrator. The topic is input from user."},
-                        {"role": "user", "content": topic}
-                    ]
+                completion = await gpt.completions.create(
+                    model="gpt-3.5-turbo-instruct",
+                    max_tokens=700,
+                    prompt=f"Create a vulgar, nsfw, politically incorrect script for a scene from Spongebob where characters discuss a topic. Possible characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Sandy. Very rarely include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. No more than ten lines of dialogue with talking only. Create a two word title with format: Title: <title>. The topic is: {topic}"
                 )
-                lines = [x for x in completion.choices[0].message.content.split("\n") if x]
+                lines = re.sub(r"\(.*?\)|\[.*?]|\*.*?\*", "", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
                 title = slugify(text=lines.pop(0)[6:].replace("'", ""), separator='_', lowercase=False)
                 progress = 1
