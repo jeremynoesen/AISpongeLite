@@ -31,6 +31,7 @@ def load_wav(path, end, gain, repeat, fade, delay):
 load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
+fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
 tree = app_commands.CommandTree(client)
 music_closing_theme = load_wav("music/closing_theme.wav", -2000, -40, True, 10000, 2000)
