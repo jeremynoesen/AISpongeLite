@@ -5,7 +5,6 @@ import time
 import discord
 import os
 from dotenv import load_dotenv
-from slugify import slugify
 from discord import app_commands
 from io import BytesIO
 from fakeyou import FakeYou
@@ -80,7 +79,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 )
                 lines = re.sub(r"\(.*?\)|\[.*?]|\*.*?\*", "", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
-                title = slugify(text=lines.pop(0)[6:].replace("'", ""), separator='_', lowercase=False)
+                title = re.sub(r"[^A-Za-z0-9 ]+", "", lines.pop(0)[7:]).strip().replace(" ", "_").upper().replace("I", "i")
                 progress = 1
                 await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 transcript = []
