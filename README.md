@@ -55,5 +55,4 @@ instructions in the popup.
 
 ## Demonstration
 
-![Generating](img/generating.png)
 ![Output](img/output.png)
