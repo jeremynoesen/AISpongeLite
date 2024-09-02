@@ -20,9 +20,9 @@ Seaweed. One of these is chosen at random per episode.
 
 ### Sound Effects
 
-The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, "My leg!", and "Oh brother
-this guy stinks!". One of these is chosen at random to play at a random point per episode. The beginning of every
-episode begins with the bubbles transition sound.
+The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, "My leg!", "Oh brother this 
+guy stinks!", and "You what?". One of these is chosen at random to play at a random point per episode. The beginning of 
+every episode begins with the bubbles transition sound.
 
 ### Random Events
 
