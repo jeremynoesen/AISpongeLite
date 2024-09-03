@@ -12,18 +12,16 @@ from openai import AsyncOpenAI
 from pydub import AudioSegment
 
 
-def load_wav(path, end, gain, repeat, fade, delay):
-    if end is None:
-        seg = AudioSegment.from_wav(path)
-    else:
-        seg = AudioSegment.from_wav(path)[:end]
-    seg = seg.apply_gain(gain-seg.dBFS)
-    if repeat:
-        seg = seg.append(seg, 0)
+def load_wav(path, start=None, end=None, gain=None, repeat=0, fade=0, delay=0):
+    seg = AudioSegment.from_wav(path)[start:end]
+    if gain is not None:
+        seg = seg.apply_gain(gain-seg.dBFS)
+    tmp = seg
+    for i in range(repeat):
+        seg = seg.append(tmp, 0)
     if fade:
         seg = seg.fade_in(fade)
-    if delay:
-        seg = AudioSegment.silent(delay).append(seg, 0)
+    seg = AudioSegment.silent(delay).append(seg, 0)
     return seg
 
 
@@ -33,21 +31,21 @@ fy = FakeYou()
 fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
 tree = app_commands.CommandTree(client)
-music_closing_theme = load_wav("music/closing_theme.wav", -2000, -40, True, 10000, 2000)
-music_tip_top_polka = load_wav("music/tip_top_polka.wav", -2000, -40, True, 10000, 2000)
-music_rake_hornpipe = load_wav("music/rake_hornpipe.wav", None, -40, True, 10000, 2000)
-music_seaweed = load_wav("music/seaweed.wav", None, -40, False, 10000, 2000)
-sfx_steel_sting = load_wav("sfx/steel_sting.wav", None, -25, False, 0, 0)
-sfx_boowomp = load_wav("sfx/boowomp.wav", None, -25, False, 0, 0)
-sfx_disgusting = load_wav("sfx/disgusting.wav", None, -25, False, 0, 0)
-sfx_vibe_link_b = load_wav("sfx/vibe_link_b.wav", None, -25, False, 0, 0)
-sfx_this_guy_stinks = load_wav("sfx/this_guy_stinks.wav", -100, -25, False, 0, 0)
-sfx_my_leg = load_wav("sfx/my_leg.wav", -2000, -25, False, 0, 0)
-sfx_you_what = load_wav("sfx/you_what.wav", None, -25, False, 0, 0)
-sfx_transition = load_wav("sfx/transition.wav", None, -25, False, 0, 0)
-sfx_gary = AudioSegment.from_wav("sfx/gary.wav")[:6000]
+music_closing_theme = load_wav("music/closing_theme.wav", end=-4000, gain=-40, repeat=1, fade=10000, delay=1800)
+music_tip_top_polka = load_wav("music/tip_top_polka.wav", end=-6000, gain=-40, repeat=2, fade=10000, delay=1800)
+music_rake_hornpipe = load_wav("music/rake_hornpipe.wav", end=-4000, gain=-40, repeat=2, fade=10000, delay=1800)
+music_seaweed = load_wav("music/seaweed.wav", gain=-40, fade=10000, delay=1800)
+sfx_steel_sting = load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=-25)
+sfx_boowomp = load_wav("sfx/boowomp.wav", start=750, end=1200, gain=-25)
+sfx_disgusting = load_wav("sfx/disgusting.wav", start=100, end=-250, gain=-25)
+sfx_vibe_link_b = load_wav("sfx/vibe_link_b.wav", start=50, gain=-25)
+sfx_this_guy_stinks = load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=-25)
+sfx_my_leg = load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-25)
+sfx_you_what = load_wav("sfx/you_what.wav", start=150, gain=-25)
+sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-25)
+sfx_gary = load_wav("sfx/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
-silence_transition = AudioSegment.silent(1500)
+silence_transition = AudioSegment.silent(1200)
 embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
 embed_idle = discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated.")
 embed_generating = discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take a while.")
