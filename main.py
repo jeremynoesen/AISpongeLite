@@ -74,9 +74,9 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 completion = await gpt.completions.create(
                     model="gpt-3.5-turbo-instruct",
                     max_tokens=700,
-                    prompt=f"Create a vulgar, nsfw, politically incorrect script for a scene from Spongebob where characters discuss a topic. Possible characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Sandy. Very rarely include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. No more than ten lines of dialogue with talking only. Create a two word title with format: Title: <title>. The topic is: {topic}"
+                     prompt=f"Create a vulgar, nsfw, politically incorrect script for a scene from Spongebob where characters discuss a topic. Possible characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Sandy and very rarely Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Create a two word title with format: Title: <title>. The topic is: {topic}"
                 )
-                lines = re.sub(r"\(.*?\)|\[.*?]|\*.*?\*", "", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
+                lines = re.sub(r"\(.*?\)|\[.*?]|\*.*?\*|<.*?>|\{.*?}", "", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
                 title = re.sub(r"[^A-Za-z0-9 ]+", "", lines.pop(0)[7:]).strip().replace(" ", "_").upper().replace("I", "i")
                 progress = 1
@@ -143,8 +143,8 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what])
                 final = silence_transition.append(combined.overlay(random.choice([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed])).overlay(sfx, random.randrange(len(combined) - len(sfx)))).overlay(sfx_transition)
                 with BytesIO() as episode:
-                    final.export(episode, "wav")
-                    await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.wav")])
+                    final.export(episode, "mp3")
+                    await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.mp3")])
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
