@@ -16,7 +16,8 @@ from Rehydrated due to them using private models.
 ### Background Music
 
 The available background music is the SpongeBob SquarePants closing theme, The Tip Top Polka, The Rake Hornpipe, and
-Seaweed. One of these is chosen at random per episode.
+Seaweed. One of these is chosen at random per episode. There is also a rare chance that Sneaky Snitch will be chosen as
+a callback to the original AI Sponge.
 
 ### Sound Effects
 
