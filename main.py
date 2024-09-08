@@ -72,9 +72,9 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     max_tokens=700,
                     prompt=f"Create a vulgar, nsfw, politically incorrect script for a scene from Spongebob where characters discuss a topic. Possible characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Sandy and very rarely Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Create a two word title with format: Title: <title>. The topic is: {topic}"
                 )
-                lines = re.sub(r"\(.*?\)|\[.*?]|\*.*?\*|<.*?>|\{.*?}", "", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
+                lines = re.sub(r"(^|\s+)[(\[*<{\-|]\S[^()\[\]*<>{}\-|]*?\S[)\]*>}\-|](\s+|$)", " ", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
-                title = re.sub(r"[^A-Za-z0-9 ]+", "", lines.pop(0)[7:]).strip().replace(" ", "_").upper().replace("I", "i")
+                title = re.sub(r"[^A-Za-z0-9 ]+", "", lines.pop(0)[6:]).strip().replace(" ", "_").upper().replace("I", "i")
                 progress = 1
                 await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 transcript = []
@@ -84,38 +84,38 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     loud = False
                     line = line.strip()
                     lower = line.lower()
-                    if lower.startswith("spongebob: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[11:], "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
-                    elif lower.startswith("patrick: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:], "weight_154man2fzg19nrtc15drner7t"), 180)
-                    elif lower.startswith("squidward: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[11:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
-                    elif lower.startswith("loudward: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                    if lower.startswith("spongebob:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
+                    elif lower.startswith("patrick:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:].strip(), "weight_154man2fzg19nrtc15drner7t"), 180)
+                    elif lower.startswith("squidward:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                    elif lower.startswith("loudward:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
                         loud = True
-                    elif lower.startswith("gary: "):
+                    elif lower.startswith("gary:"):
                         tts = None
                         seg = sfx_gary
-                    elif lower.startswith("plankton: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:], "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
-                    elif lower.startswith("mr. krabs: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[11:], "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
-                    elif lower.startswith("karen: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[7:], "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
-                    elif lower.startswith("sandy: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[7:], "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
-                    elif lower.startswith("mrs. puff: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[11:], "weight_129qhgze57zhndkkcq83e6b2a"), 180)
-                    elif lower.startswith("squilliam: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[11:], "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
-                    elif lower.startswith("larry: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[7:], "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
-                    elif lower.startswith("bubble bass: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[13:], "weight_h9g7rh6tj2hvfezrz8gjs4gwa"), 180)
-                    elif lower.startswith("bubble buddy: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[14:], "weight_sbr0372ysxbdahcvej96axy1t"), 180)
-                    elif lower.startswith("french narrator: "):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[17:], "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
+                    elif lower.startswith("plankton:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
+                    elif lower.startswith("mr. krabs:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
+                    elif lower.startswith("karen:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
+                    elif lower.startswith("sandy:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
+                    elif lower.startswith("mrs. puff:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_129qhgze57zhndkkcq83e6b2a"), 180)
+                    elif lower.startswith("squilliam:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
+                    elif lower.startswith("larry:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
+                    elif lower.startswith("bubble bass:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[12:].strip(), "weight_h9g7rh6tj2hvfezrz8gjs4gwa"), 180)
+                    elif lower.startswith("bubble buddy:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[13:].strip(), "weight_sbr0372ysxbdahcvej96axy1t"), 180)
+                    elif lower.startswith("french narrator:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[16:].strip(), "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
                     else:
                         remaining -= 1
                         await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
