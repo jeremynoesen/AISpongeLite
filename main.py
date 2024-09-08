@@ -30,6 +30,7 @@ music_tip_top_polka = load_wav("music/tip_top_polka.wav", gain=-40)
 music_rake_hornpipe = load_wav("music/rake_hornpipe.wav", gain=-40)
 music_seaweed = load_wav("music/seaweed.wav", gain=-40)
 music_sneaky_snitch = load_wav("music/sneaky_snitch.wav", gain=-40)
+music_better_call_saul = load_wav("music/better_call_saul.wav", start=50, end=18250, gain=-40)
 sfx_steel_sting = load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=-25)
 sfx_boowomp = load_wav("sfx/boowomp.wav", start=750, end=1200, gain=-25)
 sfx_disgusting = load_wav("sfx/disgusting.wav", start=100, end=-250, gain=-25)
@@ -137,7 +138,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         combined = combined.append(silence_line, 0)
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what])
-                song = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch], [10, 10, 10, 10, 1])[0]
+                song = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 1, 1])[0]
                 music = silence_music.append(song.fade_in(10000), 0)
                 while len(music) < len(combined):
                     music = music.append(song, 0)
