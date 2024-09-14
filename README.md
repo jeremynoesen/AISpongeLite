@@ -28,7 +28,7 @@ episode. The beginning of every episode begins with the bubbles transition sound
 ### Random Events
 
 The available random events are speech cutoffs and loud events. Both of these can happen in an episode any number of
-times. Loudward is always loud and will not be affected by loud events.
+times. Loud events also occur every time Loudward speaks. Cutoffs also occur anytime a line ends with a hyphen.
 
 ### Strokes
 
