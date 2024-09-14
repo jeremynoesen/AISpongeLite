@@ -146,14 +146,14 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 final = silence_transition.append(combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx))), 0).overlay(sfx_transition)
                 with BytesIO() as episode:
                     final.export(episode, "mp3")
-                    await message.edit(embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.mp3")])
+                    await message.edit(content="***[Enjoying this bot? Consider donating!](https://github.com/sponsors/jeremynoesen)***", embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.mp3")])
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
-                    await message.edit(embed=embed_error_failed)
+                    await message.edit(content=None, embed=embed_error_failed)
                 except:
                     try:
-                        await inter.edit_original_response(embed=embed_error_failed)
+                        await inter.edit_original_response(content=None, embed=embed_error_failed)
                     except:
                         pass
             busy = False
