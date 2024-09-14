@@ -134,7 +134,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     else:
                         seg = seg.apply_gain(-seg.dBFS)
                     combined = combined.append(seg, 0)
-                    if random.randrange(20) > 0:
+                    if random.randrange(20) > 0 or not line.endswith("-"):
                         combined = combined.append(silence_line, 0)
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what])
