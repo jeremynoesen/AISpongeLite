@@ -38,6 +38,7 @@ sfx_vibe_link_b = load_wav("sfx/vibe_link_b.wav", start=50, gain=-25)
 sfx_this_guy_stinks = load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=-25)
 sfx_my_leg = load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-25)
 sfx_you_what = load_wav("sfx/you_what.wav", start=150, gain=-25)
+sfx_dolphin = load_wav("sfx/dolphin.wav", start=1000, end=-900, gain=-25)
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-25)
 sfx_gary = load_wav("sfx/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
@@ -137,7 +138,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     if random.randrange(20) > 0 or not line.endswith("-"):
                         combined = combined.append(silence_line, 0)
                     await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
-                sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what])
+                sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin])
                 song = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 1, 1])[0]
                 music = silence_music.append(song.fade_in(10000), 0)
                 while len(music) < len(combined):
