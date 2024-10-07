@@ -23,7 +23,7 @@ load_dotenv()
 gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fy = FakeYou()
 fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
-client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("/generate /status"))
+client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
 tree = app_commands.CommandTree(client)
 music_closing_theme = load_wav("music/closing_theme.wav", gain=-40)
 music_tip_top_polka = load_wav("music/tip_top_polka.wav", gain=-40)
@@ -44,12 +44,11 @@ sfx_gary = load_wav("sfx/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
 silence_music = AudioSegment.silent(2000)
-embed_busy = discord.Embed(title="Busy", color=0xf5f306).set_footer(text="An episode is generating.")
-embed_idle = discord.Embed(title="Idle", color=0xf5f306).set_footer(text="An episode can be generated.")
-embed_generating = discord.Embed(title="0%", color=0xf5f306).set_footer(text="This may take a while.")
-embed_error_permissions = discord.Embed(title="Error", color=0xf5f306).set_footer(text="Missing required permissions.")
-embed_error_failed = discord.Embed(title="Error", color=0xf5f306).set_footer(text="Failed to generate episode.")
-busy = False
+embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
+embed_error_permissions = discord.Embed(title="Generating...", description="# > Failed", color=0xf5f306).set_footer(text="Missing permissions.")
+embed_error_failed = discord.Embed(title="Generating...", description="# > Failed", color=0xf5f306).set_footer(text="An error occurred.")
+generating = False
+progress = 0
 cooldown = {}
 
 
@@ -62,11 +61,14 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
         except:
             pass
     elif inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
-        global busy
-        if not busy:
-            busy = True
+        global generating
+        if not generating:
+            generating = True
             try:
-                await inter.response.send_message(embed=embed_generating)
+                global progress
+                progress = 0
+                await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Please wait..."))
+                await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                 response = await inter.original_response()
                 message = await response.channel.fetch_message(response.id)
                 completion = await gpt.completions.create(
@@ -77,8 +79,10 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 lines = re.sub(r"(^|\s+)(\(\S[^()]*?\S\)|\[\S[^\[\]]*?\S]|\*\S[^*]*?\S\*|<\S[^<>]*?\S>|\{\S[^{}]*?\S}|-\S[^-]*?\S-|\|\S[^|]*?\S\||/\S[^/]*?\S/|\\\S[^\\]*?\S\\)(\s+|$)", " ", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
                 title = re.sub(r"[^A-Za-z0-9 ]+", "", lines.pop(0)[6:]).strip().replace(" ", "_").upper().replace("I", "i")
-                progress = 1
-                await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
+                completed = 1
+                progress = int(100 * (completed / remaining))
+                await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Generated script."))
+                await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                 transcript = []
                 combined = AudioSegment.empty()
                 loop = asyncio.get_running_loop()
@@ -88,39 +92,56 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     lower = line.lower()
                     if lower.startswith("spongebob:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
+                        line = "- <:spongebob:1290871906886619147>" + line[10:]
                     elif lower.startswith("patrick:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:].strip(), "weight_154man2fzg19nrtc15drner7t"), 180)
+                        line = "- <:patrick:1290871963773960275>" + line[8:]
                     elif lower.startswith("squidward:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                        line = "- <:squidward:1290871965623648286>" + line[10:]
                     elif lower.startswith("loudward:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                        line = "- <:squidward:1290871965623648286>" + line[9:]
                         loud = True
                     elif lower.startswith("gary:"):
+                        line = "- <:gary:1290871895759126538>" + line[5:]
                         tts = None
                         seg = sfx_gary
                     elif lower.startswith("plankton:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
+                        line = "- <:plankton:1290871903661195294>" + line[9:]
                     elif lower.startswith("mr. krabs:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
+                        line = "- <:mrkrabs:1290871899621949490>" + line[10:]
                     elif lower.startswith("karen:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
+                        line = "- <:karen:1290871897394909184>" + line[6:]
                     elif lower.startswith("sandy:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
+                        line = "- <:sandy:1290871964709425182>" + line[6:]
                     elif lower.startswith("mrs. puff:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_129qhgze57zhndkkcq83e6b2a"), 180)
+                        line = "- <:mrspuff:1290871900712603709>" + line[10:]
                     elif lower.startswith("squilliam:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
+                        line = "- <:squilliam:1290871910137200712>" + line[10:]
                     elif lower.startswith("larry:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
+                        line = "- <:larry:1290871898728566917>" + line[6:]
                     elif lower.startswith("bubble bass:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[12:].strip(), "weight_h9g7rh6tj2hvfezrz8gjs4gwa"), 180)
+                        line = "- <:bubblebass:1291495397382164574>" + line[12:]
                     elif lower.startswith("bubble buddy:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[13:].strip(), "weight_sbr0372ysxbdahcvej96axy1t"), 180)
+                        line = "- <:bubblebuddy:1291489139442847774>" + line[13:]
                     elif lower.startswith("french narrator:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[16:].strip(), "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
+                        line = "- <:frenchnarrator:1290871893951512621>" + line[16:]
                     else:
                         remaining -= 1
-                        await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
+                        progress = int(100 * (completed / remaining))
+                        await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
+                        await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                         continue
                     transcript.append(line)
                     if tts is None:
@@ -129,7 +150,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         with BytesIO(tts.content) as wav:
                             seg = AudioSegment.from_wav(wav)
                         await asyncio.sleep(10)
-                        progress += 1
+                        completed += 1
                     if random.randrange(100) > 0 and not loud:
                         seg = seg.apply_gain(-20-seg.dBFS)
                     else:
@@ -137,7 +158,9 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0 and not line.endswith("-"):
                         combined = combined.append(silence_line, 0)
-                    await message.edit(embed=discord.Embed(title=f"{int(100 * (progress / remaining))}%", color=0xf5f306).set_footer(text="This may take a while."))
+                    progress = int(100 * (completed / remaining))
+                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
+                    await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin])
                 song = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 1, 1])[0]
                 music = silence_music.append(song.fade_in(10000), 0)
@@ -146,7 +169,8 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 final = silence_transition.append(combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx))), 0).overlay(sfx_transition)
                 with BytesIO() as episode:
                     final.export(episode, "mp3")
-                    await message.edit(content="***[Enjoying this bot? Consider donating!](https://github.com/sponsors/jeremynoesen)***", embed=discord.Embed(color=0xf5f306).set_footer(text="\n".join(transcript)), attachments=[discord.File(episode, f"{title}.mp3")])
+                    await message.edit(content="***[Donate to support AI Sponge Lite!](https://github.com/sponsors/jeremynoesen)***", embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.mp3")])
+                    await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
@@ -156,22 +180,23 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         await inter.edit_original_response(content=None, embed=embed_error_failed)
                     except:
                         pass
-            busy = False
+                await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
+            generating = False
         else:
-            await inter.response.send_message(ephemeral=True, embed=embed_busy)
+            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="An episode is generating."))
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You are on cooldown."))
 
 
 @tree.command(name="status", description="Check if an episode can be generated.")
 async def status(inter: discord.Interaction) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
-        if busy:
-            await inter.response.send_message(ephemeral=True, embed=embed_busy)
+        if generating:
+            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="An episode is generating."))
         else:
-            await inter.response.send_message(ephemeral=True, embed=embed_idle)
+            await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
     else:
-        await inter.response.send_message(ephemeral=True, embed=discord.Embed(title="Cooldown", color=0xf5f306).set_footer(text=f"You can generate in {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s."))
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You are on cooldown."))
 
 
 @client.event
