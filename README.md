@@ -23,7 +23,8 @@ Saul opening will be chosen as a callback to the original AI Sponge.
 
 The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, "My leg!", "Oh brother this 
 guy stinks!", "You what?", and the dolphin censor sound. One of these is chosen at random to play at a random point per 
-episode. The beginning of every episode begins with the bubbles transition sound.
+episode. Every episode begins with the bubbles transition sound. Every episode also has background ambiance that can be 
+either underwater sounds or night crickets, with a chance of rain sounds on top of that.
 
 ### Random Events
 
@@ -39,8 +40,8 @@ are normalized, so strokes will not be full volume (unless a loud event occurs).
 
 - `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
   upon successful generation. Generation may take around 15 minutes.
-- `/status`: Check if an episode can be generated. This will show if the bot is busy, if you are on cooldown,
-  or if the bot is idle.
+- `/status`: Check if an episode can be generated. This will show if an episode is generating, if you are on cooldown,
+  or if the bot is ready to generate another episode.
 
 ## Installation
 
@@ -49,9 +50,9 @@ instructions in the popup.
 
 ## Troubleshooting
 
-- If you encounter the error "Missing required permissions.", make sure the bot has the following permissions: View
+- If you encounter the error "Missing permissions.", make sure the bot has the following permissions: View
   Channels, Embed Links, Attach Files, and Read Message History.
-- If you encounter the error "Failed to generate episode.", try using the generate command again. If it happens right
+- If you encounter the error "An error occurred.", try using the generate command again. If it happens right
   after generation jumps from 0%, try changing the wording of your topic.
 
 ## Demonstration
