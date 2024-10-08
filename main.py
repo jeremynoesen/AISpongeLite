@@ -173,7 +173,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 ambiance_loop = ambiance
                 while len(ambiance_loop) < len(combined):
                     ambiance_loop = ambiance_loop.append(ambiance, 0)
-                if random.randrange(5) > 0:
+                if random.randrange(4) > 0:
                     rain_loop = AudioSegment.empty()
                 else:
                     rain_loop = sfx_rain
