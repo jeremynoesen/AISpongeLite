@@ -40,6 +40,9 @@ sfx_my_leg = load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-25)
 sfx_you_what = load_wav("sfx/you_what.wav", start=150, gain=-25)
 sfx_dolphin = load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=-25)
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-25)
+sfx_day = load_wav("sfx/day.wav", start=2000, end=-1000, gain=-50)
+sfx_night = load_wav("sfx/night.wav", start=100, end=-4000, gain=-50)
+sfx_rain = load_wav("sfx/rain.wav", start=1000, end=-1000, gain=-50)
 sfx_gary = load_wav("sfx/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
@@ -162,11 +165,21 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                 sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin])
-                song = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 1, 1])[0]
-                music = silence_music.append(song.fade_in(10000), 0)
-                while len(music) < len(combined):
-                    music = music.append(song, 0)
-                final = silence_transition.append(combined.overlay(music).overlay(sfx, random.randrange(len(combined) - len(sfx))), 0).overlay(sfx_transition)
+                music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 1, 1])[0]
+                music_loop = silence_music.append(music.fade_in(10000), 0)
+                while len(music_loop) < len(combined):
+                    music_loop = music_loop.append(music, 0)
+                ambiance = random.choice([sfx_day, sfx_night])
+                ambiance_loop = ambiance
+                while len(ambiance_loop) < len(combined):
+                    ambiance_loop = ambiance_loop.append(ambiance, 0)
+                if random.randrange(5) > 0:
+                    rain_loop = AudioSegment.empty()
+                else:
+                    rain_loop = sfx_rain
+                    while len(rain_loop) < len(combined):
+                        rain_loop = rain_loop.append(sfx_rain, 0)
+                final = silence_transition.append(combined.overlay(music_loop).overlay(sfx, random.randrange(len(combined) - len(sfx))).overlay(ambiance_loop).overlay(rain_loop), 0).overlay(sfx_transition)
                 with BytesIO() as episode:
                     final.export(episode, "mp3")
                     await message.edit(content="***[Donate to support AI Sponge Lite!](https://github.com/sponsors/jeremynoesen)***", embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.mp3")])
