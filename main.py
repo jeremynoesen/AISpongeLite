@@ -58,7 +58,7 @@ cooldown = {}
 @tree.command(name="generate", description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
 async def generate(inter: discord.Interaction, topic: str) -> None:
-    if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history):
+    if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history and inter.app_permissions.use_external_emojis):
         try:
             await inter.response.send_message(embed=embed_error_permissions)
         except:
