@@ -169,11 +169,14 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 music_loop = silence_music.append(music.fade_in(10000), 0)
                 while len(music_loop) < len(combined):
                     music_loop = music_loop.append(music, 0)
-                ambiance = random.choice([sfx_day, sfx_night])
-                ambiance_loop = ambiance
-                while len(ambiance_loop) < len(combined):
-                    ambiance_loop = ambiance_loop.append(ambiance, 0)
-                if random.randrange(4) > 0:
+                if random.randrange(3) > 0:
+                    ambiance = random.choice([ambiance_day, ambiance_night])
+                    ambiance_loop = ambiance
+                    while len(ambiance_loop) < len(combined):
+                        ambiance_loop = ambiance_loop.append(ambiance, 0)
+                else:
+                    ambiance_loop = AudioSegment.empty()
+                if random.randrange(5) > 0:
                     rain_loop = AudioSegment.empty()
                 else:
                     rain_loop = ambiance_rain
