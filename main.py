@@ -40,10 +40,10 @@ sfx_my_leg = load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-20)
 sfx_you_what = load_wav("sfx/you_what.wav", start=150, gain=-20)
 sfx_dolphin = load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=-20)
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-20)
-sfx_day = load_wav("sfx/day.wav", start=2000, end=-1000, gain=-50)
-sfx_night = load_wav("sfx/night.wav", start=100, end=-4000, gain=-50)
-sfx_rain = load_wav("sfx/rain.wav", start=1000, end=-1000, gain=-50)
-sfx_gary = load_wav("sfx/gary.wav", end=6000)
+ambiance_day = load_wav("ambiance/day.wav", start=2000, end=-1000, gain=-50)
+ambiance_night = load_wav("ambiance/night.wav", start=100, end=-4000, gain=-50)
+ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000, gain=-50)
+voice_gary = load_wav("voice/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
 silence_music = AudioSegment.silent(2000)
@@ -109,7 +109,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     elif lower.startswith("gary:"):
                         line = "- <:gary:1290871895759126538>" + line[5:]
                         tts = None
-                        seg = sfx_gary
+                        seg = voice_gary
                     elif lower.startswith("plankton:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
                         line = "- <:plankton:1290871903661195294>" + line[9:]
@@ -176,9 +176,9 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 if random.randrange(4) > 0:
                     rain_loop = AudioSegment.empty()
                 else:
-                    rain_loop = sfx_rain
+                    rain_loop = ambiance_rain
                     while len(rain_loop) < len(combined):
-                        rain_loop = rain_loop.append(sfx_rain, 0)
+                        rain_loop = rain_loop.append(ambiance_rain, 0)
                 final = silence_transition.append(combined.overlay(music_loop).overlay(sfx, random.randrange(len(combined) - len(sfx))).overlay(ambiance_loop).overlay(rain_loop), 0).overlay(sfx_transition)
                 with BytesIO() as episode:
                     final.export(episode, "mp3")
