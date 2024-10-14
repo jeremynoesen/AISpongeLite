@@ -55,7 +55,7 @@ instructions in the popup.
 ## Troubleshooting
 
 - If you encounter the error "Missing permissions.", make sure the bot has the following permissions: View
-  Channels, Embed Links, Attach Files, and Read Message History.
+  Channels, Embed Links, Attach Files, Read Message History, Use External Emojis, and Send Messages.
 - If you encounter the error "An error occurred.", try using the generate command again. If it happens right
   after generation jumps from 0%, try changing the wording of your topic.
 
