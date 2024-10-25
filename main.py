@@ -171,7 +171,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     music_loop = music_loop.append(music, 0)
                 if random.randrange(3) > 0:
                     ambiance = random.choice([ambiance_day, ambiance_night])
-                    ambiance_loop = ambiance
+                    ambiance_loop = ambiance.fade_in(500)
                     while len(ambiance_loop) < len(combined):
                         ambiance_loop = ambiance_loop.append(ambiance, 0)
                 else:
@@ -179,7 +179,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 if random.randrange(5) > 0:
                     rain_loop = AudioSegment.empty()
                 else:
-                    rain_loop = ambiance_rain
+                    rain_loop = ambiance_rain.fade_in(500)
                     while len(rain_loop) < len(combined):
                         rain_loop = rain_loop.append(ambiance_rain, 0)
                 final = silence_transition.append(combined.overlay(sfx, random.randrange(len(combined) - len(sfx))).overlay(music_loop).overlay(ambiance_loop).overlay(rain_loop), 0).overlay(sfx_transition).fade_out(500)
