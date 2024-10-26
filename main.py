@@ -173,7 +173,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     else:
                         seg = seg.apply_gain(-seg.dBFS)
                     combined = combined.append(seg, 0)
-                    if (random.randrange(10) > 0 and not line.endswith("-")) or progress == completed:
+                    if random.randrange(10) > 0 and not line.endswith("-"):
                         combined = combined.append(silence_line, 0)
                     progress = int(100 * (completed / remaining))
                     await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
@@ -196,7 +196,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     rain_loop = ambiance_rain.fade_in(500)
                     while len(rain_loop) < len(combined):
                         rain_loop = rain_loop.append(ambiance_rain, 0)
-                final = silence_transition.append(combined.overlay(sfx, random.randrange(len(combined) - len(sfx))).overlay(music_loop).overlay(ambiance_loop).overlay(rain_loop), 0).overlay(sfx_transition).fade_out(500)
+                final = silence_transition.append(combined.overlay(sfx, random.randrange(len(combined) - len(sfx))).append(silence_line, 0).overlay(music_loop).overlay(ambiance_loop).overlay(rain_loop), 0).overlay(sfx_transition).fade_out(500)
                 with BytesIO() as episode:
                     final.export(episode, "mp3")
                     await message.edit(content="***[Donate to support AI Sponge Lite!](https://github.com/sponsors/jeremynoesen)***", embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.mp3")])
