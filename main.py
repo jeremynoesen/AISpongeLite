@@ -166,7 +166,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     else:
                         with BytesIO(tts.content) as wav:
                             seg = AudioSegment.from_wav(wav)
-                        await asyncio.sleep(10)
+                        # await asyncio.sleep(10)
                         completed += 1
                     if random.randrange(100) > 0 and not loud:
                         seg = seg.apply_gain(-15-seg.dBFS)
