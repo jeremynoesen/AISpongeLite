@@ -42,7 +42,7 @@ are normalized, so strokes will not be full volume (unless a loud event occurs).
 
 ## Usage
 
-- `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
+- `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 3-minute cooldown
   upon successful generation. Generation may take around 15 minutes.
 - `/status`: Check if an episode can be generated. This will show if an episode is generating, if you are on cooldown,
   or if the bot is ready to generate another episode.
