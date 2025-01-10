@@ -22,8 +22,8 @@ Saul opening will be chosen as a callback to the original AI Sponge.
 ### Sound Effects
 
 The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, "My leg!", "Oh brother this 
-guy stinks!", "You what?", and the dolphin censor sound. One of these is chosen at random to play at a random point per 
-episode. Every episode begins with the bubbles transition sound. 
+guy stinks!", "You what?", and the dolphin censor sound. One or more of these are chosen at random to play at random 
+points in each episode. Every episode begins with the bubbles transition sound. 
 
 ### Ambiance
 

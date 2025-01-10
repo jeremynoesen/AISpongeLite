@@ -178,25 +178,27 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     progress = int(100 * (completed / remaining))
                     await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
-                sfx = random.choice([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin])
+                for i in range(random.randint(1, len(transcript) // 5)):
+                    sfx = random.choices([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin], [5, 5, 1, 1, 1, 1, 1, 1])[0]
+                    combined = combined.overlay(sfx, random.randrange(len(combined) - len(sfx)))
+                combined = combined.append(silence_line, 0)
                 music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 1, 1])[0]
                 music_loop = silence_music.append(music.fade_in(10000), 0)
                 while len(music_loop) < len(combined):
                     music_loop = music_loop.append(music, 0)
-                if random.randrange(3) > 0:
+                combined = combined.overlay(music_loop)
+                if random.randrange(5) > 0:
                     ambiance = random.choice([ambiance_day, ambiance_night])
                     ambiance_loop = ambiance.fade_in(500)
                     while len(ambiance_loop) < len(combined):
                         ambiance_loop = ambiance_loop.append(ambiance, 0)
-                else:
-                    ambiance_loop = AudioSegment.empty()
-                if random.randrange(5) > 0:
-                    rain_loop = AudioSegment.empty()
-                else:
+                    combined = combined.overlay(ambiance_loop)
+                if random.randrange(5) == 0:
                     rain_loop = ambiance_rain.fade_in(500)
                     while len(rain_loop) < len(combined):
                         rain_loop = rain_loop.append(ambiance_rain, 0)
-                final = silence_transition.append(combined.overlay(sfx, random.randrange(len(combined) - len(sfx))).append(silence_line, 0).overlay(music_loop).overlay(ambiance_loop).overlay(rain_loop), 0).overlay(sfx_transition).fade_out(500)
+                    combined = combined.overlay(rain_loop)
+                combined = silence_transition.append(combined, 0).overlay(sfx_transition).fade_out(500)
                 with BytesIO() as episode:
                     combined.export(episode, "ogg")
                     await message.edit(embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
@@ -204,10 +206,10 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 cooldown[inter.user.id] = time.time()
             except:
                 try:
-                    await message.edit(content=None, embed=embed_error_failed)
+                    await message.edit(embed=embed_error_failed)
                 except:
                     try:
-                        await inter.edit_original_response(content=None, embed=embed_error_failed)
+                        await inter.edit_original_response(embed=embed_error_failed)
                     except:
                         pass
                 await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
