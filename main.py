@@ -183,7 +183,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     sfx = random.choices([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin], [5, 5, 1, 1, 1, 1, 1, 1])[0]
                     combined = combined.overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 combined = combined.append(silence_line, 0)
-                music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_hello_sailor_b, music_stars_and_games, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 10, 10, 1, 1])[0]
+                music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_hello_sailor_b, music_stars_and_games, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 5, 5, 1, 1])[0]
                 music_loop = silence_music.append(music.fade_in(10000), 0)
                 while len(music_loop) < len(combined):
                     music_loop = music_loop.append(music, 0)
