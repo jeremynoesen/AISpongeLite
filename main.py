@@ -44,7 +44,7 @@ sfx_dolphin = load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=-20)
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-20)
 ambiance_day = load_wav("ambiance/day.wav", start=2000, end=-1000, gain=-45)
 ambiance_night = load_wav("ambiance/night.wav", start=100, end=-4000, gain=-45)
-ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000, gain=-45)
+ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = load_wav("voice/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
@@ -197,9 +197,10 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         ambiance_loop = ambiance_loop.append(ambiance, 0)
                     combined = combined.overlay(ambiance_loop)
                 if random.randrange(5) == 0:
-                    rain_loop = ambiance_rain.fade_in(500)
+                    rain_randomized = ambiance_rain.apply_gain(random.randint(-45, -40)-ambiance_rain.dBFS)
+                    rain_loop = rain_randomized.fade_in(500)
                     while len(rain_loop) < len(combined):
-                        rain_loop = rain_loop.append(ambiance_rain, 0)
+                        rain_loop = rain_loop.append(rain_randomized, 0)
                     combined = combined.overlay(rain_loop)
                 combined = silence_transition.append(combined, 0).overlay(sfx_transition).fade_out(500)
                 with BytesIO() as episode:
