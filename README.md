@@ -28,7 +28,8 @@ points in each episode. Every episode begins with the bubbles transition sound.
 ### Ambiance
 
 The available ambiance includes underwater sounds, night crickets, and silence. One of these is chosen at random to play
-in the background of each episode below all other sounds. Rain sounds can also play simultaneously at random.
+in the background of each episode below all other sounds. Rain sounds with randomized intensity also have a chance to 
+play on top of the other ambiance sounds.
 
 ### Random Events
 
