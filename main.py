@@ -97,7 +97,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 )
                 lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", " ", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
-                title = re.sub(r"[^A-Za-z0-9 ]+", "", lines.pop(0)[6:]).strip().replace(" ", "_").upper().replace("I", "i")
+                title = lines.pop(0)[6:].strip().upper().replace("I", "i")
                 if not title:
                     title = "EPiSODE"
                 completed = 1
