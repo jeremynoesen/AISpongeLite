@@ -131,6 +131,10 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     elif lower.startswith("plankton:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
                         line = "- " + emoji_plankton + line[9:]
+                    elif lower.startswith("loudton:"):
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
+                        line = "- " + emoji_plankton + line[8:]
+                        loud = True
                     elif lower.startswith("mr. krabs:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
                         line = "- " + emoji_mrkrabs + line[10:]

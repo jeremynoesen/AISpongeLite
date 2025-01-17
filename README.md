@@ -9,9 +9,9 @@ AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes wit
 
 ### Characters
 
-The available characters are SpongeBob, Patrick, Squidward, Loudward, Gary, Sandy, Mr. Krabs, Plankton, Karen,
-Mrs. Puff, Squilliam, Larry, Bubble Bass, Bubble Buddy, and the French Narrator. Some characters will sound different 
-from Rehydrated due to them using private models.
+The available characters are SpongeBob, Patrick, Squidward (and Loudward), Gary, Sandy, Mr. Krabs, Plankton (and 
+Loudton), Karen, Mrs. Puff, Squilliam, Larry, Bubble Bass, Bubble Buddy, and the French Narrator. Some characters will 
+sound different from Rehydrated due to them using private models.
 
 ### Background Music
 
@@ -34,7 +34,8 @@ play on top of the other ambiance sounds.
 ### Random Events
 
 The available random events are speech cutoffs and loud events. Both of these can happen in an episode any number of
-times. Loud events also occur every time Loudward speaks. Cutoffs also occur anytime a line ends with a hyphen.
+times. Loud events also occur every time Loudward and Loudton speak. Cutoffs also occur anytime a line ends with a 
+hyphen.
 
 ### Strokes
 
