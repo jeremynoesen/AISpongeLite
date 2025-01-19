@@ -93,7 +93,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                 completion = await gpt.completions.create(
                     model="gpt-3.5-turbo-instruct",
                     max_tokens=700,
-                    prompt=f"Create a vulgar, nsfw, politically incorrect script for a scene from Spongebob where characters discuss a topic. Possible characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Sandy and very rarely Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Create a two word title with format: Title: <title>. The topic is: {topic}"
+                    prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Include a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}"
                 )
                 lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", " ", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                 remaining = len(lines)
