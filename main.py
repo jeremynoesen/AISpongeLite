@@ -186,9 +186,6 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     progress = int(100 * (completed / remaining))
                     await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
-                for i in range(random.randint(1, len(transcript) // 5)):
-                    sfx = random.choices([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin], [5, 5, 1, 1, 1, 1, 1, 1])[0]
-                    combined = combined.overlay(sfx, random.randrange(len(combined) - len(sfx)))
                 combined = combined.append(silence_line, 0)
                 music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_hello_sailor_b, music_stars_and_games, music_rock_bottom, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 5, 5, 5, 1, 1])[0]
                 music_loop = silence_music.append(music.fade_in(10000), 0)
@@ -207,7 +204,11 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     while len(rain_loop) < len(combined):
                         rain_loop = rain_loop.append(rain_randomized, 0)
                     combined = combined.overlay(rain_loop)
-                combined = silence_transition.append(combined, 0).overlay(sfx_transition).fade_out(500)
+                combined = silence_transition.append(combined, 0).overlay(sfx_transition)
+                for i in range(random.randint(1, len(transcript) // 5)):
+                    sfx = random.choices([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin], [5, 5, 1, 1, 1, 1, 1, 1])[0]
+                    combined = combined.overlay(sfx, random.randrange(len(combined)))
+                combined = combined.fade_out(500)
                 with BytesIO() as episode:
                     combined.export(episode, "ogg")
                     await message.edit(embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
