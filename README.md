@@ -16,8 +16,9 @@ sound different from Rehydrated due to them using private models.
 ### Background Music
 
 The available background music is the SpongeBob SquarePants closing theme, The Tip Top Polka, The Rake Hornpipe, 
-Seaweed, Hello Sailor (b), and Stars and Games. One of these is chosen at random per episode. There is also a rare 
-chance that Sneaky Snitch or the Better Call Saul opening will be chosen as a callback to the original AI Sponge.
+Seaweed, Hello Sailor (b), Stars and Games, and the Rock Bottom music from Rehydrated. One of these is chosen at random 
+per episode. There is also a rare chance that Sneaky Snitch or the Better Call Saul opening will be chosen as a callback
+to the original AI Sponge.
 
 ### Sound Effects
 
