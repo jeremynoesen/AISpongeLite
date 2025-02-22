@@ -2,6 +2,8 @@
 
 # AI Sponge Lite
 
+[![Discord](https://img.shields.io/discord/1289760166891225088?style=for-the-badge&logo=discord&logoColor=ffffff&label=Support&color=5865F2)](https://discord.gg/4qXZXZF3Vs)
+
 ## About
 
 AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes with transcripts inspired by 
