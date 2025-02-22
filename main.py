@@ -126,9 +126,10 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         line = "- " + emoji_squidward + line[9:]
                         loud = True
                     elif lower.startswith("gary:"):
-                        line = "- " + emoji_gary + line[5:]
                         tts = None
+                        line = "- " + emoji_gary + line[5:]
                         seg = voice_gary
+                        await asyncio.sleep(5)
                     elif lower.startswith("plankton:"):
                         tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
                         line = "- " + emoji_plankton + line[9:]
@@ -166,6 +167,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     else:
                         remaining -= 1
                         progress = int(100 * (completed / remaining))
+                        await asyncio.sleep(5)
                         await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
                         await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                         continue
@@ -215,6 +217,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
                 cooldown[inter.user.id] = time.time()
             except:
+                await asyncio.sleep(5)
                 try:
                     await message.edit(embed=embed_error_failed)
                 except:
