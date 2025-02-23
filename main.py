@@ -70,6 +70,7 @@ embed_error_failed = discord.Embed(title="Generating...", description="# > Faile
 generating = False
 progress = 0
 cooldown = {}
+no_cooldown_sku = int(os.getenv("NO_COOLDOWN_SKU"))
 
 
 @tree.command(name="generate", description="Generate an episode.")
@@ -214,7 +215,15 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     await asyncio.sleep(5)
                     await message.edit(embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
                     await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
-                cooldown[inter.user.id] = time.time()
+                no_cooldown = False
+                for entitlement in inter.entitlements:
+                    if entitlement.sku_id == no_cooldown_sku and not entitlement.is_expired():
+                        no_cooldown = True
+                        break
+                if not no_cooldown:
+                    cooldown[inter.user.id] = time.time()
+                elif inter.user.id in cooldown.keys():
+                    del cooldown[inter.user.id]
             except:
                 await asyncio.sleep(5)
                 try:
