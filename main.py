@@ -82,6 +82,8 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
         except:
             pass
     elif inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
+        if inter.user.id in cooldown.keys():
+            del cooldown[inter.user.id]
         global generating
         if not generating:
             generating = True
@@ -244,6 +246,8 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
 @tree.command(name="status", description="Check if an episode can be generated.")
 async def status(inter: discord.Interaction) -> None:
     if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
+        if inter.user.id in cooldown.keys():
+            del cooldown[inter.user.id]
         if generating:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
         else:
