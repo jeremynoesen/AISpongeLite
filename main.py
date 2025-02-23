@@ -81,7 +81,7 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
             await inter.response.send_message(embed=embed_error_permissions)
         except:
             pass
-    elif inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 180:
+    elif inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
         global generating
         if not generating:
             generating = True
@@ -238,18 +238,18 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
         else:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
     else:
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((180 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((180 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."))
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."))
 
 
 @tree.command(name="status", description="Check if an episode can be generated.")
 async def status(inter: discord.Interaction) -> None:
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 180:
+    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
         if generating:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
         else:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
     else:
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((180 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((180 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."))
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."))
 
 
 @client.event
