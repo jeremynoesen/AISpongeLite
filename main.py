@@ -224,8 +224,6 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                         break
                 if not no_cooldown:
                     cooldown[inter.user.id] = time.time()
-                elif inter.user.id in cooldown.keys():
-                    del cooldown[inter.user.id]
             except:
                 await asyncio.sleep(5)
                 try:
