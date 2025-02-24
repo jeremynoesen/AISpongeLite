@@ -70,7 +70,8 @@ embed_error_failed = discord.Embed(title="Generating...", description="# > Faile
 generating = False
 progress = 0
 cooldown = {}
-no_cooldown_sku = int(os.getenv("NO_COOLDOWN_SKU"))
+remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
+remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 
 
 @tree.command(name="generate", description="Generate an episode.")
@@ -217,12 +218,12 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
                     await asyncio.sleep(5)
                     await message.edit(embed=discord.Embed(description="\n".join(transcript), color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
                     await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
-                no_cooldown = False
+                remove_cooldown = False
                 for entitlement in inter.entitlements:
-                    if entitlement.sku_id == no_cooldown_sku and not entitlement.is_expired():
-                        no_cooldown = True
+                    if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
+                        remove_cooldown = True
                         break
-                if not no_cooldown:
+                if not remove_cooldown:
                     cooldown[inter.user.id] = time.time()
             except:
                 await asyncio.sleep(5)
@@ -238,7 +239,9 @@ async def generate(inter: discord.Interaction, topic: str) -> None:
         else:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
     else:
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."))
+        view = discord.ui.View()
+        view.add_item(remove_cooldown_button)
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
 
 
 @tree.command(name="status", description="Check if an episode can be generated.")
@@ -251,7 +254,9 @@ async def status(inter: discord.Interaction) -> None:
         else:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
     else:
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."))
+        view = discord.ui.View()
+        view.add_item(remove_cooldown_button)
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
 
 
 @client.event
