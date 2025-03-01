@@ -50,9 +50,7 @@ are normalized, so strokes will not be full volume (unless a loud event occurs).
 - `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
-  Generation may take a few minutes.
-- `/status`: Check if an episode can be generated. This will show if an episode is generating, if you are on cooldown,
-  or if the bot is ready to generate another episode.
+  Generation may take a few minutes. Do not enter a topic if you want to check generation status or remaining cooldown.
 
 ## Installation
 
