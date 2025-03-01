@@ -37,8 +37,8 @@ play on top of the other ambiance sounds.
 ### Random Events
 
 The available random events are speech cutoffs and loud events. Both of these can happen in an episode any number of
-times. Loud events also occur when Loudward and Loudton speak, and when a line is all caps. Cutoffs also occur anytime 
-a line ends with a dash or a hyphen.
+times and will appear in the transcript. Loud events also occur when Loudward and Loudton speak, and when a line 
+generates in all caps. Cutoffs also occur anytime a line ends with an em dash, en dash, or a hyphen.
 
 ### Strokes
 

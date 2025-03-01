@@ -189,7 +189,6 @@ async def generate(inter: discord.Interaction, topic: str):
                         await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
                         await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                         continue
-                    transcript.append(line)
                     if tts is None:
                         remaining -= 1
                     else:
@@ -198,11 +197,19 @@ async def generate(inter: discord.Interaction, topic: str):
                         completed += 1
                     if loud or stripped.isupper() or random.randrange(100) == 0:
                         seg = seg.apply_gain(-seg.dBFS)
+                        line = line.replace(stripped, stripped.upper())
                     else:
                         seg = seg.apply_gain(-15-seg.dBFS)
                     combined = combined.append(seg, 0)
-                    if not (line.endswith("-") or line.endswith("–") or random.randrange(10) == 0):
+                    if line[-1] in "-–—":
+                        pass
+                    elif random.randrange(10) == 0:
+                        while line[-1] in ".!?":
+                            line = line[:-1]
+                        line += "—"
+                    else:
                         combined = combined.append(silence_line, 0)
+                    transcript.append(line)
                     progress = int(100 * (completed / remaining))
                     await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
