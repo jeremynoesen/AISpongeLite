@@ -238,7 +238,7 @@ async def generate(inter: discord.Interaction, topic: str):
                 combined = combined.fade_out(500)
                 with BytesIO() as episode:
                     combined.export(episode, "ogg")
-                    await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript), color=0xf5f306).set_footer(text=f"{inter.user.display_name} – \"{topic}\"", icon_url=inter.user.display_avatar.url), attachments=[discord.File(episode, f"{title}.ogg")])
+                    await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript) + "\n\n-# > " + topic, color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
                     await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
                 remove_cooldown = False
                 for entitlement in inter.entitlements:
