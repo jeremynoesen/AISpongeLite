@@ -201,7 +201,7 @@ async def generate(inter: discord.Interaction, topic: str):
                     else:
                         seg = seg.apply_gain(-15-seg.dBFS)
                     combined = combined.append(seg, 0)
-                    if random.randrange(10) > 0 and not line.endswith("-"):
+                    if not (line.endswith("-") or line.endswith("–") or random.randrange(10) == 0):
                         combined = combined.append(silence_line, 0)
                     progress = int(100 * (completed / remaining))
                     await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
