@@ -117,56 +117,72 @@ async def generate(inter: discord.Interaction, topic: str):
                     line = discord.utils.escape_markdown(line).strip()
                     lower = line.lower()
                     if lower.startswith("spongebob:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
-                        line = "- " + emoji_spongebob + line[10:]
+                        stripped = line[10:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
+                        line = "- " + emoji_spongebob + " " + stripped
                     elif lower.startswith("patrick:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:].strip(), "weight_154man2fzg19nrtc15drner7t"), 180)
-                        line = "- " + emoji_patrick + line[8:]
+                        stripped = line[8:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_154man2fzg19nrtc15drner7t"), 180)
+                        line = "- " + emoji_patrick + " " + stripped
                     elif lower.startswith("squidward:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
-                        line = "- " + emoji_squidward + line[10:]
+                        stripped = line[10:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                        line = "- " + emoji_squidward + " " + stripped
                     elif lower.startswith("loudward:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
-                        line = "- " + emoji_squidward + line[9:]
+                        stripped = line[9:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
+                        line = "- " + emoji_squidward + " " + stripped
                         loud = True
                     elif lower.startswith("gary:"):
+                        stripped = line[5:].strip()
                         tts = None
-                        line = "- " + emoji_gary + line[5:]
+                        line = "- " + emoji_gary + " " + stripped
                         seg = voice_gary
                     elif lower.startswith("plankton:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[9:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
-                        line = "- " + emoji_plankton + line[9:]
+                        stripped = line[9:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
+                        line = "- " + emoji_plankton + " " + stripped
                     elif lower.startswith("loudton:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[8:].strip(), "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
-                        line = "- " + emoji_plankton + line[8:]
+                        stripped = line[8:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
+                        line = "- " + emoji_plankton + " " + stripped
                         loud = True
                     elif lower.startswith("mr. krabs:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
-                        line = "- " + emoji_mrkrabs + line[10:]
+                        stripped = line[10:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
+                        line = "- " + emoji_mrkrabs + " " + stripped
                     elif lower.startswith("karen:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
-                        line = "- " + emoji_karen + line[6:]
+                        stripped = line[6:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
+                        line = "- " + emoji_karen + " " + stripped
                     elif lower.startswith("sandy:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
-                        line = "- " + emoji_sandy + line[6:]
+                        stripped = line[6:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
+                        line = "- " + emoji_sandy + " " + stripped
                     elif lower.startswith("mrs. puff:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_129qhgze57zhndkkcq83e6b2a"), 180)
-                        line = "- " + emoji_mrspuff + line[10:]
+                        stripped = line[10:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_129qhgze57zhndkkcq83e6b2a"), 180)
+                        line = "- " + emoji_mrspuff + " " + stripped
                     elif lower.startswith("squilliam:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[10:].strip(), "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
-                        line = "- " + emoji_squilliam + line[10:]
+                        stripped = line[10:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
+                        line = "- " + emoji_squilliam + " " + stripped
                     elif lower.startswith("larry:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[6:].strip(), "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
-                        line = "- " + emoji_larry + line[6:]
+                        stripped = line[6:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
+                        line = "- " + emoji_larry + " " + stripped
                     elif lower.startswith("bubble bass:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[12:].strip(), "weight_h9g7rh6tj2hvfezrz8gjs4gwa"), 180)
-                        line = "- " + emoji_bubblebass + line[12:]
+                        stripped = line[12:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_h9g7rh6tj2hvfezrz8gjs4gwa"), 180)
+                        line = "- " + emoji_bubblebass + " " + stripped
                     elif lower.startswith("bubble buddy:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[13:].strip(), "weight_sbr0372ysxbdahcvej96axy1t"), 180)
-                        line = "- " + emoji_bubblebuddy + line[13:]
+                        stripped = line[13:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_sbr0372ysxbdahcvej96axy1t"), 180)
+                        line = "- " + emoji_bubblebuddy + " " + stripped
                     elif lower.startswith("french narrator:"):
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, line[16:].strip(), "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
-                        line = "- " + emoji_frenchnarrator + line[16:]
+                        stripped = line[16:].strip()
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
+                        line = "- " + emoji_frenchnarrator + " " + stripped
                     else:
                         remaining -= 1
                         progress = int(100 * (completed / remaining))
@@ -180,10 +196,10 @@ async def generate(inter: discord.Interaction, topic: str):
                         with BytesIO(tts.content) as wav:
                             seg = AudioSegment.from_wav(wav)
                         completed += 1
-                    if random.randrange(100) > 0 and not loud:
-                        seg = seg.apply_gain(-15-seg.dBFS)
-                    else:
+                    if loud or stripped.isupper() or random.randrange(100) == 0:
                         seg = seg.apply_gain(-seg.dBFS)
+                    else:
+                        seg = seg.apply_gain(-15-seg.dBFS)
                     combined = combined.append(seg, 0)
                     if random.randrange(10) > 0 and not line.endswith("-"):
                         combined = combined.append(silence_line, 0)
