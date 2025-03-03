@@ -65,8 +65,8 @@ emoji_bubblebass = os.getenv("EMOJI_BUBBLEBASS")
 emoji_bubblebuddy = os.getenv("EMOJI_BUBBLEBUDDY")
 emoji_frenchnarrator = os.getenv("EMOJI_FRENCHNARRATOR")
 embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
-embed_error_permissions = discord.Embed(title="Generating...", description="# > Failed", color=0xf5f306).set_footer(text="Missing permissions.")
-embed_error_failed = discord.Embed(title="Generating...", description="# > Failed", color=0xf5f306).set_footer(text="An error occurred.")
+embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Missing permissions.")
+embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="An error occurred.")
 generating = False
 progress = 0
 cooldown = {}
@@ -92,7 +92,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                 try:
                     global progress
                     progress = 0
-                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Please wait..."))
+                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Please wait..."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     response = await inter.original_response()
                     message = await response.channel.fetch_message(response.id)
@@ -108,7 +108,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         title = "EPiSODE"
                     completed = 1
                     progress = int(100 * (completed / remaining))
-                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Generated script."))
+                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Generated script."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     transcript = []
                     combined = AudioSegment.empty()
@@ -187,7 +187,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         else:
                             remaining -= 1
                             progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
+                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
                             await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                             continue
                         if tts is None:
@@ -212,7 +212,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             combined = combined.append(silence_line, 0)
                         transcript.append(line)
                         progress = int(100 * (completed / remaining))
-                        await message.edit(embed=discord.Embed(title="Generating...", description=f"# > {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
+                        await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                         await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
                     music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_hello_sailor_b, music_stars_and_games, music_rock_bottom, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 5, 5, 5, 1, 1])[0]
@@ -261,11 +261,12 @@ async def episode(inter: discord.Interaction, topic: str = ""):
             else:
                 await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
         else:
-            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
+            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
     else:
         view = discord.ui.View()
         view.add_item(remove_cooldown_button)
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
+
 
 
 @tree.command(name="status", description="Check if an episode can be generated.")
