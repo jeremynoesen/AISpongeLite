@@ -88,18 +88,18 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         global generating
         if not generating:
             if topic:
-                generating = True
                 try:
+                    generating = True
                     global progress
                     progress = 0
-                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Please wait..."))
+                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Preparing episode..."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     response = await inter.original_response()
                     message = await response.channel.fetch_message(response.id)
                     completion = await gpt.completions.create(
                         model="gpt-3.5-turbo-instruct",
                         max_tokens=700,
-                        prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Include a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}"
+                        prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Include a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}"
                     )
                     lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", " ", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                     remaining = len(lines)
@@ -240,7 +240,6 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     with BytesIO() as episode:
                         combined.export(episode, "ogg")
                         await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript) + "\n\n-# > " + topic, color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
-                        await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
                     remove_cooldown = False
                     for entitlement in inter.entitlements:
                         if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
@@ -256,7 +255,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             await inter.edit_original_response(embed=embed_error_failed)
                         except:
                             pass
-                    await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
+                await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
                 generating = False
             else:
                 await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
