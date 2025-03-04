@@ -77,7 +77,7 @@ remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sk
 @tree.command(name="episode", description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
 async def episode(inter: discord.Interaction, topic: str = ""):
-    if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history and inter.app_permissions.use_external_emojis and inter.app_permissions.send_messages):
+    if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history and inter.app_permissions.use_external_emojis):
         try:
             await inter.response.send_message(embed=embed_error_permissions)
         except:
