@@ -11,9 +11,9 @@ AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes wit
 
 ### Characters
 
-The available characters are SpongeBob, Patrick, Squidward (and Loudward), Gary, Sandy, Mr. Krabs, Plankton (and
-Loudton), Karen, Mrs. Puff, Squilliam, Larry, Bubble Bass, Bubble Buddy, and the French Narrator. Some characters will
-sound different from Rehydrated due to them using private models.
+The available characters are SpongeBob, Patrick, Squidward, Gary, Sandy, Mr. Krabs, Plankton, Karen, Mrs. Puff, 
+Squilliam, Larry, Bubble Bass, Bubble Buddy, and the French Narrator. Some characters will sound different from 
+Rehydrated due to them using private models.
 
 ### Background Music
 
@@ -47,10 +47,11 @@ are normalized, so strokes will not be full volume (unless a loud event occurs).
 
 ## Usage
 
-- `/generate`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
+- `/episode`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
-  Generation may take a few minutes. Do not enter a topic if you want to check generation status or remaining cooldown.
+  Generation may take a few minutes. Do not enter a topic to check generation status or remaining cooldown.
+- `/msg`: Send a message to one of the characters. This can be used at any time anywhere and does not have a cooldown.
 
 ## Installation
 
@@ -60,9 +61,9 @@ instructions in the popup.
 ## Troubleshooting
 
 - If you encounter the error "Missing permissions.", make sure the bot has the following permissions: View
-  Channels, Embed Links, Attach Files, Read Message History, Use External Emojis, and Send Messages.
-- If you encounter the error "An error occurred.", try using the generate command again. If it happens right
-  after generation jumps from 0%, try changing the wording of your topic.
+  Channels, Embed Links, Attach Files, Read Message History, and Use External Emojis.
+- If you encounter the error "An error occurred.", try again later. If this occurs immediately after generation 
+  progresses past 0%, try rewording your topic. Quotation marks and similar punctuation can cause problems.
 
 ## Demonstration
 
