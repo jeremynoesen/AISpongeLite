@@ -67,6 +67,7 @@ emoji_frenchnarrator = os.getenv("EMOJI_FRENCHNARRATOR")
 embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="An error occurred.")
+embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Invalid character.")
 generating = False
 progress = 0
 cooldown = {}
@@ -267,20 +268,64 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
 
 
+async def character_autocomplete(interaction: discord.Interaction, current: str,):
+    characters = ["SpongeBob", "Patrick", "Squidward", "Gary", "Plankton", "Mr. Krabs", "Karen", "Sandy", "Mrs. Puff", "Squilliam", "Larry", "Bubble Bass", "Bubble Buddy", "French Narrator"]
+    return [app_commands.Choice(name=character, value=character) for character in characters if current.lower() in character.lower()]
 
-@tree.command(name="status", description="Check if an episode can be generated.")
-async def status(inter: discord.Interaction):
-    if inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
-        if inter.user.id in cooldown.keys():
-            del cooldown[inter.user.id]
-        if generating:
-            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# > {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
+
+@tree.command(name="msg", description="Message a character.")
+@app_commands.describe(character="Character to message.")
+@app_commands.describe(message="Message to send.")
+@app_commands.autocomplete(character=character_autocomplete)
+async def msg(inter: discord.Interaction, character: str, message: str):
+    try:
+        character = character.title().replace("bob", "Bob")
+        if character == "SpongeBob":
+            emoji = emoji_spongebob
+        elif character == "Patrick":
+            emoji = emoji_patrick
+        elif character == "Squidward":
+            emoji = emoji_squidward
+        elif character == "Gary":
+            emoji = emoji_gary
+        elif character == "Plankton":
+            emoji = emoji_plankton
+        elif character == "Mr. Krabs":
+            emoji = emoji_mrkrabs
+        elif character == "Karen":
+            emoji = emoji_karen
+        elif character == "Sandy":
+            emoji = emoji_sandy
+        elif character == "Mrs. Puff":
+            emoji = emoji_mrspuff
+        elif character == "Squilliam":
+            emoji = emoji_squilliam
+        elif character == "Larry":
+            emoji = emoji_larry
+        elif character == "Bubble Bass":
+            emoji = emoji_bubblebass
+        elif character == "Bubble Buddy":
+            emoji = emoji_bubblebuddy
+        elif character == "French Narrator":
+            emoji = emoji_frenchnarrator
         else:
-            await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
-    else:
-        view = discord.ui.View()
-        view.add_item(remove_cooldown_button)
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# > {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
+            await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_error_character)
+            return
+        await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# 💬", color=0xf5f306).set_footer(text=f"Sending message..."))
+        completion = await gpt.completions.create(
+            model="gpt-3.5-turbo-instruct",
+            max_tokens=250,
+            prompt=f"You are {character} from SpongeBob SquarePants messaging with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
+        )
+        compiled = re.compile(re.escape(character + ": "), re.IGNORECASE)
+        output = compiled.sub("", completion.choices[0].text.strip().strip("\""), 1)
+        embed = discord.Embed(description=f"{output}\n\n-# > {message}", color=0xf5f306).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
+        await inter.edit_original_response(embed=embed)
+    except:
+        try:
+            await inter.edit_original_response(embed=embed_error_failed)
+        except:
+            pass
 
 
 @client.event
