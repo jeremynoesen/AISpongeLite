@@ -51,7 +51,7 @@ are normalized, so strokes will not be full volume (unless a loud event occurs).
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
   Generation may take a few minutes. Do not enter a topic to check generation status or remaining cooldown.
-- `/msg`: Send a message to one of the characters. This can be used at any time anywhere and does not have a cooldown.
+- `/chat`: Chat with one of the characters. This can be used at any time anywhere and does not have a cooldown.
 
 ## Installation
 

@@ -26,7 +26,7 @@ fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
 tree = app_commands.CommandTree(client)
 embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
-embed_generating_msg = discord.Embed(title="Generating...", description=f"# 💬", color=0xf5f306).set_footer(text=f"Sending message...")
+embed_generating_chat = discord.Embed(title="Generating...", description=f"# 💬", color=0xf5f306).set_footer(text=f"Sending chat...")
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="An error occurred.")
 embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Invalid character.")
@@ -209,11 +209,11 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
     return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys()] if current.lower() in character.lower()]
 
 
-@tree.command(name="msg", description="Message a character.")
-@app_commands.describe(character="Character to message.")
+@tree.command(name="chat", description="Chat with a character.")
+@app_commands.describe(character="Character to chat with.")
 @app_commands.describe(message="Message to send.")
 @app_commands.autocomplete(character=character_autocomplete)
-async def msg(inter: discord.Interaction, character: str, message: str):
+async def chat(inter: discord.Interaction, character: str, message: str):
     try:
         character = character.lower()
         if character in characters.keys():
@@ -222,7 +222,7 @@ async def msg(inter: discord.Interaction, character: str, message: str):
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_error_character)
             return
         character = character.title().replace("bob", "Bob")
-        await inter.response.send_message(embed=embed_generating_msg)
+        await inter.response.send_message(embed=embed_generating_chat)
         completion = await gpt.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
