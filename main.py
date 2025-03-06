@@ -138,7 +138,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 seg = seg.apply_gain(-15-seg.dBFS)
                             combined = combined.append(seg, 0)
                             if line[-1] in "-–—":
-                                pass
+                                line[-1] = "—"
                             elif random.randrange(10) == 0:
                                 while line[-1] in ".!?":
                                     line = line[:-1]
