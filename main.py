@@ -25,54 +25,57 @@ fy = FakeYou()
 fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
 tree = app_commands.CommandTree(client)
-music_closing_theme = load_wav("music/closing_theme.wav", gain=-35)
-music_tip_top_polka = load_wav("music/tip_top_polka.wav", gain=-35)
-music_rake_hornpipe = load_wav("music/rake_hornpipe.wav", gain=-35)
-music_seaweed = load_wav("music/seaweed.wav", gain=-35)
-music_hello_sailor_b = load_wav("music/hello_sailor_b.wav", gain=-35)
-music_stars_and_games = load_wav("music/stars_and_games.wav", gain=-35)
-music_rock_bottom = load_wav("music/rock_bottom.wav", gain=-35)
-music_sneaky_snitch = load_wav("music/sneaky_snitch.wav", gain=-35)
-music_better_call_saul = load_wav("music/better_call_saul.wav", start=50, end=18250, gain=-35)
-sfx_steel_sting = load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=-20)
-sfx_boowomp = load_wav("sfx/boowomp.wav", start=750, end=1200, gain=-20)
-sfx_disgusting = load_wav("sfx/disgusting.wav", start=100, end=-250, gain=-20)
-sfx_vibe_link_b = load_wav("sfx/vibe_link_b.wav", start=50, gain=-20)
-sfx_this_guy_stinks = load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=-20)
-sfx_my_leg = load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-20)
-sfx_you_what = load_wav("sfx/you_what.wav", start=150, gain=-20)
-sfx_dolphin = load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=-20)
+embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
+embed_generating_msg = discord.Embed(title="Generating...", description=f"# 💬", color=0xf5f306).set_footer(text=f"Sending message...")
+embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Missing permissions.")
+embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="An error occurred.")
+embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Invalid character.")
+remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
+remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
+characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB")),
+              "patrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PATRICK")),
+              "squidward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SQUIDWARD")),
+              "loudward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SQUIDWARD")),
+              "gary": (None, os.getenv("EMOJI_GARY")),
+              "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON")),
+              "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON")),
+              "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_MRKRABS")),
+              "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", os.getenv("EMOJI_KAREN")),
+              "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", os.getenv("EMOJI_SANDY")),
+              "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", os.getenv("EMOJI_MRSPUFF")),
+              "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", os.getenv("EMOJI_SQUILLIAM")),
+              "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", os.getenv("EMOJI_LARRY")),
+              "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLEBASS")),
+              "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLEBUDDY")),
+              "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCHNARRATOR"))}
+songs = {load_wav("music/closing_theme.wav", gain=-35): 10,
+         load_wav("music/tip_top_polka.wav", gain=-35): 10,
+         load_wav("music/rake_hornpipe.wav", gain=-35): 10,
+         load_wav("music/seaweed.wav", gain=-35): 10,
+         load_wav("music/hello_sailor_b.wav", gain=-35): 5,
+         load_wav("music/stars_and_games.wav", gain=-35): 5,
+         load_wav("music/rock_bottom.wav", gain=-35): 5,
+         load_wav("music/sneaky_snitch.wav", gain=-35): 1,
+         load_wav("music/better_call_saul.wav", start=50, end=18250, gain=-35): 1}
+sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=-20): 5,
+       load_wav("sfx/boowomp.wav", start=750, end=1200, gain=-20): 5,
+       load_wav("sfx/disgusting.wav", start=100, end=-250, gain=-20): 1,
+       load_wav("sfx/vibe_link_b.wav", start=50, gain=-20): 1,
+       load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=-20): 1,
+       load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-20): 1,
+       load_wav("sfx/you_what.wav", start=150, gain=-20): 1,
+       load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=-20): 1}
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-20)
-ambiance_day = load_wav("ambiance/day.wav", start=2000, end=-1000, gain=-45)
-ambiance_night = load_wav("ambiance/night.wav", start=100, end=-4000, gain=-45)
+ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=-45),
+                 load_wav("ambiance/night.wav", start=100, end=-4000, gain=-45)]
 ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = load_wav("voice/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
 silence_music = AudioSegment.silent(2450)
-emoji_spongebob = os.getenv("EMOJI_SPONGEBOB")
-emoji_patrick = os.getenv("EMOJI_PATRICK")
-emoji_squidward = os.getenv("EMOJI_SQUIDWARD")
-emoji_gary = os.getenv("EMOJI_GARY")
-emoji_plankton = os.getenv("EMOJI_PLANKTON")
-emoji_mrkrabs = os.getenv("EMOJI_MRKRABS")
-emoji_karen = os.getenv("EMOJI_KAREN")
-emoji_sandy = os.getenv("EMOJI_SANDY")
-emoji_mrspuff = os.getenv("EMOJI_MRSPUFF")
-emoji_squilliam = os.getenv("EMOJI_SQUILLIAM")
-emoji_larry = os.getenv("EMOJI_LARRY")
-emoji_bubblebass = os.getenv("EMOJI_BUBBLEBASS")
-emoji_bubblebuddy = os.getenv("EMOJI_BUBBLEBUDDY")
-emoji_frenchnarrator = os.getenv("EMOJI_FRENCHNARRATOR")
-embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
-embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Missing permissions.")
-embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="An error occurred.")
-embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Invalid character.")
 generating = False
 progress = 0
 cooldown = {}
-remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
-remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 
 
 @tree.command(name="episode", description="Generate an episode.")
@@ -115,114 +118,49 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     combined = AudioSegment.empty()
                     loop = asyncio.get_running_loop()
                     for line in lines:
-                        loud = False
                         line = discord.utils.escape_markdown(line).strip()
-                        lower = line.lower()
-                        if lower.startswith("spongebob:"):
-                            stripped = line[10:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_5by9kjm8vr8xsp7abe8zvaxc8"), 180)
-                            line = "- " + emoji_spongebob + " " + stripped
-                        elif lower.startswith("patrick:"):
-                            stripped = line[8:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_154man2fzg19nrtc15drner7t"), 180)
-                            line = "- " + emoji_patrick + " " + stripped
-                        elif lower.startswith("squidward:"):
-                            stripped = line[10:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
-                            line = "- " + emoji_squidward + " " + stripped
-                        elif lower.startswith("loudward:"):
-                            stripped = line[9:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_y9arhnd7wjamezhqd27ksvmaz"), 180)
-                            line = "- " + emoji_squidward + " " + stripped
-                            loud = True
-                        elif lower.startswith("gary:"):
-                            stripped = line[5:].strip()
-                            tts = None
-                            line = "- " + emoji_gary + " " + stripped
-                            seg = voice_gary
-                        elif lower.startswith("plankton:"):
-                            stripped = line[9:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
-                            line = "- " + emoji_plankton + " " + stripped
-                        elif lower.startswith("loudton:"):
-                            stripped = line[8:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_ahxbf2104ngsgyegncaefyy6j"), 180)
-                            line = "- " + emoji_plankton + " " + stripped
-                            loud = True
-                        elif lower.startswith("mr. krabs:"):
-                            stripped = line[10:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_5bxbp9xqy61svfx03b25ezmwx"), 180)
-                            line = "- " + emoji_mrkrabs + " " + stripped
-                        elif lower.startswith("karen:"):
-                            stripped = line[6:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_eckp92cd68r4yk68n6re3fwcb"), 180)
-                            line = "- " + emoji_karen + " " + stripped
-                        elif lower.startswith("sandy:"):
-                            stripped = line[6:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_tzgp5df2xzwz7y7jzz7at96jf"), 180)
-                            line = "- " + emoji_sandy + " " + stripped
-                        elif lower.startswith("mrs. puff:"):
-                            stripped = line[10:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_129qhgze57zhndkkcq83e6b2a"), 180)
-                            line = "- " + emoji_mrspuff + " " + stripped
-                        elif lower.startswith("squilliam:"):
-                            stripped = line[10:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_zmjv8223ed6wx1fp234c79v9s"), 180)
-                            line = "- " + emoji_squilliam + " " + stripped
-                        elif lower.startswith("larry:"):
-                            stripped = line[6:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_k7qvaffwsft6vxbcps4wbyj58"), 180)
-                            line = "- " + emoji_larry + " " + stripped
-                        elif lower.startswith("bubble bass:"):
-                            stripped = line[12:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_h9g7rh6tj2hvfezrz8gjs4gwa"), 180)
-                            line = "- " + emoji_bubblebass + " " + stripped
-                        elif lower.startswith("bubble buddy:"):
-                            stripped = line[13:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_sbr0372ysxbdahcvej96axy1t"), 180)
-                            line = "- " + emoji_bubblebuddy + " " + stripped
-                        elif lower.startswith("french narrator:"):
-                            stripped = line[16:].strip()
-                            tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, "weight_edzcfmq6y0vj7pte9pzhq5b6j"), 180)
-                            line = "- " + emoji_frenchnarrator + " " + stripped
+                        character = line.split(":")[0].lower()
+                        if character in characters.keys():
+                            stripped = line[len(character)+1:].strip()
+                            line = "- " + characters[character][1] + " " + stripped
+                            if character == "gary":
+                                seg = voice_gary
+                                remaining -= 1
+                            else:
+                                tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, characters[character][0]), 180)
+                                with BytesIO(tts.content) as wav:
+                                    seg = AudioSegment.from_wav(wav)
+                                completed += 1
+                            if "loud" in character or stripped.isupper() or random.randrange(100) == 0:
+                                seg = seg.apply_gain(-seg.dBFS)
+                                line = line.replace(stripped, stripped.upper())
+                            else:
+                                seg = seg.apply_gain(-15-seg.dBFS)
+                            combined = combined.append(seg, 0)
+                            if line[-1] in "-–—":
+                                pass
+                            elif random.randrange(10) == 0:
+                                while line[-1] in ".!?":
+                                    line = line[:-1]
+                                line += "—"
+                            else:
+                                combined = combined.append(silence_line, 0)
+                            transcript.append(line)
+                            progress = int(100 * (completed / remaining))
+                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                         else:
                             remaining -= 1
                             progress = int(100 * (completed / remaining))
                             await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
-                            await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
-                            continue
-                        if tts is None:
-                            remaining -= 1
-                        else:
-                            with BytesIO(tts.content) as wav:
-                                seg = AudioSegment.from_wav(wav)
-                            completed += 1
-                        if loud or stripped.isupper() or random.randrange(100) == 0:
-                            seg = seg.apply_gain(-seg.dBFS)
-                            line = line.replace(stripped, stripped.upper())
-                        else:
-                            seg = seg.apply_gain(-15-seg.dBFS)
-                        combined = combined.append(seg, 0)
-                        if line[-1] in "-–—":
-                            pass
-                        elif random.randrange(10) == 0:
-                            while line[-1] in ".!?":
-                                line = line[:-1]
-                            line += "—"
-                        else:
-                            combined = combined.append(silence_line, 0)
-                        transcript.append(line)
-                        progress = int(100 * (completed / remaining))
-                        await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                         await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
-                    music = random.choices([music_closing_theme, music_tip_top_polka, music_rake_hornpipe, music_seaweed, music_hello_sailor_b, music_stars_and_games, music_rock_bottom, music_sneaky_snitch, music_better_call_saul], [10, 10, 10, 10, 5, 5, 5, 1, 1])[0]
+                    music = random.choices(list(songs.keys()), list(songs.values()))[0]
                     music_loop = silence_music.append(music.fade_in(10000), 0)
                     while len(music_loop) < len(combined):
                         music_loop = music_loop.append(music, 0)
                     combined = combined.overlay(music_loop)
                     if random.randrange(5) > 0:
-                        ambiance = random.choice([ambiance_day, ambiance_night])
+                        ambiance = random.choice(ambiance_time)
                         ambiance_loop = ambiance.fade_in(500)
                         while len(ambiance_loop) < len(combined):
                             ambiance_loop = ambiance_loop.append(ambiance, 0)
@@ -235,12 +173,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         combined = combined.overlay(rain_loop)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
                     for i in range(random.randint(1, len(transcript) // 5)):
-                        sfx = random.choices([sfx_steel_sting, sfx_boowomp, sfx_disgusting, sfx_vibe_link_b, sfx_this_guy_stinks, sfx_my_leg, sfx_you_what, sfx_dolphin], [5, 5, 1, 1, 1, 1, 1, 1])[0]
-                        combined = combined.overlay(sfx, random.randrange(len(combined)))
+                        combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))
                     combined = combined.fade_out(500)
-                    with BytesIO() as episode:
-                        combined.export(episode, "ogg")
-                        await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript) + "\n\n-# > " + topic, color=0xf5f306), attachments=[discord.File(episode, f"{title}.ogg")])
+                    with BytesIO() as output:
+                        combined.export(output, "ogg")
+                        await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript) + "\n\n-# > " + topic, color=0xf5f306), attachments=[discord.File(output, f"{title}.ogg")])
                     remove_cooldown = False
                     for entitlement in inter.entitlements:
                         if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
@@ -269,8 +206,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
-    characters = ["SpongeBob", "Patrick", "Squidward", "Gary", "Plankton", "Mr. Krabs", "Karen", "Sandy", "Mrs. Puff", "Squilliam", "Larry", "Bubble Bass", "Bubble Buddy", "French Narrator"]
-    return [app_commands.Choice(name=character, value=character) for character in characters if current.lower() in character.lower()]
+    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys()] if current.lower() in character.lower()]
 
 
 @tree.command(name="msg", description="Message a character.")
@@ -279,46 +215,20 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 @app_commands.autocomplete(character=character_autocomplete)
 async def msg(inter: discord.Interaction, character: str, message: str):
     try:
-        character = character.title().replace("bob", "Bob")
-        if character == "SpongeBob":
-            emoji = emoji_spongebob
-        elif character == "Patrick":
-            emoji = emoji_patrick
-        elif character == "Squidward":
-            emoji = emoji_squidward
-        elif character == "Gary":
-            emoji = emoji_gary
-        elif character == "Plankton":
-            emoji = emoji_plankton
-        elif character == "Mr. Krabs":
-            emoji = emoji_mrkrabs
-        elif character == "Karen":
-            emoji = emoji_karen
-        elif character == "Sandy":
-            emoji = emoji_sandy
-        elif character == "Mrs. Puff":
-            emoji = emoji_mrspuff
-        elif character == "Squilliam":
-            emoji = emoji_squilliam
-        elif character == "Larry":
-            emoji = emoji_larry
-        elif character == "Bubble Bass":
-            emoji = emoji_bubblebass
-        elif character == "Bubble Buddy":
-            emoji = emoji_bubblebuddy
-        elif character == "French Narrator":
-            emoji = emoji_frenchnarrator
+        character = character.lower()
+        if character in characters.keys():
+            emoji = characters[character][1]
         else:
             await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_error_character)
             return
-        await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# 💬", color=0xf5f306).set_footer(text=f"Sending message..."))
+        character = character.title().replace("bob", "Bob")
+        await inter.response.send_message(embed=embed_generating_msg)
         completion = await gpt.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
             prompt=f"You are {character} from SpongeBob SquarePants messaging with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
-        compiled = re.compile(re.escape(character + ": "), re.IGNORECASE)
-        output = compiled.sub("", completion.choices[0].text.strip().strip("\""), 1)
+        output = re.compile(re.escape(character + ": "), re.IGNORECASE).sub("", completion.choices[0].text.strip().strip("\""), 1)
         embed = discord.Embed(description=f"{output}\n\n-# > {message}", color=0xf5f306).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
         await inter.edit_original_response(embed=embed)
     except:
@@ -334,4 +244,3 @@ async def on_ready():
 
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
-
