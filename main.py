@@ -217,7 +217,15 @@ async def episode(inter: discord.Interaction, topic: str = ""):
     else:
         view = discord.ui.View()
         view.add_item(remove_cooldown_button)
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# {(episode_cooldown - (int(time.time()) - episode_cooldowns[inter.user.id])) // 60}m {(episode_cooldown - (int(time.time()) - episode_cooldowns[inter.user.id])) % 60}s", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
+        remaining = episode_cooldown - (int(time.time()) - episode_cooldowns[inter.user.id])
+        remaining_formatted = ""
+        minutes = remaining // 60
+        if minutes > 0:
+            remaining_formatted += f"{minutes}m "
+        seconds = remaining % 60
+        if seconds > 0:
+            remaining_formatted += f"{seconds}s"
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# {remaining_formatted}", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
