@@ -25,11 +25,13 @@ fy = FakeYou()
 fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
 tree = app_commands.CommandTree(client)
-embed_ready = discord.Embed(title="Ready", color=0xf5f306).set_footer(text="Ready to generate.")
-embed_generating_chat = discord.Embed(title="Generating...", description=f"# 💬", color=0xf5f306).set_footer(text=f"Sending chat...")
-embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Missing permissions.")
-embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="An error occurred.")
-embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=0xf5f306).set_footer(text="Invalid character.")
+embed_color_dark = 0x7f9400
+embed_color_light = 0xf5f306
+embed_ready = discord.Embed(title="Ready", description="# 📺", color=embed_color_light).set_footer(text="Ready to generate.")
+embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending chat...")
+embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
+embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
+embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Invalid character.")
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -99,7 +101,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     generating = True
                     global progress
                     progress = 0
-                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Preparing episode..."))
+                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Preparing episode..."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     response = await inter.original_response()
                     message = await response.channel.fetch_message(response.id)
@@ -115,7 +117,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         title = "EPiSODE"
                     completed = 1
                     progress = int(100 * (completed / remaining))
-                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Generated script."))
+                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Generated script."))
                     await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     transcript = []
                     combined = AudioSegment.empty()
@@ -150,11 +152,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 combined = combined.append(silence_line, 0)
                             transcript.append(line)
                             progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
+                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
                         else:
                             remaining -= 1
                             progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=0xf5f306).set_footer(text=f"Skipped line."))
+                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Skipped line."))
                         await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
                     music = random.choices(list(songs.keys()), list(songs.values()))[0]
@@ -180,7 +182,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     combined = combined.fade_out(500)
                     with BytesIO() as output:
                         combined.export(output, "ogg")
-                        await message.edit(embed=discord.Embed(title=title, description="\n".join(transcript) + "\n\n-# > " + topic, color=0xf5f306), attachments=[discord.File(output, f"{title}.ogg")])
+                        await message.edit(embed=discord.Embed(title="__**" + discord.utils.escape_markdown(title) + "**__", description="\n".join(transcript) + "\n\n-# > *" + discord.utils.escape_markdown(topic) + "*", color=embed_color_light), attachments=[discord.File(output, f"{title}.ogg")])
                     remove_cooldown = False
                     for entitlement in inter.entitlements:
                         if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
@@ -201,11 +203,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
             else:
                 await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
         else:
-            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# {progress}%", color=0xf5f306).set_footer(text="Generating an episode."))
+            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# {progress}%", color=embed_color_light).set_footer(text="Generating an episode."))
     else:
         view = discord.ui.View()
         view.add_item(remove_cooldown_button)
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=0xf5f306).set_footer(text="You're on cooldown."), view=view)
+        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
@@ -232,7 +234,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
             prompt=f"You are {character} from SpongeBob SquarePants messaging with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
         output = re.compile(re.escape(character + ": "), re.IGNORECASE).sub("", completion.choices[0].text.strip().strip("\""), 1)
-        embed = discord.Embed(description=f"{output}\n\n-# > {message}", color=0xf5f306).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
+        embed = discord.Embed(description=discord.utils.escape_markdown(output) + "\n\n-# > *" + discord.utils.escape_markdown(message) + "*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
         await inter.edit_original_response(embed=embed)
     except:
         try:
