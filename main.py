@@ -20,13 +20,15 @@ def load_wav(path, start=None, end=None, gain=None):
 
 
 load_dotenv()
-gpt = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-fy = FakeYou()
-fy.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
+openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+fakeyou = FakeYou()
+fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
+fakeyou_timeout = 180
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
-tree = app_commands.CommandTree(client)
+command_tree = app_commands.CommandTree(client)
 embed_color_dark = 0x7f9400
 embed_color_light = 0xf5f306
+embed_delete_after = 10
 embed_ready = discord.Embed(title="Ready", description="# 📺", color=embed_color_light).set_footer(text="Ready to generate.")
 embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending chat...")
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
@@ -53,37 +55,41 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLE_BASS"), False),
               "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
               "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False)}
-songs = {load_wav("music/closing_theme.wav", gain=-35): 10,
-         load_wav("music/tip_top_polka.wav", gain=-35): 10,
-         load_wav("music/rake_hornpipe.wav", gain=-35): 10,
-         load_wav("music/seaweed.wav", gain=-35): 10,
-         load_wav("music/hello_sailor_b.wav", gain=-35): 5,
-         load_wav("music/stars_and_games.wav", gain=-35): 5,
-         load_wav("music/rock_bottom.wav", gain=-35): 5,
-         load_wav("music/sneaky_snitch.wav", gain=-35): 1,
-         load_wav("music/better_call_saul.wav", start=50, end=18250, gain=-35): 1}
-sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=-20): 5,
-       load_wav("sfx/boowomp.wav", start=750, end=1200, gain=-20): 5,
-       load_wav("sfx/disgusting.wav", start=100, end=-250, gain=-20): 1,
-       load_wav("sfx/vibe_link_b.wav", start=50, gain=-20): 1,
-       load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=-20): 1,
-       load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=-20): 1,
-       load_wav("sfx/you_what.wav", start=150, gain=-20): 1,
-       load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=-20): 1}
-sfx_transition = load_wav("sfx/transition.wav", start=200, gain=-20)
-ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=-45),
-                 load_wav("ambiance/night.wav", start=100, end=-4000, gain=-45)]
+music_gain = -35
+songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
+         load_wav("music/tip_top_polka.wav", gain=music_gain): 10,
+         load_wav("music/rake_hornpipe.wav", gain=music_gain): 10,
+         load_wav("music/seaweed.wav", gain=music_gain): 10,
+         load_wav("music/hello_sailor_b.wav", gain=music_gain): 5,
+         load_wav("music/stars_and_games.wav", gain=music_gain): 5,
+         load_wav("music/rock_bottom.wav", gain=music_gain): 5,
+         load_wav("music/sneaky_snitch.wav", gain=music_gain): 1,
+         load_wav("music/better_call_saul.wav", start=50, end=18250, gain=music_gain): 1}
+sfx_gain = -20
+sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
+       load_wav("sfx/boowomp.wav", start=750, end=1200, gain=sfx_gain): 5,
+       load_wav("sfx/disgusting.wav", start=100, end=-250, gain=sfx_gain): 1,
+       load_wav("sfx/vibe_link_b.wav", start=50, gain=sfx_gain): 1,
+       load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=sfx_gain): 1,
+       load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=sfx_gain): 1,
+       load_wav("sfx/you_what.wav", start=150, gain=sfx_gain): 1,
+       load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=sfx_gain): 1}
+sfx_transition = load_wav("sfx/transition.wav", start=200, gain=sfx_gain)
+ambiance_gain = -45
+ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
+                 load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
 ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = load_wav("voice/gary.wav", end=6000)
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
 silence_music = AudioSegment.silent(2450)
-generating = False
-progress = 0
-cooldown = {}
+episode_generating = False
+episode_progress = 0
+episode_cooldown = 300
+episode_cooldowns = {}
 
 
-@tree.command(name="episode", description="Generate an episode.")
+@command_tree.command(name="episode", description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
 async def episode(inter: discord.Interaction, topic: str = ""):
     if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history and inter.app_permissions.use_external_emojis):
@@ -91,21 +97,21 @@ async def episode(inter: discord.Interaction, topic: str = ""):
             await inter.response.send_message(embed=embed_error_permissions)
         except:
             pass
-    elif inter.user.id not in cooldown.keys() or time.time() - cooldown[inter.user.id] > 300:
-        if inter.user.id in cooldown.keys():
-            del cooldown[inter.user.id]
-        global generating
-        if not generating:
+    elif inter.user.id not in episode_cooldowns.keys() or time.time() - episode_cooldowns[inter.user.id] > episode_cooldown:
+        if inter.user.id in episode_cooldowns.keys():
+            del episode_cooldowns[inter.user.id]
+        global episode_generating
+        if not episode_generating:
             if topic:
                 try:
-                    generating = True
-                    global progress
-                    progress = 0
-                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Preparing episode..."))
-                    await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
+                    episode_generating = True
+                    global episode_progress
+                    episode_progress = 0
+                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Preparing episode..."))
+                    await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     response = await inter.original_response()
                     message = await response.channel.fetch_message(response.id)
-                    completion = await gpt.completions.create(
+                    completion = await openai.completions.create(
                         model="gpt-3.5-turbo-instruct",
                         max_tokens=700,
                         prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Include a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}"
@@ -116,9 +122,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     if not title:
                         title = "EPiSODE"
                     completed = 1
-                    progress = int(100 * (completed / remaining))
-                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Generated script."))
-                    await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
+                    episode_progress = int(100 * (completed / remaining))
+                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Generated script."))
+                    await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     transcript = []
                     combined = AudioSegment.empty()
                     loop = asyncio.get_running_loop()
@@ -126,13 +132,13 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         line = discord.utils.escape_markdown(line).strip()
                         character = line.split(":")[0].lower()
                         if character in characters.keys():
-                            stripped = line[len(character)+1:].strip()
+                            stripped = line[len(character) + 1:].strip()
                             line = "- " + characters[character][1] + " " + stripped
                             if character == "gary":
                                 seg = voice_gary
                                 remaining -= 1
                             else:
-                                tts = await asyncio.wait_for(loop.run_in_executor(None, fy.say, stripped, characters[character][0]), 180)
+                                tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, stripped, characters[character][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
                                     seg = AudioSegment.from_wav(wav)
                                 completed += 1
@@ -151,13 +157,13 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             else:
                                 combined = combined.append(silence_line, 0)
                             transcript.append(line)
-                            progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed-1}/{remaining-1}."))
+                            episode_progress = int(100 * (completed / remaining))
+                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
                         else:
                             remaining -= 1
-                            progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {progress}%", color=embed_color_light).set_footer(text=f"Skipped line."))
-                        await client.change_presence(activity=discord.Game(f"Generating... {progress}%"), status=discord.Status.dnd)
+                            episode_progress = int(100 * (completed / remaining))
+                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Skipped line."))
+                        await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
                     music = random.choices(list(songs.keys()), list(songs.values()))[0]
                     music_loop = silence_music.append(music.fade_in(10000), 0)
@@ -171,7 +177,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             ambiance_loop = ambiance_loop.append(ambiance, 0)
                         combined = combined.overlay(ambiance_loop)
                     if random.randrange(5) == 0:
-                        rain_randomized = ambiance_rain.apply_gain(random.randint(-45, -40)-ambiance_rain.dBFS)
+                        rain_randomized = ambiance_rain.apply_gain(random.randint(ambiance_gain, ambiance_gain + 5)-ambiance_rain.dBFS)
                         rain_loop = rain_randomized.fade_in(500)
                         while len(rain_loop) < len(combined):
                             rain_loop = rain_loop.append(rain_randomized, 0)
@@ -189,7 +195,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             remove_cooldown = True
                             break
                     if not remove_cooldown:
-                        cooldown[inter.user.id] = time.time()
+                        episode_cooldowns[inter.user.id] = time.time()
                 except:
                     try:
                         await message.edit(embed=embed_error_failed)
@@ -199,22 +205,22 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         except:
                             pass
                 await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
-                generating = False
+                episode_generating = False
             else:
-                await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_ready)
+                await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_ready)
         else:
-            await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title="Generating", description=f"# {progress}%", color=embed_color_light).set_footer(text="Generating an episode."))
+            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title="Generating", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text="Generating an episode."))
     else:
         view = discord.ui.View()
         view.add_item(remove_cooldown_button)
-        await inter.response.send_message(ephemeral=True, delete_after=10, embed=discord.Embed(title=f"Cooldown", description=f"# {int((300 - (time.time() - cooldown[inter.user.id])) / 60)}m {int((300 - (time.time() - cooldown[inter.user.id])) % 60)}s", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# {int((episode_cooldown - (time.time() - episode_cooldowns[inter.user.id])) / 60)}m {int((episode_cooldown - (time.time() - episode_cooldowns[inter.user.id])) % 60)}s", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
     return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if not characters[character][2]] if current.lower() in character.lower()]
 
 
-@tree.command(name="chat", description="Chat with a character.")
+@command_tree.command(name="chat", description="Chat with a character.")
 @app_commands.describe(character="Character to chat with.")
 @app_commands.describe(message="Message to send.")
 @app_commands.autocomplete(character=character_autocomplete)
@@ -224,11 +230,11 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         if character in characters.keys() and not characters[character][2]:
             emoji = characters[character][1]
         else:
-            await inter.response.send_message(ephemeral=True, delete_after=10, embed=embed_error_character)
+            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
             return
         character = character.title().replace("bob", "Bob")
         await inter.response.send_message(embed=embed_generating_chat)
-        completion = await gpt.completions.create(
+        completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
             prompt=f"You are {character} from SpongeBob SquarePants messaging with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
@@ -245,7 +251,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 
 @client.event
 async def on_ready():
-    await tree.sync()
+    await command_tree.sync()
 
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
