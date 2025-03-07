@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import random
 import re
 import time
@@ -87,6 +88,7 @@ episode_generating = False
 episode_progress = 0
 episode_cooldown = 300
 episode_cooldowns = {}
+start_time = int(time.time())
 
 
 @command_tree.command(name="episode", description="Generate an episode.")
@@ -97,7 +99,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
             await inter.response.send_message(embed=embed_error_permissions)
         except:
             pass
-    elif inter.user.id not in episode_cooldowns.keys() or time.time() - episode_cooldowns[inter.user.id] > episode_cooldown:
+    elif inter.user.id not in episode_cooldowns.keys() or int(time.time()) - episode_cooldowns[inter.user.id] > episode_cooldown:
         if inter.user.id in episode_cooldowns.keys():
             del episode_cooldowns[inter.user.id]
         global episode_generating
@@ -189,13 +191,16 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     with BytesIO() as output:
                         combined.export(output, "ogg")
                         await message.edit(embed=discord.Embed(title="__**" + discord.utils.escape_markdown(title) + "**__", description="\n".join(transcript) + "\n\n-# > *" + discord.utils.escape_markdown(topic) + "*", color=embed_color_light), attachments=[discord.File(output, f"{title}.ogg")])
+                    end_time = int(time.time())
                     remove_cooldown = False
                     for entitlement in inter.entitlements:
                         if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
                             remove_cooldown = True
                             break
                     if not remove_cooldown:
-                        episode_cooldowns[inter.user.id] = time.time()
+                        episode_cooldowns[inter.user.id] = end_time
+                    with open("statistics.txt", "a") as file:
+                        file.write(f"E {end_time}\n")
                 except:
                     try:
                         await message.edit(embed=embed_error_failed)
@@ -213,7 +218,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
     else:
         view = discord.ui.View()
         view.add_item(remove_cooldown_button)
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# {int((episode_cooldown - (time.time() - episode_cooldowns[inter.user.id])) / 60)}m {int((episode_cooldown - (time.time() - episode_cooldowns[inter.user.id])) % 60)}s", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# {(episode_cooldown - (int(time.time()) - episode_cooldowns[inter.user.id])) // 60}m {(episode_cooldown - (int(time.time()) - episode_cooldowns[inter.user.id])) % 60}s", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
@@ -242,11 +247,36 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         output = re.compile(re.escape(character + ": "), re.IGNORECASE).sub("", completion.choices[0].text.strip().strip("\""), 1)
         embed = discord.Embed(description=discord.utils.escape_markdown(output) + "\n\n-# > *" + discord.utils.escape_markdown(message) + "*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
         await inter.edit_original_response(embed=embed)
+        with open("statistics.txt", "a") as file:
+            file.write(f"C {int(time.time())}\n")
     except:
         try:
             await inter.edit_original_response(embed=embed_error_failed)
         except:
             pass
+
+
+@command_tree.command(name="statistics", description="View bot statistics.")
+async def statistics(inter: discord.Interaction):
+    episodes_24h = 0
+    episodes_all = 0
+    chats_24h = 0
+    chats_all = 0
+    current_time = int(time.time())
+    if os.path.exists("statistics.txt"):
+        with open("statistics.txt", "r") as file:
+            lines = file.read().strip().split("\n")
+        for line in lines:
+            parts = line.split(" ")
+            if parts[0] == "E":
+                episodes_all += 1
+                if current_time - int(parts[1]) < 86400:
+                    episodes_24h += 1
+            elif parts[0] == "C":
+                chats_all += 1
+                if current_time - int(parts[1]) < 86400:
+                    chats_24h += 1
+    await inter.response.send_message(embed=discord.Embed(title="Statistics", color=embed_color_light).add_field(name="📺 __Episodes:__", value=f"- 24H: {episodes_24h}\n- All: {episodes_all}", inline=False).add_field(name="💬 __Chats:__", value=f"- 24H: {chats_24h}\n- All: {chats_all}", inline=False).set_footer(text=f"Uptime: {datetime.timedelta(seconds=int(current_time - start_time))}").set_thumbnail(url=client.user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
 
 
 @client.event
