@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 import random
 import re
 import time
@@ -276,7 +275,25 @@ async def statistics(inter: discord.Interaction):
                 chats_all += 1
                 if current_time - int(parts[1]) < 86400:
                     chats_24h += 1
-    await inter.response.send_message(embed=discord.Embed(title="Statistics", color=embed_color_light).add_field(name="📺 __Episodes:__", value=f"- 24H: {episodes_24h}\n- All: {episodes_all}", inline=False).add_field(name="💬 __Chats:__", value=f"- 24H: {chats_24h}\n- All: {chats_all}", inline=False).set_footer(text=f"Uptime: {datetime.timedelta(seconds=int(current_time - start_time))}").set_thumbnail(url=client.user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
+    uptime = int(current_time - start_time)
+    uptime_formatted = ""
+    days = uptime // 86400
+    if days > 0:
+        uptime_formatted += f"{days}d "
+    hours = (uptime % 86400) // 3600
+    if hours > 0:
+        uptime_formatted += f"{hours}h "
+    minutes = (uptime % 3600) // 60
+    if minutes > 0:
+        uptime_formatted += f"{minutes}m "
+    seconds = uptime % 60
+    if seconds > 0:
+        uptime_formatted += f"{seconds}s"
+    await inter.response.send_message(embed=discord.Embed(title="Statistics", color=embed_color_light)
+                                      .add_field(name="📺 __Episodes:__", value=f"- 24H: {episodes_24h}\n- All: {episodes_all}", inline=False)
+                                      .add_field(name="💬 __Chats:__", value=f"- 24H: {chats_24h}\n- All: {chats_all}", inline=False)
+                                      .add_field(name="🖥 __Service:__", value=f"- Latency: {int(1000 * client.latency)}ms\n- Uptime: {uptime_formatted}", inline=False)
+                                      .set_thumbnail(url=client.user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
 
 
 @client.event
