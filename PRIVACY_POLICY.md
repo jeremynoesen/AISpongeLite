@@ -1,18 +1,18 @@
 ## What data is collected?
 
-No user data is collected by the bot itself.
+The only data stored by AI Sponge Lite is timestamps of when generative commands complete, which are used for statistics. Only an integer is stored for the timestamp; there is no identifying information linked to it.
 
 ## How long is data stored?
 
-No user data is stored by the bot itself.
+Data is stored indefinitely by AI Sponge Lite, for use in long-term statistics.
 
 ## Who is data shared with?
 
-No user data is shared with anyone by the bot itself.
+No data is shared with anyone by AI Sponge Lite.
 
 ## How can I request data deletion?
 
-Since no user data is stored, you can not request data deletion.
+Since there are no identifiers linked to the stored data, it is not possible to request data deletion.
 
 ## How can I contact you about privacy concerns?
 
