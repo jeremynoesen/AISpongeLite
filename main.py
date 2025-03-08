@@ -293,9 +293,9 @@ async def statistics(inter: discord.Interaction):
     if seconds > 0:
         uptime_formatted += f"{seconds}s"
     await inter.response.send_message(embed=discord.Embed(title="Statistics", color=embed_color_light)
-                                      .add_field(name="📺 __Episodes:__", value=f"- 24H: {episodes_24h}\n- All: {episodes_all}", inline=False)
-                                      .add_field(name="💬 __Chats:__", value=f"- 24H: {chats_24h}\n- All: {chats_all}", inline=False)
-                                      .add_field(name="🖥 __Service:__", value=f"- Latency: {int(1000 * client.latency)}ms\n- Uptime: {uptime_formatted}", inline=False)
+                                      .add_field(name="📺 __Episodes:__", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
+                                      .add_field(name="💬 __Chats:__", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
+                                      .add_field(name="🖥 __Service:__", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`", inline=False)
                                       .set_thumbnail(url=client.user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
 
 
