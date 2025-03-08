@@ -93,7 +93,7 @@ start_time = int(time.time())
 @command_tree.command(name="episode", description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
 async def episode(inter: discord.Interaction, topic: str = ""):
-    if not (inter.app_permissions.view_channel and inter.app_permissions.embed_links and inter.app_permissions.attach_files and inter.app_permissions.read_message_history and inter.app_permissions.use_external_emojis):
+    if not inter.app_permissions.use_external_emojis:
         try:
             await inter.response.send_message(embed=embed_error_permissions)
         except:
@@ -110,8 +110,6 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     episode_progress = 0
                     await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Preparing episode..."))
                     await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
-                    response = await inter.original_response()
-                    message = await response.channel.fetch_message(response.id)
                     completion = await openai.completions.create(
                         model="gpt-3.5-turbo-instruct",
                         max_tokens=700,
@@ -124,7 +122,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         title = "EPiSODE"
                     completed = 1
                     episode_progress = int(100 * (completed / remaining))
-                    await message.edit(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Generated script."))
+                    await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Generated script."))
                     await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     transcript = []
                     combined = AudioSegment.empty()
@@ -159,11 +157,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 combined = combined.append(silence_line, 0)
                             transcript.append(line)
                             episode_progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
+                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
                         else:
                             remaining -= 1
                             episode_progress = int(100 * (completed / remaining))
-                            await message.edit(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Skipped line."))
+                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Skipped line."))
                         await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
                     music = random.choices(list(songs.keys()), list(songs.values()))[0]
@@ -189,7 +187,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     combined = combined.fade_out(500)
                     with BytesIO() as output:
                         combined.export(output, "ogg")
-                        await message.edit(embed=discord.Embed(title="__**" + discord.utils.escape_markdown(title) + "**__", description="\n".join(transcript) + "\n\n-# > *" + discord.utils.escape_markdown(topic) + "*", color=embed_color_light), attachments=[discord.File(output, f"{title}.ogg")])
+                        await inter.edit_original_response(embed=discord.Embed(title="__**" + discord.utils.escape_markdown(title) + "**__", description="\n".join(transcript) + "\n\n-# > *" + discord.utils.escape_markdown(topic) + "*", color=embed_color_light), attachments=[discord.File(output, f"{title}.ogg")])
                     end_time = int(time.time())
                     remove_cooldown = False
                     for entitlement in inter.entitlements:
@@ -202,12 +200,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         file.write(f"E {end_time}\n")
                 except:
                     try:
-                        await message.edit(embed=embed_error_failed)
+                        await inter.edit_original_response(embed=embed_error_failed)
                     except:
-                        try:
-                            await inter.edit_original_response(embed=embed_error_failed)
-                        except:
-                            pass
+                        pass
                 await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
                 episode_generating = False
             else:

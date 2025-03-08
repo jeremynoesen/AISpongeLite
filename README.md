@@ -62,8 +62,7 @@ instructions in the popup.
 
 ## Troubleshooting
 
-- If you encounter the error "Missing permissions.", make sure the bot has the following permissions: View
-  Channels, Embed Links, Attach Files, Read Message History, and Use External Emojis.
+- If you encounter the error "Missing permissions.", make sure the bot has the "Use External Emojis" permission.
 - If you encounter the error "An error occurred.", try again later. If this occurs immediately after generation 
   progresses past 0%, try rewording your topic. Quotation marks and similar punctuation can cause problems.
 
