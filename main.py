@@ -42,6 +42,8 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "squidward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SQUIDWARD"), False),
               "loudward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_LOUDWARD"), True),
               "schizoward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SCHIZOWARD"), True),
+              "shadeward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SHADEWARD"), True),
+              "skodwarde": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SKODWARDE"), True),
               "gary": (None, os.getenv("EMOJI_GARY"), True),
               "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON"), False),
               "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_LOUDTON"), True),
