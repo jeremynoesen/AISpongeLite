@@ -137,12 +137,10 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             line = "- " + characters[character][1] + " " + stripped
                             if character == "gary":
                                 seg = voice_gary
-                                remaining -= 1
                             else:
                                 tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, stripped, characters[character][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
                                     seg = AudioSegment.from_wav(wav)
-                                completed += 1
                             if "loud" in character or stripped.isupper() or random.randrange(100) == 0:
                                 seg = seg.apply_gain(-seg.dBFS)
                                 line = line.replace(stripped, stripped.upper())
@@ -158,6 +156,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             else:
                                 combined = combined.append(silence_line, 0)
                             transcript.append(line)
+                            completed += 1
                             episode_progress = int(100 * (completed / remaining))
                             await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
                         else:
