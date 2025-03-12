@@ -30,7 +30,7 @@ embed_color_dark = 0x7f9400
 embed_color_light = 0xf5f306
 embed_delete_after = 10
 embed_ready = discord.Embed(title="Ready", description="# 📺", color=embed_color_light).set_footer(text="Ready to generate.")
-embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending chat...")
+embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending message...")
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
 embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Invalid character.")
@@ -103,66 +103,80 @@ async def episode(inter: discord.Interaction, topic: str = ""):
     elif inter.user.id not in episode_cooldowns.keys() or int(time.time()) - episode_cooldowns[inter.user.id] > episode_cooldown:
         if inter.user.id in episode_cooldowns.keys():
             del episode_cooldowns[inter.user.id]
-        global episode_generating
+        global episode_generating, episode_progress
         if not episode_generating:
             if topic:
                 try:
                     episode_generating = True
-                    global episode_progress
                     episode_progress = 0
-                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Preparing episode..."))
+                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Preparing episode..."))
                     await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     completion = await openai.completions.create(
                         model="gpt-3.5-turbo-instruct",
                         max_tokens=700,
-                        prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. Include a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}"
+                        prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
                     )
                     lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", " ", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                     remaining = len(lines)
-                    title = lines.pop(0)[6:].strip().upper().replace("I", "i")
-                    if not title:
-                        title = "EPiSODE"
+                    line = lines.pop(0).strip()
+                    title = line.split(":")[0].lower()
+                    if title.strip() == "title":
+                        line = line[len(title) + 1:].strip()
+                        if line[0] == line[-1] == "\"" or line[0] == line[-1] == "'":
+                            line = line[1:-1].strip()
+                        file_title = line.upper().replace("I", "i")
+                        embed_title = ""
+                        for character in discord.utils.escape_markdown(line):
+                            if character.isupper() or character.isnumeric() or character in ".,!?":
+                                embed_title += f"**{character}**"
+                            else:
+                                embed_title += character
+                        embed_title = embed_title.upper().replace("I", "i")
+                    else:
+                        file_title = "UNTiTLED EPiSODE"
+                        embed_title = "**U**NTiTLED **E**PiSODE"
                     completed = 1
                     episode_progress = int(100 * (completed / remaining))
-                    await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Generated script."))
+                    await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Generated script."))
                     await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     transcript = []
                     combined = AudioSegment.empty()
                     loop = asyncio.get_running_loop()
                     for line in lines:
-                        line = discord.utils.escape_markdown(line).strip()
+                        line = line.strip()
                         character = line.split(":")[0].lower()
-                        if character in characters.keys():
-                            stripped = line[len(character) + 1:].strip()
-                            line = "- " + characters[character][1] + " " + stripped
-                            if character == "gary":
+                        character_stripped = character.strip()
+                        if character_stripped in characters.keys():
+                            line_stripped = line[len(character) + 1:].strip()
+                            line = f"{characters[character_stripped][1]} {line_stripped}"
+                            if character_stripped == "gary":
                                 seg = voice_gary
                             else:
-                                tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, stripped, characters[character][0]), fakeyou_timeout)
+                                tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
                                     seg = AudioSegment.from_wav(wav)
-                            if "loud" in character or stripped.isupper() or random.randrange(100) == 0:
+                            if "loud" in character_stripped or line_stripped.isupper() or random.randrange(100) == 0:
                                 seg = seg.apply_gain(-seg.dBFS)
-                                line = line.replace(stripped, stripped.upper())
+                                line = line.replace(line_stripped, line_stripped.upper())
                             else:
                                 seg = seg.apply_gain(-15-seg.dBFS)
                             combined = combined.append(seg, 0)
                             if line[-1] in "-–—":
-                                line[-1] = "—"
+                                line = line[:-1] + "—"
                             elif random.randrange(10) == 0:
-                                while line[-1] in ".!?":
+                                while line[-1] in ".!?…":
                                     line = line[:-1]
                                 line += "—"
                             else:
                                 combined = combined.append(silence_line, 0)
-                            transcript.append(line)
+                            transcript.append(f"- {discord.utils.escape_markdown(line)}")
                             completed += 1
                             episode_progress = int(100 * (completed / remaining))
-                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
+                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
                         else:
                             remaining -= 1
                             episode_progress = int(100 * (completed / remaining))
-                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text=f"Skipped line."))
+                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Skipped line."))
                         await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
                     music = random.choices(list(songs.keys()), list(songs.values()))[0]
@@ -188,7 +202,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     combined = combined.fade_out(500)
                     with BytesIO() as output:
                         combined.export(output, "ogg")
-                        await inter.edit_original_response(embed=discord.Embed(title="__**" + discord.utils.escape_markdown(title) + "**__", description="\n".join(transcript) + "\n\n-# > *" + discord.utils.escape_markdown(topic) + "*", color=embed_color_light), attachments=[discord.File(output, f"{title}.ogg")])
+                        await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_light), attachments=[discord.File(output, f"{file_title}.ogg")])
                     end_time = int(time.time())
                     remove_cooldown = False
                     for entitlement in inter.entitlements:
@@ -209,7 +223,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
             else:
                 await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_ready)
         else:
-            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title="Generating", description=f"# {episode_progress}%", color=embed_color_light).set_footer(text="Generating an episode."))
+            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title="Generating", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text="Generating an episode."))
     else:
         view = discord.ui.View()
         view.add_item(remove_cooldown_button)
@@ -221,7 +235,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         seconds = remaining % 60
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# {remaining_formatted}", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# `{remaining_formatted}`", color=embed_color_light).set_footer(text="You're on cooldown."), view=view)
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
@@ -247,8 +261,10 @@ async def chat(inter: discord.Interaction, character: str, message: str):
             max_tokens=250,
             prompt=f"You are {character} from SpongeBob SquarePants messaging with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
-        output = re.compile(re.escape(character + ": "), re.IGNORECASE).sub("", completion.choices[0].text.strip().strip("\""), 1)
-        embed = discord.Embed(description=discord.utils.escape_markdown(output) + "\n\n-# > *" + discord.utils.escape_markdown(message) + "*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
+        output = discord.utils.escape_markdown(re.compile(re.escape(f"{character}:"), re.IGNORECASE).sub("", completion.choices[0].text.strip(), 1).strip())
+        if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
+            output = output[1:-1].strip()
+        embed = discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
         await inter.edit_original_response(embed=embed)
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
@@ -259,7 +275,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
             pass
 
 
-@command_tree.command(name="statistics", description="View bot statistics.")
+@command_tree.command(name="statistics", description="View statistics.")
 async def statistics(inter: discord.Interaction):
     episodes_24h = 0
     episodes_all = 0
@@ -294,9 +310,9 @@ async def statistics(inter: discord.Interaction):
     if seconds > 0:
         uptime_formatted += f"{seconds}s"
     await inter.response.send_message(embed=discord.Embed(color=embed_color_light)
-                                      .add_field(name="📺 __**Episodes:**__", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
-                                      .add_field(name="💬 __**Chats:**__", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
-                                      .add_field(name="🤖 __**Bot:**__", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
+                                      .add_field(name="📺 Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
+                                      .add_field(name="💬 Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
+                                      .add_field(name="🤖 Bot", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
                                       ephemeral=True)
 
 
