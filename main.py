@@ -30,6 +30,8 @@ embed_color_dark = 0x7f9400
 embed_color_light = 0xf5f306
 embed_delete_after = 10
 embed_ready = discord.Embed(title="Ready", description="# 📺", color=embed_color_light).set_footer(text="Ready to generate.")
+embed_help = discord.Embed(title="See the App Directory for bot help.", description="You will also find links to the support server and source code there.", color=embed_color_light)
+help_button = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
 embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending message...")
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
@@ -275,7 +277,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
             pass
 
 
-@command_tree.command(name="statistics", description="View statistics.")
+@command_tree.command(name="statistics", description="Show bot statistics.")
 async def statistics(inter: discord.Interaction):
     episodes_24h = 0
     episodes_all = 0
@@ -313,7 +315,12 @@ async def statistics(inter: discord.Interaction):
                                       .add_field(name="📺 Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
                                       .add_field(name="💬 Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
                                       .add_field(name="🤖 Bot", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
-                                      ephemeral=True)
+                                      ephemeral=True, delete_after=embed_delete_after)
+
+
+@command_tree.command(name="help", description="Show bot help.")
+async def help(inter: discord.Interaction):
+    await inter.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=discord.ui.View().add_item(help_button))
 
 
 @client.event
