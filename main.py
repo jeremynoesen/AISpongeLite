@@ -83,7 +83,7 @@ ambiance_gain = -45
 ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
                  load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
 ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
-voice_gary = load_wav("voice/gary.wav", end=6000)
+voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 silence_line = AudioSegment.silent(500)
 silence_transition = AudioSegment.silent(1100)
 silence_music = AudioSegment.silent(2450)
@@ -152,7 +152,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             line_stripped = line[len(character) + 1:].strip()
                             line = f"{characters[character_stripped][1]} {line_stripped}"
                             if character_stripped == "gary":
-                                seg = voice_gary
+                                seg = random.choice(voice_gary)
                             else:
                                 tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
