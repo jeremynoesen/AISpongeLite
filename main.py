@@ -49,7 +49,7 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "shadeward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SHADEWARD"), True),
               "skodwarde": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SKODWARDE"), True),
               "spinward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SPINWARD"), True),
-              "gary": (None, os.getenv("EMOJI_GARY"), True),
+              "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", os.getenv("EMOJI_GARY"), False),
               "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON"), False),
               "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_LOUDTON"), True),
               "dr. jr.": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DR_JR"), True),
@@ -154,7 +154,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         if character_stripped in characters.keys():
                             line_stripped = line[len(character) + 1:].strip()
                             line = f"{characters[character_stripped][1]} {line_stripped}"
-                            if character_stripped == "gary":
+                            if character_stripped == "gary" and bool(re.fullmatch(r"(\W*meow\W*)+", line_stripped, re.IGNORECASE)):
                                 seg = random.choice(voice_gary)
                             else:
                                 tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
