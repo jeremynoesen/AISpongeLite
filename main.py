@@ -87,9 +87,9 @@ ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambian
                  load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
 ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
-silence_line = AudioSegment.silent(500)
-silence_transition = AudioSegment.silent(1100)
-silence_music = AudioSegment.silent(2450)
+silence_line = AudioSegment.silent(200)
+silence_transition = AudioSegment.silent(600)
+silence_music = AudioSegment.silent(3000)
 episode_generating = False
 episode_progress = 0
 episode_cooldown = 300
@@ -204,7 +204,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
                     for i in range(random.randint(1, len(transcript) // 5)):
                         combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))
-                    combined = combined.fade_out(500)
+                    combined = combined.fade_out(200)
                     with BytesIO() as output:
                         combined.export(output, "ogg")
                         await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_light), attachments=[discord.File(output, f"{file_title}.ogg")])
