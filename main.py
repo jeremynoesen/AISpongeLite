@@ -145,18 +145,33 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Generated script."))
                     await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     transcript = []
+                    spoken_characters = set()
                     combined = AudioSegment.empty()
                     loop = asyncio.get_running_loop()
                     for line in lines:
                         line = line.strip()
                         character = line.split(":")[0].lower()
                         character_stripped = character.strip()
-                        if character_stripped in characters.keys():
+                        if character_stripped in characters.keys() or any(x in character_stripped for x in ["all", "every", "unison"]):
                             line_stripped = line[len(character) + 1:].strip()
-                            line = f"{characters[character_stripped][1]} {line_stripped}"
-                            if character_stripped == "gary" and bool(re.fullmatch(r"(\W*meow\W*)+", line_stripped, re.IGNORECASE)):
+                            if any(x in character_stripped for x in ["all", "every", "unison"]):
+                                line = f"👥 {line_stripped}"
+                                segs = []
+                                for character in spoken_characters:
+                                    tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
+                                    with BytesIO(tts.content) as wav:
+                                        segs.append(AudioSegment.from_wav(wav))
+                                segs.sort(key=lambda x: -len(x))
+                                seg = segs[0]
+                                for i in range(1, len(segs)):
+                                    seg = seg.overlay(segs[i], 0)
+                            elif character_stripped == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", line_stripped, re.IGNORECASE)):
+                                spoken_characters.add(character_stripped)
+                                line = f"{characters[character_stripped][1]} {line_stripped}"
                                 seg = random.choice(voice_gary)
                             else:
+                                spoken_characters.add(character_stripped)
+                                line = f"{characters[character_stripped][1]} {line_stripped}"
                                 tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
                                     seg = AudioSegment.from_wav(wav)
@@ -218,7 +233,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         episode_cooldowns[inter.user.id] = end_time
                     with open("statistics.txt", "a") as file:
                         file.write(f"E {end_time}\n")
-                except:
+                except ValueError:
                     try:
                         await inter.edit_original_response(embed=embed_error_failed)
                     except:
