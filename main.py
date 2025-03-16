@@ -81,7 +81,9 @@ sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
        load_wav("sfx/this_guy_stinks.wav", start=550, end=-100, gain=sfx_gain): 1,
        load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=sfx_gain): 1,
        load_wav("sfx/you_what.wav", start=150, gain=sfx_gain): 1,
-       load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=sfx_gain): 1}
+       load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=sfx_gain): 1,
+       load_wav("sfx/boo_you_stink.wav", start=250, end=-1100, gain=sfx_gain): 1,
+       load_wav("sfx/bonk.wav", start=450, end=-900, gain=sfx_gain): 1}
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=sfx_gain)
 ambiance_gain = -45
 ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
