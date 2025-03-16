@@ -4,6 +4,8 @@ import re
 import time
 import discord
 import os
+
+import pydub.effects
 from dotenv import load_dotenv
 from discord import app_commands
 from io import BytesIO
@@ -183,6 +185,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
                                     seg = AudioSegment.from_wav(wav)
+                            seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
                             if "loud" in character_stripped or line_stripped.isupper() or random.randrange(100) == 0:
                                 seg = seg.apply_gain(-seg.dBFS)
                                 line = line.replace(line_stripped, line_stripped.upper())
