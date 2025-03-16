@@ -62,7 +62,8 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLE_BASS"), False),
               "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
               "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
-              "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False)}
+              "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
+              "all": (None, os.getenv("EMOJI_ALL"), True)}
 music_gain = -35
 songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/tip_top_polka.wav", gain=music_gain): 10,
@@ -159,7 +160,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         if character_stripped in characters.keys() or any(x in character_stripped for x in ["all", "every", "unison"]):
                             line_stripped = line[len(character) + 1:].strip()
                             if any(x in character_stripped for x in ["all", "every", "unison"]):
-                                line = f"👥 {line_stripped}"
+                                line = f"{characters['all'][1]} {line_stripped}"
                                 segs = []
                                 for character in spoken_characters:
                                     tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
@@ -170,11 +171,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 for i in range(1, len(segs)):
                                     seg = seg.overlay(segs[i], 0)
                             elif character_stripped == "doodlebob":
-                                line = f"{characters[character_stripped][1]} {line_stripped}"
+                                line = f"{characters['doodlebob'][1]} {line_stripped}"
                                 seg = random.choice(voice_doodlebob)
                             elif character_stripped == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", line_stripped, re.IGNORECASE)):
                                 spoken_characters.add(character_stripped)
-                                line = f"{characters[character_stripped][1]} {line_stripped}"
+                                line = f"{characters['gary'][1]} {line_stripped}"
                                 seg = random.choice(voice_gary)
                             else:
                                 spoken_characters.add(character_stripped)
