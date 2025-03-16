@@ -61,6 +61,7 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", os.getenv("EMOJI_LARRY"), False),
               "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLE_BASS"), False),
               "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
+              "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
               "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False)}
 music_gain = -35
 songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
@@ -87,6 +88,7 @@ ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambian
                  load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
 ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
+voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 7)]
 silence_line = AudioSegment.silent(200)
 silence_transition = AudioSegment.silent(600)
 silence_music = AudioSegment.silent(3000)
@@ -119,7 +121,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     completion = await openai.completions.create(
                         model="gpt-3.5-turbo-instruct",
                         max_tokens=700,
-                        prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
+                        prompt=f"Create a vulgar, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
                     )
                     lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
                     remaining = len(lines)
@@ -165,6 +167,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 seg = segs[0]
                                 for i in range(1, len(segs)):
                                     seg = seg.overlay(segs[i], 0)
+                            elif character_stripped == "doodlebob":
+                                line = f"{characters[character_stripped][1]} {line_stripped}"
+                                seg = random.choice(voice_doodlebob)
                             elif character_stripped == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", line_stripped, re.IGNORECASE)):
                                 spoken_characters.add(character_stripped)
                                 line = f"{characters[character_stripped][1]} {line_stripped}"
