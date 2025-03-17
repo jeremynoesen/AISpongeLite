@@ -79,6 +79,7 @@ songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/stars_and_games.wav", gain=music_gain): 5,
          load_wav("music/rock_bottom.wav", gain=music_gain): 5,
          load_wav("music/sneaky_snitch.wav", gain=music_gain): 1,
+         load_wav("music/grass_skirt_chase.wav", gain=music_gain): 1,
          load_wav("music/better_call_saul.wav", start=50, end=18250, gain=music_gain): 1}
 sfx_gain = -20
 sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
