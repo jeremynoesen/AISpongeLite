@@ -17,7 +17,7 @@ from pydub import AudioSegment
 def load_wav(path, start=None, end=None, gain=None):
     seg = AudioSegment.from_wav(path)[start:end]
     if gain is not None:
-        seg = seg.apply_gain(gain-seg.dBFS)
+        seg = seg.apply_gain(gain - seg.dBFS)
     return seg
 
 
@@ -94,6 +94,7 @@ sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
        load_wav("sfx/bonk.wav", start=450, end=-900, gain=sfx_gain): 1,
        load_wav('sfx/fling.wav', start=50, end=900, gain=sfx_gain): 1}
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=sfx_gain)
+sfx_strike = load_wav('sfx/strike.wav', start=500)
 ambiance_gain = -45
 ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
                  load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
@@ -228,11 +229,13 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             ambiance_loop = ambiance_loop.append(ambiance, 0)
                         combined = combined.overlay(ambiance_loop)
                     if random.randrange(5) == 0:
-                        rain_randomized = ambiance_rain.apply_gain(random.randint(ambiance_gain, ambiance_gain + 5)-ambiance_rain.dBFS)
+                        rain_randomized = ambiance_rain.apply_gain((ambiance_gain + random.randint(0, 5)) - ambiance_rain.dBFS)
                         rain_loop = rain_randomized.fade_in(500)
                         while len(rain_loop) < len(combined):
                             rain_loop = rain_loop.append(rain_randomized, 0)
                         combined = combined.overlay(rain_loop)
+                        for i in range(random.randint(0, len(transcript) // 10)):
+                            combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(0, 5)) - sfx_strike.dBFS), random.randrange(len(combined)))
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
                     for i in range(random.randint(1, len(transcript) // 5)):
                         combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))

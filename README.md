@@ -26,7 +26,8 @@ chosen as a callback to the original AI Sponge.
 
 The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, dolphin, bonk, fling,
 "My leg!", "Oh brother this guy stinks!", "Boo you stink!", and "You what?". One or more of these are chosen at random 
-to play at random points in each episode. Every episode begins with the bubbles transition sound.
+to play at random points in each episode. If it is raining, lightning strikes with randomized intensity may occur as 
+well. Every episode begins with the bubbles transition sound.
 
 ### Ambiance
 
