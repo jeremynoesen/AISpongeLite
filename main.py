@@ -70,6 +70,10 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
               "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
               "all": (None, os.getenv("EMOJI_ALL"), True)}
+ambiance_gain = -45
+ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
+                 load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
+ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 music_gain = -35
 songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/tip_top_polka.wav", gain=music_gain): 10,
@@ -95,11 +99,8 @@ sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
        load_wav("sfx/bonk.wav", start=450, end=-900, gain=sfx_gain): 1,
        load_wav("sfx/fling.wav", start=50, end=900, gain=sfx_gain): 1}
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=sfx_gain)
+sfx_bomb = load_wav("sfx/bomb.wav", start=1500, end=7600, gain=ambiance_gain) + load_wav("sfx/bomb.wav", start=9850, end=15000, gain=sfx_gain)
 sfx_strike = load_wav("sfx/strike.wav", start=500)
-ambiance_gain = -45
-ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
-                 load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
-ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
 silence_line = AudioSegment.silent(200)
@@ -160,6 +161,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Generated script."))
                     await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     transcript = []
+                    bombs = []
                     spoken_characters = set()
                     combined = AudioSegment.empty()
                     loop = asyncio.get_running_loop()
@@ -167,9 +169,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         line = line.strip()
                         character = line.split(":")[0].lower()
                         character_stripped = character.strip()
-                        if character_stripped in characters.keys() or any(x in character_stripped for x in ["all", "every", "unison"]):
+                        if character_stripped in characters.keys() or any(x in character_stripped for x in ["all", "every", "unison", "together"]):
                             line_stripped = line[len(character) + 1:].strip()
-                            if any(x in character_stripped for x in ["all", "every", "unison"]):
+                            if any(x in character_stripped for x in ["all", "every", "unison", "together"]):
                                 line = f"{characters['all'][1]} {line_stripped}"
                                 segs = []
                                 for character in spoken_characters:
@@ -199,6 +201,8 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 line = line.replace(line_stripped, line_stripped.upper())
                             else:
                                 seg = seg.apply_gain(-15-seg.dBFS)
+                            if any(x in line_stripped.lower() for x in ["bomb", "explod", "explos", "boom", "dynamite", "tnt"]):
+                                bombs.append(len(combined))
                             combined = combined.append(seg, 0)
                             if line[-1] in "-–—":
                                 line = line[:-1] + "—"
@@ -236,7 +240,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             rain_loop = rain_loop.append(rain_randomized, 0)
                         combined = combined.overlay(rain_loop)
                         for i in range(random.randint(0, len(transcript) // 10)):
-                            combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(0, 5)) - sfx_strike.dBFS), random.randrange(len(combined)))
+                            combined = combined.overlay(sfx_strike.apply_gain((sfx_gain - random.randint(0, 5)) - sfx_strike.dBFS), random.randrange(len(combined)))
+                    for bomb in bombs:
+                        combined = combined.overlay(sfx_bomb, bomb)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
                     for i in range(random.randint(1, len(transcript) // 5)):
                         combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))
