@@ -14,8 +14,8 @@ from openai import AsyncOpenAI
 from pydub import AudioSegment
 
 
-def load_wav(path, start=None, end=None, gain=None):
-    seg = AudioSegment.from_wav(path)[start:end]
+def load_wav(path, gain=None):
+    seg = AudioSegment.from_wav(path)
     if gain is not None:
         seg = seg.apply_gain(gain - seg.dBFS)
     return seg
@@ -71,9 +71,9 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
               "all": (None, os.getenv("EMOJI_ALL"), True)}
 ambiance_gain = -45
-ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
-                 load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
-ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
+ambiance_time = [load_wav("ambiance/day.wav", gain=ambiance_gain),
+                 load_wav("ambiance/night.wav", gain=ambiance_gain)]
+ambiance_rain = load_wav("ambiance/rain.wav")
 music_gain = -35
 songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/tip_top_polka.wav", gain=music_gain): 10,
@@ -84,23 +84,23 @@ songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/rock_bottom.wav", gain=music_gain): 5,
          load_wav("music/sneaky_snitch.wav", gain=music_gain): 1,
          load_wav("music/grass_skirt_chase.wav", gain=music_gain): 1,
-         load_wav("music/better_call_saul.wav", start=50, end=18250, gain=music_gain): 1}
+         load_wav("music/better_call_saul.wav", gain=music_gain): 1}
 sfx_gain = -20
-sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
-       load_wav("sfx/boowomp.wav", start=750, end=1200, gain=sfx_gain): 5,
-       load_wav("sfx/disgusting.wav", start=100, end=-250, gain=sfx_gain): 1,
-       load_wav("sfx/vibe_link_b.wav", start=50, gain=sfx_gain): 1,
+sfx = {load_wav("sfx/steel_sting.wav", gain=sfx_gain): 5,
+       load_wav("sfx/boowomp.wav", gain=sfx_gain): 5,
+       load_wav("sfx/foghorn.wav", gain=sfx_gain): 1,
+       load_wav("sfx/vibe_link_b.wav", gain=sfx_gain): 1,
        load_wav("sfx/this_guy_stinks.wav", gain=sfx_gain): 1,
-       load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=sfx_gain): 1,
-       load_wav("sfx/my_leg.wav", start=1900, end=-700, gain=sfx_gain): 1,
-       load_wav("sfx/you_what.wav", start=150, gain=sfx_gain): 1,
-       load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=sfx_gain): 1,
-       load_wav("sfx/boo_you_stink.wav", start=200, end=-1000, gain=sfx_gain): 1,
-       load_wav("sfx/bonk.wav", start=450, end=-900, gain=sfx_gain): 1,
-       load_wav("sfx/fling.wav", start=50, end=900, gain=sfx_gain): 1}
-sfx_transition = load_wav("sfx/transition.wav", start=200, gain=sfx_gain)
-sfx_bomb = load_wav("sfx/bomb.wav", start=1500, end=7600, gain=ambiance_gain) + load_wav("sfx/bomb.wav", start=9850, end=15000, gain=sfx_gain)
-sfx_strike = load_wav("sfx/strike.wav", start=500)
+       load_wav("sfx/my_leg_1.wav", gain=sfx_gain): 1,
+       load_wav("sfx/my_leg_2.wav", gain=sfx_gain): 1,
+       load_wav("sfx/you_what.wav", gain=sfx_gain): 1,
+       load_wav("sfx/dolphin.wav", gain=sfx_gain): 1,
+       load_wav("sfx/boo_you_stink.wav", gain=sfx_gain): 1,
+       load_wav("sfx/bonk.wav", gain=sfx_gain): 1,
+       load_wav("sfx/fling.wav", gain=sfx_gain): 1}
+sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
+sfx_bomb = load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)
+sfx_strike = load_wav("sfx/lightning.wav")
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
 silence_line = AudioSegment.silent(200)
