@@ -88,20 +88,20 @@ sfx = {load_wav("sfx/steel_sting.wav", start=100, end=-450, gain=sfx_gain): 5,
        load_wav("sfx/vibe_link_b.wav", start=50, gain=sfx_gain): 1,
        load_wav("sfx/this_guy_stinks.wav", gain=sfx_gain): 1,
        load_wav("sfx/my_leg.wav", start=150, end=-2700, gain=sfx_gain): 1,
-       load_wav('sfx/my_leg.wav', start=1900, end=-700, gain=sfx_gain): 1,
+       load_wav("sfx/my_leg.wav", start=1900, end=-700, gain=sfx_gain): 1,
        load_wav("sfx/you_what.wav", start=150, gain=sfx_gain): 1,
        load_wav("sfx/dolphin.wav", start=1050, end=-950, gain=sfx_gain): 1,
        load_wav("sfx/boo_you_stink.wav", start=200, end=-1000, gain=sfx_gain): 1,
        load_wav("sfx/bonk.wav", start=450, end=-900, gain=sfx_gain): 1,
-       load_wav('sfx/fling.wav', start=50, end=900, gain=sfx_gain): 1}
+       load_wav("sfx/fling.wav", start=50, end=900, gain=sfx_gain): 1}
 sfx_transition = load_wav("sfx/transition.wav", start=200, gain=sfx_gain)
-sfx_strike = load_wav('sfx/strike.wav', start=500)
+sfx_strike = load_wav("sfx/strike.wav", start=500)
 ambiance_gain = -45
 ambiance_time = [load_wav("ambiance/day.wav", start=2000, end=-1000, gain=ambiance_gain),
                  load_wav("ambiance/night.wav", start=100, end=-4000, gain=ambiance_gain)]
 ambiance_rain = load_wav("ambiance/rain.wav", start=1000, end=-1000)
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
-voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 7)]
+voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
 silence_line = AudioSegment.silent(200)
 silence_transition = AudioSegment.silent(600)
 silence_music = AudioSegment.silent(3000)
