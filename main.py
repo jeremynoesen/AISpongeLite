@@ -45,6 +45,8 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "sadbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SADBOB"), True),
               "nerdbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_NERDBOB"), True),
               "patrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PATRICK"), False),
+              "shortrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_SHORTRICK"), True),
+              "widerick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_WIDERICK"), True),
               "pinhead": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PINHEAD"), True),
               "squidward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_SQUIDWARD"), False),
               "loudward": ("weight_y9arhnd7wjamezhqd27ksvmaz", os.getenv("EMOJI_LOUDWARD"), True),
