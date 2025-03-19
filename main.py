@@ -1,4 +1,5 @@
 import asyncio
+import math
 import random
 import re
 import time
@@ -215,7 +216,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             else:
                                 seg = seg.apply_gain(-15-seg.dBFS)
                             line_stripped_lower = line_stripped.lower()
-                            if any(x in line_stripped_lower for x in ["boom", "bomb", "explosion", "fire in the hole"]):
+                            if any(x in line_stripped_lower for x in ["boom", "bomb", "explosion", "explode", "fire in the hole"]):
                                 bombs.append(len(combined))
                             combined = combined.append(seg, 0)
                             if any(x in line_stripped_lower for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped_lower:
@@ -259,7 +260,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         while len(rain_loop) < len(combined):
                             rain_loop = rain_loop.append(rain_randomized, 0)
                         combined = combined.overlay(rain_loop)
-                        for i in range(random.randint(0, len(transcript) // 10)):
+                        for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
                             combined = combined.overlay(sfx_strike.apply_gain((sfx_gain - random.randint(0, 5)) - sfx_strike.dBFS), random.randrange(len(combined)))
                     for food in foods:
                         combined = combined.overlay(sfx_chomp, food)
@@ -270,7 +271,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     for bomb in bombs:
                         combined = combined.overlay(sfx_bomb, bomb)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
-                    for i in range(random.randint(0, len(transcript) // 5)):
+                    for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
                         combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))
                     combined = combined.fade_out(200)
                     with BytesIO() as output:
