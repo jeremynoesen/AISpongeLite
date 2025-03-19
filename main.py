@@ -266,7 +266,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     for bomb in bombs:
                         combined = combined.overlay(sfx_bomb, bomb)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
-                    for i in range(random.randint(1, len(transcript) // 5)):
+                    for i in range(random.randint(0, len(transcript) // 5)):
                         combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))
                     combined = combined.fade_out(200)
                     with BytesIO() as output:
