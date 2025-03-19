@@ -212,12 +212,13 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 line = line.replace(line_stripped, line_stripped.upper())
                             else:
                                 seg = seg.apply_gain(-15-seg.dBFS)
-                            if any(x in line_stripped.lower() for x in ["boom", "bomb", "explosion", "fire in the hole"]):
+                            line_stripped_lower = line_stripped.lower()
+                            if any(x in line_stripped_lower for x in ["boom", "bomb", "explosion", "fire in the hole"]):
                                 bombs.append(len(combined))
                             combined = combined.append(seg, 0)
-                            if any(x in line_stripped.lower() for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped.lower():
+                            if any(x in line_stripped_lower for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped_lower:
                                 molotov_cocktails.append(len(combined))
-                            if any(x in line_stripped.lower() for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
+                            if any(x in line_stripped_lower for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
                                 foods.append(len(combined))
                             if line[-1] in "-–—":
                                 line = line[:-1] + "—"
@@ -227,7 +228,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 line += "—"
                             else:
                                 combined = combined.append(silence_line, 0)
-                            if any(x in line_stripped.lower() for x in ["shoot", "shot", "kill", "murder", "gun"]):
+                            if any(x in line_stripped_lower for x in ["shoot", "shot", "kill", "murder", "gun"]):
                                 guns.append(len(combined))
                             transcript.append(f"- {discord.utils.escape_markdown(line)}")
                             completed += 1
