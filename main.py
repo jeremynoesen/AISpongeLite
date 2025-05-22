@@ -292,7 +292,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         episode_cooldowns[inter.user.id] = end_time
                     with open("statistics.txt", "a") as file:
                         file.write(f"E {end_time}\n")
-                except ValueError:
+                except:
                     try:
                         await inter.edit_original_response(embed=embed_error_failed)
                     except:
