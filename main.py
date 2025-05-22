@@ -192,6 +192,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                     tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
                                     with BytesIO(tts.content) as wav:
                                         segs.append(AudioSegment.from_wav(wav))
+                                    await asyncio.sleep(5)
                                 segs.sort(key=lambda x: -len(x))
                                 seg = segs[0]
                                 for i in range(1, len(segs)):
@@ -209,6 +210,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
                                 with BytesIO(tts.content) as wav:
                                     seg = AudioSegment.from_wav(wav)
+                                await asyncio.sleep(5)
                             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
                             if "loud" in character_stripped or line_stripped.isupper() or random.randrange(100) == 0:
                                 seg = seg.apply_gain(-seg.dBFS)
