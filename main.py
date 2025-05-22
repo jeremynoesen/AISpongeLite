@@ -90,22 +90,22 @@ songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/grass_skirt_chase.wav", gain=music_gain): 1,
          load_wav("music/better_call_saul.wav", gain=music_gain): 1}
 sfx_gain = -20
-sfx = {load_wav("sfx/steel_sting.wav", gain=sfx_gain): 5,
-       load_wav("sfx/boowomp.wav", gain=sfx_gain): 5,
-       load_wav("sfx/foghorn.wav", gain=sfx_gain): 1,
-       load_wav("sfx/vibe_link_b.wav", gain=sfx_gain): 1,
-       load_wav("sfx/this_guy_stinks.wav", gain=sfx_gain): 1,
-       load_wav("sfx/my_leg_1.wav", gain=sfx_gain): 1,
-       load_wav("sfx/my_leg_2.wav", gain=sfx_gain): 1,
-       load_wav("sfx/you_what.wav", gain=sfx_gain): 1,
-       load_wav("sfx/dolphin.wav", gain=sfx_gain): 1,
-       load_wav("sfx/boo_you_stink.wav", gain=sfx_gain): 1,
-       load_wav("sfx/bonk.wav", gain=sfx_gain): 1,
-       load_wav("sfx/fling.wav", gain=sfx_gain): 1,
-       load_wav("sfx/kick.wav", gain=sfx_gain): 1,
-       load_wav("sfx/kiss.wav", gain=sfx_gain): 1,
-       load_wav("sfx/squish.wav", gain=sfx_gain): 1,
-       load_wav("sfx/dramatic_cue.wav", gain=sfx_gain): 1}
+sfx = {load_wav("sfx/steel_sting.wav"): 5,
+       load_wav("sfx/boowomp.wav"): 5,
+       load_wav("sfx/foghorn.wav"): 1,
+       load_wav("sfx/vibe_link_b.wav"): 1,
+       load_wav("sfx/this_guy_stinks.wav"): 1,
+       load_wav("sfx/my_leg_1.wav"): 1,
+       load_wav("sfx/my_leg_2.wav"): 1,
+       load_wav("sfx/you_what.wav"): 1,
+       load_wav("sfx/dolphin.wav"): 1,
+       load_wav("sfx/boo_you_stink.wav"): 1,
+       load_wav("sfx/bonk.wav"): 1,
+       load_wav("sfx/fling.wav"): 1,
+       load_wav("sfx/kick.wav"): 1,
+       load_wav("sfx/kiss.wav"): 1,
+       load_wav("sfx/squish.wav"): 1,
+       load_wav("sfx/dramatic_cue.wav"): 1}
 sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
 sfx_chomp = load_wav("sfx/chomp.wav", gain=sfx_gain)
 sfx_gun = load_wav("sfx/gun.wav", gain=sfx_gain)
@@ -255,13 +255,15 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             ambiance_loop = ambiance_loop.append(ambiance, 0)
                         combined = combined.overlay(ambiance_loop)
                     if random.randrange(5) == 0:
-                        rain_randomized = ambiance_rain.apply_gain((ambiance_gain + random.randint(0, 5)) - ambiance_rain.dBFS)
+                        rain_intensity = random.randint(-5, 5)
+                        rain_randomized = ambiance_rain.apply_gain((ambiance_gain + rain_intensity) - ambiance_rain.dBFS)
                         rain_loop = rain_randomized.fade_in(500)
                         while len(rain_loop) < len(combined):
                             rain_loop = rain_loop.append(rain_randomized, 0)
                         combined = combined.overlay(rain_loop)
-                        for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
-                            combined = combined.overlay(sfx_strike.apply_gain((sfx_gain - random.randint(0, 5)) - sfx_strike.dBFS), random.randrange(len(combined)))
+                        if rain_intensity > 0:
+                            for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
+                                combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
                     for food in foods:
                         combined = combined.overlay(sfx_chomp, food)
                     for gun in guns:
@@ -272,7 +274,8 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                         combined = combined.overlay(sfx_bomb, bomb)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
                     for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
-                        combined = combined.overlay(random.choices(list(sfx.keys()), list(sfx.values()))[0], random.randrange(len(combined)))
+                        choice = random.choices(list(sfx.keys()), list(sfx.values()))[0]
+                        combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
                     combined = combined.fade_out(200)
                     with BytesIO() as output:
                         combined.export(output, "ogg")
