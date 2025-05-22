@@ -336,7 +336,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
-            prompt=f"You are {character} from SpongeBob SquarePants messaging with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
+            prompt=f"You are {character} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Only respond with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
         output = discord.utils.escape_markdown(re.compile(re.escape(f"{character}:"), re.IGNORECASE).sub("", completion.choices[0].text.strip(), 1).strip())
         if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
