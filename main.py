@@ -26,7 +26,7 @@ load_dotenv()
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
 fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
-fakeyou_timeout = 180
+fakeyou_timeout = 120
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
 command_tree = app_commands.CommandTree(client)
 embed_color_dark = 0x7f9400
