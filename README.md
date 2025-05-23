@@ -45,7 +45,7 @@ generates in all caps. Cutoffs also occur anytime a line ends with an em dash, e
 ### Strokes
 
 Lite supports all strokes, which are when FakeYou glitches out and generates abnormal audio. The volumes of characters
-are normalized, so strokes will not be full volume (unless a loud event occurs).
+are normalized, so strokes will not be full volume.
 
 ## Usage
 

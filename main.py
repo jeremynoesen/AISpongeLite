@@ -213,7 +213,8 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 await asyncio.sleep(5)
                             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
                             if "loud" in character_stripped or line_stripped.isupper() or random.randrange(100) == 0:
-                                seg = seg.apply_gain(-seg.dBFS)
+                                seg = seg.apply_gain(20)
+                                seg = seg.apply_gain(-10-seg.dBFS)
                                 line = line.replace(line_stripped, line_stripped.upper())
                             else:
                                 seg = seg.apply_gain(-15-seg.dBFS)
