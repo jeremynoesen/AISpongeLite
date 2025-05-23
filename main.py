@@ -400,8 +400,8 @@ async def tts(inter: discord.Interaction, character: str, text: str):
             pass
 
 
-@command_tree.command(name="statistics", description="Show bot statistics.")
-async def statistics(inter: discord.Interaction):
+@command_tree.command(name="stats", description="Show bot statistics.")
+async def stats(inter: discord.Interaction):
     episodes_24h = 0
     episodes_all = 0
     chats_24h = 0

@@ -56,7 +56,7 @@ are normalized, so strokes will not be full volume.
 - `/chat`: Chat with a character. This can be used at any time anywhere and does not have a cooldown.
 - `/tts`: Synthesize character speech. This can be used whenever an episode is not generating and does not have a 
   cooldown.
-- `/statistics`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all 
+- `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all 
   time, and view the bot uptime.
 - `/help`: Show bot help. This will show a link to the Discord App Directory page.
 
