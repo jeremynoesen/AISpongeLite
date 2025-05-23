@@ -135,10 +135,7 @@ start_time = int(time.time())
 @app_commands.describe(topic="Topic of episode.")
 async def episode(inter: discord.Interaction, topic: str = ""):
     if not inter.app_permissions.use_external_emojis:
-        try:
-            await inter.response.send_message(embed=embed_error_permissions)
-        except:
-            pass
+        await inter.response.send_message(embed=embed_error_permissions)
     elif inter.user.id not in episode_cooldowns.keys() or int(time.time()) - episode_cooldowns[inter.user.id] > episode_cooldown:
         if inter.user.id in episode_cooldowns.keys():
             del episode_cooldowns[inter.user.id]
@@ -369,6 +366,9 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 @app_commands.autocomplete(character=character_autocomplete)
 async def tts(inter: discord.Interaction, character: str, text: str):
     try:
+        if not inter.app_permissions.use_external_emojis:
+            await inter.response.send_message(embed=embed_error_permissions)
+            return
         if episode_generating:
             await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_busy)
             return
@@ -383,8 +383,8 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         elif character == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE)):
             seg = random.choice(voice_gary)
         else:
-            tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
-            with BytesIO(tts.content) as wav:
+            fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
+            with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
         seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
         seg = seg.apply_gain(-15-seg.dBFS)
