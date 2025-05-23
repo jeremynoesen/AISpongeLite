@@ -104,11 +104,12 @@ sfx = {load_wav("sfx/steel_sting.wav"): 5,
        load_wav("sfx/fling.wav"): 1,
        load_wav("sfx/kick.wav"): 1,
        load_wav("sfx/kiss.wav"): 1,
-       load_wav("sfx/squish.wav"): 1,
+       load_wav("sfx/squish_1.wav"): 1,
+       load_wav("sfx/squish_2.wav"): 1,
        load_wav("sfx/dramatic_cue.wav"): 1}
 sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
 sfx_chomp = load_wav("sfx/chomp.wav", gain=sfx_gain)
-sfx_gun = load_wav("sfx/gun.wav", gain=sfx_gain)
+sfx_gun = [load_wav(f"sfx/gun_{i}.wav", gain=sfx_gain) for i in range(1, 3)]
 sfx_molotov_cocktail = load_wav("sfx/molotov_cocktail.wav", gain=sfx_gain)
 sfx_bomb = load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)
 sfx_strike = load_wav("sfx/lightning.wav")
@@ -270,7 +271,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     for food in foods:
                         combined = combined.overlay(sfx_chomp, food)
                     for gun in guns:
-                        combined = combined.overlay(sfx_gun, gun)
+                        combined = combined.overlay(random.choice(sfx_gun), gun)
                     for molotov_cocktail in molotov_cocktails:
                         combined = combined.overlay(sfx_molotov_cocktail, molotov_cocktail)
                     for bomb in bombs:
