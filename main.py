@@ -272,13 +272,17 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
                                 combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
                     for food in foods:
-                        combined = combined.overlay(sfx_food, food)
+                        if random.randrange(2) == 0:
+                            combined = combined.overlay(sfx_food, food)
                     for gun in guns:
-                        combined = combined.overlay(random.choice(sfx_gun), gun)
+                        if random.randrange(2) == 0:
+                            combined = combined.overlay(random.choice(sfx_gun), gun)
                     for molotov in molotovs:
-                        combined = combined.overlay(sfx_molotov, molotov)
+                        if random.randrange(2) == 0:
+                            combined = combined.overlay(sfx_molotov, molotov)
                     for bomb in bombs:
-                        combined = combined.overlay(sfx_bomb, bomb)
+                        if random.randrange(2) == 0:
+                            combined = combined.overlay(sfx_bomb, bomb)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
                     for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
                         choice = random.choices(list(sfx.keys()), list(sfx.values()))[0]
