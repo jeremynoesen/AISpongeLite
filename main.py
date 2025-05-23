@@ -36,9 +36,11 @@ embed_ready = discord.Embed(title="Ready", description="# 📺", color=embed_col
 embed_help = discord.Embed(title="See the App Directory for bot help.", description="You will also find links to the support server and source code there.", color=embed_color_light)
 help_button = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
 embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending message...")
+embed_generating_tts = discord.Embed(title="Generating...", description="# 🔊", color=embed_color_light).set_footer(text=f"Synthesizing speech...")
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
 embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Invalid character.")
+embed_error_busy = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Unavailable during episode generation.")
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -337,11 +339,10 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 async def chat(inter: discord.Interaction, character: str, message: str):
     try:
         character = character.lower()
-        if character in characters.keys() and not characters[character][2]:
-            emoji = characters[character][1]
-        else:
+        if character not in characters.keys() or characters[character][2]:
             await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
             return
+        emoji = characters[character][1]
         character = character.title().replace("bob", "Bob")
         await inter.response.send_message(embed=embed_generating_chat)
         completion = await openai.completions.create(
@@ -352,10 +353,46 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         output = discord.utils.escape_markdown(re.compile(re.escape(f"{character}:"), re.IGNORECASE).sub("", completion.choices[0].text.strip(), 1).strip())
         if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
             output = output[1:-1].strip()
-        embed = discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url)
-        await inter.edit_original_response(embed=embed)
+        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
+    except:
+        try:
+            await inter.edit_original_response(embed=embed_error_failed)
+        except:
+            pass
+
+
+@command_tree.command(name="tts", description="Synthesize character speech.")
+@app_commands.describe(character="Voice to use.")
+@app_commands.describe(text="Text to speak.")
+@app_commands.autocomplete(character=character_autocomplete)
+async def tts(inter: discord.Interaction, character: str, text: str):
+    try:
+        if episode_generating:
+            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_busy)
+            return
+        character = character.lower()
+        if character not in characters.keys() or characters[character][2]:
+            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
+            return
+        await inter.response.send_message(embed=embed_generating_tts)
+        loop = asyncio.get_running_loop()
+        if character == "doodlebob":
+            seg = random.choice(voice_doodlebob)
+        elif character == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE)):
+            seg = random.choice(voice_gary)
+        else:
+            tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
+            with BytesIO(tts.content) as wav:
+                seg = AudioSegment.from_wav(wav)
+        seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
+        seg = seg.apply_gain(-15-seg.dBFS)
+        with BytesIO() as output:
+            seg.export(output, "ogg")
+            await inter.edit_original_response(embed=discord.Embed(description=f"- {characters[character][1]} {text}", color=embed_color_light), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
+        with open("statistics.txt", "a") as file:
+            file.write(f"T {int(time.time())}\n")
     except:
         try:
             await inter.edit_original_response(embed=embed_error_failed)
@@ -369,6 +406,8 @@ async def statistics(inter: discord.Interaction):
     episodes_all = 0
     chats_24h = 0
     chats_all = 0
+    tts_24h = 0
+    tts_all = 0
     current_time = int(time.time())
     if os.path.exists("statistics.txt"):
         with open("statistics.txt", "r") as file:
@@ -383,6 +422,10 @@ async def statistics(inter: discord.Interaction):
                 chats_all += 1
                 if current_time - int(parts[1]) < 86400:
                     chats_24h += 1
+            elif parts[0] == "T":
+                tts_all += 1
+                if current_time - int(parts[1]) < 86400:
+                    tts_24h += 1
     uptime = int(current_time - start_time)
     uptime_formatted = ""
     days = uptime // 86400
@@ -400,6 +443,7 @@ async def statistics(inter: discord.Interaction):
     await inter.response.send_message(embed=discord.Embed(color=embed_color_light)
                                       .add_field(name="📺 Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
                                       .add_field(name="💬 Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
+                                      .add_field(name="🔊 TTS", value=f"- 24h: `{tts_24h}`\n- All: `{tts_all}`", inline=False)
                                       .add_field(name="🤖 Bot", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
                                       ephemeral=True, delete_after=embed_delete_after)
 
