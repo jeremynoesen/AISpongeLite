@@ -108,9 +108,9 @@ sfx = {load_wav("sfx/steel_sting.wav"): 5,
        load_wav("sfx/squish_2.wav"): 1,
        load_wav("sfx/dramatic_cue.wav"): 1}
 sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
-sfx_chomp = load_wav("sfx/chomp.wav", gain=sfx_gain)
+sfx_food = load_wav("sfx/burp.wav", gain=sfx_gain)
 sfx_gun = [load_wav(f"sfx/gun_{i}.wav", gain=sfx_gain) for i in range(1, 3)]
-sfx_molotov_cocktail = load_wav("sfx/molotov_cocktail.wav", gain=sfx_gain)
+sfx_molotov = load_wav("sfx/molotov.wav", gain=sfx_gain)
 sfx_bomb = load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)
 sfx_strike = load_wav("sfx/lightning.wav")
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
@@ -175,7 +175,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     transcript = []
                     foods = []
                     guns = []
-                    molotov_cocktails = []
+                    molotovs = []
                     bombs = []
                     spoken_characters = set()
                     combined = AudioSegment.empty()
@@ -224,7 +224,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                                 bombs.append(len(combined))
                             combined = combined.append(seg, 0)
                             if any(x in line_stripped_lower for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped_lower:
-                                molotov_cocktails.append(len(combined))
+                                molotovs.append(len(combined))
                             if any(x in line_stripped_lower for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
                                 foods.append(len(combined))
                             if line[-1] in "-–—":
@@ -269,11 +269,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
                                 combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
                     for food in foods:
-                        combined = combined.overlay(sfx_chomp, food)
+                        combined = combined.overlay(sfx_food, food)
                     for gun in guns:
                         combined = combined.overlay(random.choice(sfx_gun), gun)
-                    for molotov_cocktail in molotov_cocktails:
-                        combined = combined.overlay(sfx_molotov_cocktail, molotov_cocktail)
+                    for molotov in molotovs:
+                        combined = combined.overlay(sfx_molotov, molotov)
                     for bomb in bombs:
                         combined = combined.overlay(sfx_bomb, bomb)
                     combined = silence_transition.append(combined, 0).overlay(sfx_transition)
