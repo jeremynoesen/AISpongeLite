@@ -25,10 +25,10 @@ Call Saul opening will be chosen as a callback to the original AI Sponge.
 ### Sound Effects
 
 The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, dolphin, bonk, fling, kick, 
-squish, kiss, dramatic cue, "My leg!", "Oh brother this guy stinks!", "Boo you stink!", and "You what?". One or more of 
-these are chosen at random to play at random points in each episode. If it is raining, lightning strikes with randomized
-intensity may occur as well. Every episode begins with the bubbles transition sound. Sound effects triggered by words
-are burps, gunshots, molotovs, and bombs.
+squish, kiss, dramatic cue, car passing by, "My leg!", "Oh brother this guy stinks!", "Boo you stink!", and "You what?". 
+One or more of these are chosen at random to play at random points in each episode. If it is raining, lightning strikes 
+with randomized intensity may occur as well. Every episode begins with the bubbles transition sound. Sound effects 
+triggered by words are burps, gunshots, molotovs, and bombs.
 
 ### Ambiance
 
