@@ -249,12 +249,13 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                             await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Skipped line."))
                         await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
                     combined = combined.append(silence_line, 0)
-                    music = random.choices(list(songs.keys()), list(songs.values()))[0]
-                    music_loop = silence_music.append(music.fade_in(10000), 0)
-                    while len(music_loop) < len(combined):
-                        music_loop = music_loop.append(music, 0)
-                    combined = combined.overlay(music_loop)
-                    if random.randrange(5) > 0:
+                    if random.randrange(20) > 0:
+                        music = random.choices(list(songs.keys()), list(songs.values()))[0]
+                        music_loop = silence_music.append(music.fade_in(10000), 0)
+                        while len(music_loop) < len(combined):
+                            music_loop = music_loop.append(music, 0)
+                        combined = combined.overlay(music_loop)
+                    if random.randrange(10) > 0:
                         ambiance = random.choice(ambiance_time)
                         ambiance_loop = ambiance.fade_in(500)
                         while len(ambiance_loop) < len(combined):
