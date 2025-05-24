@@ -5,7 +5,6 @@ import re
 import time
 import discord
 import os
-
 import pydub.effects
 from dotenv import load_dotenv
 from discord import app_commands
@@ -40,7 +39,6 @@ embed_generating_tts = discord.Embed(title="Generating...", description="# 🔊"
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
 embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Invalid character.")
-embed_error_busy = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Unavailable during episode generation.")
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -363,7 +361,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
         return
     if episode_generating:
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_busy)
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title="Generating", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text="Generating an episode."))
         return
     if not inter.app_permissions.use_external_emojis:
         await inter.response.send_message(embed=embed_error_permissions)
