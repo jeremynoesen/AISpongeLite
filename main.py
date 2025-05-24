@@ -134,186 +134,8 @@ start_time = int(time.time())
 @command_tree.command(name="episode", description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
 async def episode(inter: discord.Interaction, topic: str = ""):
-    if not inter.app_permissions.use_external_emojis:
-        await inter.response.send_message(embed=embed_error_permissions)
-    elif inter.user.id not in episode_cooldowns.keys() or int(time.time()) - episode_cooldowns[inter.user.id] > episode_cooldown:
-        if inter.user.id in episode_cooldowns.keys():
-            del episode_cooldowns[inter.user.id]
-        global episode_generating, episode_progress
-        if not episode_generating:
-            if topic:
-                try:
-                    episode_generating = True
-                    episode_progress = 0
-                    await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Preparing episode..."))
-                    await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
-                    completion = await openai.completions.create(
-                        model="gpt-3.5-turbo-instruct",
-                        max_tokens=700,
-                        prompt=f"Create a profanity-filled, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
-                    )
-                    lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
-                    remaining = len(lines)
-                    line = lines.pop(0).strip()
-                    title = line.split(":")[0].lower()
-                    if title.strip() == "title":
-                        line = line[len(title) + 1:].strip()
-                        if line[0] == line[-1] == "\"" or line[0] == line[-1] == "'":
-                            line = line[1:-1].strip()
-                        file_title = line.upper().replace("I", "i")
-                        embed_title = ""
-                        for character in discord.utils.escape_markdown(line):
-                            if character.isupper() or character.isnumeric() or character in ".,!?":
-                                embed_title += f"**{character}**"
-                            else:
-                                embed_title += character
-                        embed_title = embed_title.upper().replace("I", "i")
-                    else:
-                        file_title = "UNTiTLED EPiSODE"
-                        embed_title = "**U**NTiTLED **E**PiSODE"
-                    completed = 1
-                    episode_progress = int(100 * (completed / remaining))
-                    await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Generated script."))
-                    await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
-                    transcript = []
-                    foods = []
-                    guns = []
-                    molotovs = []
-                    bombs = []
-                    spoken_characters = set()
-                    combined = AudioSegment.empty()
-                    loop = asyncio.get_running_loop()
-                    for line in lines:
-                        line = line.strip()
-                        character = line.split(":")[0].lower()
-                        character_stripped = character.strip()
-                        if character_stripped in characters.keys() or any(x in character_stripped for x in ["all", "every", "unison", "together"]):
-                            line_stripped = line[len(character) + 1:].strip()
-                            if any(x in character_stripped for x in ["all", "every", "unison", "together"]):
-                                line = f"{characters['all'][1]} {line_stripped}"
-                                segs = []
-                                for character in spoken_characters:
-                                    tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
-                                    with BytesIO(tts.content) as wav:
-                                        segs.append(AudioSegment.from_wav(wav))
-                                    await asyncio.sleep(5)
-                                segs.sort(key=lambda x: -len(x))
-                                seg = segs[0]
-                                for i in range(1, len(segs)):
-                                    seg = seg.overlay(segs[i], 0)
-                            elif character_stripped == "doodlebob":
-                                line = f"{characters['doodlebob'][1]} {line_stripped}"
-                                seg = random.choice(voice_doodlebob)
-                            elif character_stripped == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", line_stripped, re.IGNORECASE)):
-                                spoken_characters.add(character_stripped)
-                                line = f"{characters['gary'][1]} {line_stripped}"
-                                seg = random.choice(voice_gary)
-                            else:
-                                spoken_characters.add(character_stripped)
-                                line = f"{characters[character_stripped][1]} {line_stripped}"
-                                tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
-                                with BytesIO(tts.content) as wav:
-                                    seg = AudioSegment.from_wav(wav)
-                                await asyncio.sleep(5)
-                            seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
-                            if "loud" in character_stripped or line_stripped.isupper() or random.randrange(100) == 0:
-                                seg = seg.apply_gain(20)
-                                seg = seg.apply_gain(-10-seg.dBFS)
-                                line = line.replace(line_stripped, line_stripped.upper())
-                            else:
-                                seg = seg.apply_gain(-15-seg.dBFS)
-                            line_stripped_lower = line_stripped.lower()
-                            if any(x in line_stripped_lower for x in ["boom", "bomb", "explosion", "explode", "fire in the hole"]):
-                                bombs.append(len(combined))
-                            combined = combined.append(seg, 0)
-                            if any(x in line_stripped_lower for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped_lower:
-                                molotovs.append(len(combined))
-                            if any(x in line_stripped_lower for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
-                                foods.append(len(combined))
-                            if line[-1] in "-–—":
-                                line = line[:-1] + "—"
-                            elif random.randrange(10) == 0:
-                                while line[-1] in ".!?…":
-                                    line = line[:-1]
-                                line += "—"
-                            else:
-                                combined = combined.append(silence_line, 0)
-                            if any(x in line_stripped_lower for x in ["shoot", "shot", "kill", "murder", "gun"]):
-                                guns.append(len(combined))
-                            transcript.append(f"- {discord.utils.escape_markdown(line)}")
-                            completed += 1
-                            episode_progress = int(100 * (completed / remaining))
-                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
-                        else:
-                            remaining -= 1
-                            episode_progress = int(100 * (completed / remaining))
-                            await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Skipped line."))
-                        await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
-                    combined = combined.append(silence_line, 0)
-                    if random.randrange(20) > 0:
-                        music = random.choices(list(songs.keys()), list(songs.values()))[0]
-                        music_loop = silence_music.append(music.fade_in(10000), 0)
-                        while len(music_loop) < len(combined):
-                            music_loop = music_loop.append(music, 0)
-                        combined = combined.overlay(music_loop)
-                    if random.randrange(10) > 0:
-                        ambiance = random.choice(ambiance_time)
-                        ambiance_loop = ambiance.fade_in(500)
-                        while len(ambiance_loop) < len(combined):
-                            ambiance_loop = ambiance_loop.append(ambiance, 0)
-                        combined = combined.overlay(ambiance_loop)
-                    if random.randrange(5) == 0:
-                        rain_intensity = random.randint(-5, 5)
-                        rain_randomized = ambiance_rain.apply_gain((ambiance_gain + rain_intensity) - ambiance_rain.dBFS)
-                        rain_loop = rain_randomized.fade_in(500)
-                        while len(rain_loop) < len(combined):
-                            rain_loop = rain_loop.append(rain_randomized, 0)
-                        combined = combined.overlay(rain_loop)
-                        if rain_intensity > 0:
-                            for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
-                                combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
-                    for food in foods:
-                        if random.randrange(2) == 0:
-                            combined = combined.overlay(sfx_food, food)
-                    for gun in guns:
-                        if random.randrange(2) == 0:
-                            combined = combined.overlay(random.choice(sfx_gun), gun)
-                    for molotov in molotovs:
-                        if random.randrange(2) == 0:
-                            combined = combined.overlay(sfx_molotov, molotov)
-                    for bomb in bombs:
-                        if random.randrange(2) == 0:
-                            combined = combined.overlay(sfx_bomb, bomb)
-                    combined = silence_transition.append(combined, 0).overlay(sfx_transition)
-                    for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
-                        choice = random.choices(list(sfx.keys()), list(sfx.values()))[0]
-                        combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
-                    combined = combined.fade_out(200)
-                    with BytesIO() as output:
-                        combined.export(output, "ogg")
-                        await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_light), attachments=[discord.File(output, f"{file_title}.ogg")])
-                    end_time = int(time.time())
-                    remove_cooldown = False
-                    for entitlement in inter.entitlements:
-                        if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
-                            remove_cooldown = True
-                            break
-                    if not remove_cooldown:
-                        episode_cooldowns[inter.user.id] = end_time
-                    with open("statistics.txt", "a") as file:
-                        file.write(f"E {end_time}\n")
-                except:
-                    try:
-                        await inter.edit_original_response(embed=embed_error_failed)
-                    except:
-                        pass
-                await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
-                episode_generating = False
-            else:
-                await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_ready)
-        else:
-            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title="Generating", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text="Generating an episode."))
-    else:
+    global episode_generating, episode_progress
+    if inter.user.id in episode_cooldowns.keys() and int(time.time()) - episode_cooldowns[inter.user.id] <= episode_cooldown:
         remaining = episode_cooldown - (int(time.time()) - episode_cooldowns[inter.user.id])
         remaining_formatted = ""
         minutes = remaining // 60
@@ -323,6 +145,183 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"Cooldown", description=f"# `{remaining_formatted}`", color=embed_color_light).set_footer(text="You're on cooldown."), view=discord.ui.View().add_item(remove_cooldown_button))
+        return
+    if episode_generating:
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title="Generating", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text="Generating an episode."))
+        return
+    if not topic:
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_ready)
+        return
+    if not inter.app_permissions.use_external_emojis:
+        await inter.response.send_message(embed=embed_error_permissions)
+        return
+    try:
+        episode_generating = True
+        episode_progress = 0
+        await inter.response.send_message(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Preparing episode..."))
+        await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
+        completion = await openai.completions.create(
+            model="gpt-3.5-turbo-instruct",
+            max_tokens=700,
+            prompt=f"Create a profanity-filled, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
+        )
+        lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
+        remaining = len(lines)
+        line = lines.pop(0).strip()
+        title = line.split(":")[0].lower()
+        if title.strip() == "title":
+            line = line[len(title) + 1:].strip()
+            if line[0] == line[-1] == "\"" or line[0] == line[-1] == "'":
+                line = line[1:-1].strip()
+            file_title = line.upper().replace("I", "i")
+            embed_title = ""
+            for character in discord.utils.escape_markdown(line):
+                if character.isupper() or character.isnumeric() or character in ".,!?":
+                    embed_title += f"**{character}**"
+                else:
+                    embed_title += character
+            embed_title = embed_title.upper().replace("I", "i")
+        else:
+            file_title = "UNTiTLED EPiSODE"
+            embed_title = "**U**NTiTLED **E**PiSODE"
+        completed = 1
+        episode_progress = int(100 * (completed / remaining))
+        await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Generated script."))
+        await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
+        transcript = []
+        foods = []
+        guns = []
+        molotovs = []
+        bombs = []
+        spoken_characters = set()
+        combined = AudioSegment.empty()
+        loop = asyncio.get_running_loop()
+        for line in lines:
+            line = line.strip()
+            character = line.split(":")[0].lower()
+            character_stripped = character.strip()
+            if character_stripped in characters.keys() or any(x in character_stripped for x in ["all", "every", "unison", "together"]):
+                line_stripped = line[len(character) + 1:].strip()
+                if any(x in character_stripped for x in ["all", "every", "unison", "together"]):
+                    line = f"{characters['all'][1]} {line_stripped}"
+                    segs = []
+                    for character in spoken_characters:
+                        tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
+                        with BytesIO(tts.content) as wav:
+                            segs.append(AudioSegment.from_wav(wav))
+                        await asyncio.sleep(5)
+                    segs.sort(key=lambda x: -len(x))
+                    seg = segs[0]
+                    for i in range(1, len(segs)):
+                        seg = seg.overlay(segs[i], 0)
+                elif character_stripped == "doodlebob":
+                    line = f"{characters['doodlebob'][1]} {line_stripped}"
+                    seg = random.choice(voice_doodlebob)
+                elif character_stripped == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", line_stripped, re.IGNORECASE)):
+                    spoken_characters.add(character_stripped)
+                    line = f"{characters['gary'][1]} {line_stripped}"
+                    seg = random.choice(voice_gary)
+                else:
+                    spoken_characters.add(character_stripped)
+                    line = f"{characters[character_stripped][1]} {line_stripped}"
+                    tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
+                    with BytesIO(tts.content) as wav:
+                        seg = AudioSegment.from_wav(wav)
+                    await asyncio.sleep(5)
+                seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
+                if "loud" in character_stripped or line_stripped.isupper() or random.randrange(100) == 0:
+                    seg = seg.apply_gain(20)
+                    seg = seg.apply_gain(-10-seg.dBFS)
+                    line = line.replace(line_stripped, line_stripped.upper())
+                else:
+                    seg = seg.apply_gain(-15-seg.dBFS)
+                line_stripped_lower = line_stripped.lower()
+                if any(x in line_stripped_lower for x in ["boom", "bomb", "explosion", "explode", "fire in the hole"]):
+                    bombs.append(len(combined))
+                combined = combined.append(seg, 0)
+                if any(x in line_stripped_lower for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped_lower:
+                    molotovs.append(len(combined))
+                if any(x in line_stripped_lower for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
+                    foods.append(len(combined))
+                if line[-1] in "-–—":
+                    line = line[:-1] + "—"
+                elif random.randrange(10) == 0:
+                    while line[-1] in ".!?…":
+                        line = line[:-1]
+                    line += "—"
+                else:
+                    combined = combined.append(silence_line, 0)
+                if any(x in line_stripped_lower for x in ["shoot", "shot", "kill", "murder", "gun"]):
+                    guns.append(len(combined))
+                transcript.append(f"- {discord.utils.escape_markdown(line)}")
+                completed += 1
+                episode_progress = int(100 * (completed / remaining))
+                await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Synthesized line {completed - 1}/{remaining - 1}."))
+            else:
+                remaining -= 1
+                episode_progress = int(100 * (completed / remaining))
+                await inter.edit_original_response(embed=discord.Embed(title="Generating...", description=f"# `{episode_progress}%`", color=embed_color_light).set_footer(text=f"Skipped line."))
+            await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
+        combined = combined.append(silence_line, 0)
+        if random.randrange(20) > 0:
+            music = random.choices(list(songs.keys()), list(songs.values()))[0]
+            music_loop = silence_music.append(music.fade_in(10000), 0)
+            while len(music_loop) < len(combined):
+                music_loop = music_loop.append(music, 0)
+            combined = combined.overlay(music_loop)
+        if random.randrange(10) > 0:
+            ambiance = random.choice(ambiance_time)
+            ambiance_loop = ambiance.fade_in(500)
+            while len(ambiance_loop) < len(combined):
+                ambiance_loop = ambiance_loop.append(ambiance, 0)
+            combined = combined.overlay(ambiance_loop)
+        if random.randrange(5) == 0:
+            rain_intensity = random.randint(-5, 5)
+            rain_randomized = ambiance_rain.apply_gain((ambiance_gain + rain_intensity) - ambiance_rain.dBFS)
+            rain_loop = rain_randomized.fade_in(500)
+            while len(rain_loop) < len(combined):
+                rain_loop = rain_loop.append(rain_randomized, 0)
+            combined = combined.overlay(rain_loop)
+            if rain_intensity > 0:
+                for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
+                    combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
+        for food in foods:
+            if random.randrange(2) == 0:
+                combined = combined.overlay(sfx_food, food)
+        for gun in guns:
+            if random.randrange(2) == 0:
+                combined = combined.overlay(random.choice(sfx_gun), gun)
+        for molotov in molotovs:
+            if random.randrange(2) == 0:
+                combined = combined.overlay(sfx_molotov, molotov)
+        for bomb in bombs:
+            if random.randrange(2) == 0:
+                combined = combined.overlay(sfx_bomb, bomb)
+        combined = silence_transition.append(combined, 0).overlay(sfx_transition)
+        for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
+            choice = random.choices(list(sfx.keys()), list(sfx.values()))[0]
+            combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
+        combined = combined.fade_out(200)
+        with BytesIO() as output:
+            combined.export(output, "ogg")
+            await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_light), attachments=[discord.File(output, f"{file_title}.ogg")])
+        end_time = int(time.time())
+        remove_cooldown = False
+        for entitlement in inter.entitlements:
+            if entitlement.sku_id == remove_cooldown_sku and not entitlement.is_expired():
+                remove_cooldown = True
+                break
+        if not remove_cooldown:
+            episode_cooldowns[inter.user.id] = end_time
+        with open("statistics.txt", "a") as file:
+            file.write(f"E {end_time}\n")
+    except:
+        try:
+            await inter.edit_original_response(embed=embed_error_failed)
+        except:
+            pass
+    await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
+    episode_generating = False
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
@@ -334,11 +333,11 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 @app_commands.describe(message="Message to send.")
 @app_commands.autocomplete(character=character_autocomplete)
 async def chat(inter: discord.Interaction, character: str, message: str):
+    character = character.lower()
+    if character not in characters.keys() or characters[character][2]:
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
+        return
     try:
-        character = character.lower()
-        if character not in characters.keys() or characters[character][2]:
-            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
-            return
         emoji = characters[character][1]
         character = character.title().replace("bob", "Bob")
         await inter.response.send_message(embed=embed_generating_chat)
@@ -365,17 +364,17 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 @app_commands.describe(text="Text to speak.")
 @app_commands.autocomplete(character=character_autocomplete)
 async def tts(inter: discord.Interaction, character: str, text: str):
+    character = character.lower()
+    if character not in characters.keys() or characters[character][2]:
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
+        return
+    if episode_generating:
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_busy)
+        return
+    if not inter.app_permissions.use_external_emojis:
+        await inter.response.send_message(embed=embed_error_permissions)
+        return
     try:
-        if not inter.app_permissions.use_external_emojis:
-            await inter.response.send_message(embed=embed_error_permissions)
-            return
-        if episode_generating:
-            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_busy)
-            return
-        character = character.lower()
-        if character not in characters.keys() or characters[character][2]:
-            await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
-            return
         await inter.response.send_message(embed=embed_generating_tts)
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
