@@ -115,6 +115,7 @@ sfx = {AudioSegment.from_mp3("sfx/car.mp3"): 10,
        load_wav("sfx/dramatic_cue.wav"): 1}
 sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
 sfx_food = load_wav("sfx/burp.wav", gain=sfx_gain)
+sfx_ball = load_wav("sfx/ball.wav", gain=sfx_gain)
 sfx_gun = [load_wav(f"sfx/gun_{i}.wav", gain=sfx_gain) for i in range(1, 3)]
 sfx_molotov = load_wav("sfx/molotov.wav", gain=sfx_gain)
 sfx_bomb = load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)
@@ -190,6 +191,7 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         await client.change_presence(activity=discord.Game(f"Generating... {episode_progress}%"), status=discord.Status.dnd)
         transcript = []
         foods = []
+        balls = []
         guns = []
         molotovs = []
         bombs = []
@@ -243,6 +245,8 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     molotovs.append(len(combined))
                 if any(x in line_stripped_lower for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
                     foods.append(len(combined))
+                if "ball" in line_stripped_lower:
+                    balls.append(len(combined))
                 if line[-1] in "-–—":
                     line = line[:-1] + "—"
                 elif random.randrange(10) == 0:
@@ -288,6 +292,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         for food in foods:
             if random.randrange(2) == 0:
                 combined = combined.overlay(sfx_food, food)
+        for ball in balls:
+            if random.randrange(2) == 0:
+                combined = combined.overlay(sfx_ball, ball)
         for gun in guns:
             if random.randrange(2) == 0:
                 combined = combined.overlay(random.choice(sfx_gun), gun)
