@@ -208,8 +208,8 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     line = f"{characters['all'][1]} {line_stripped}"
                     segs = []
                     for character in spoken_characters:
-                        tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
-                        with BytesIO(tts.content) as wav:
+                        fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
+                        with BytesIO(fy_tts.content) as wav:
                             segs.append(AudioSegment.from_wav(wav))
                         await asyncio.sleep(5)
                     segs.sort(key=lambda x: -len(x))
@@ -226,8 +226,8 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                 else:
                     spoken_characters.add(character_stripped)
                     line = f"{characters[character_stripped][1]} {line_stripped}"
-                    tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
-                    with BytesIO(tts.content) as wav:
+                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
+                    with BytesIO(fy_tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
                     await asyncio.sleep(5)
                 seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
