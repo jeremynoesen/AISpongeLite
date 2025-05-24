@@ -114,11 +114,11 @@ sfx = {AudioSegment.from_mp3("sfx/car.mp3"): 10,
        load_wav("sfx/squish_2.wav"): 1,
        load_wav("sfx/dramatic_cue.wav"): 1}
 sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
-sfx_food = load_wav("sfx/burp.wav", gain=sfx_gain)
-sfx_ball = load_wav("sfx/ball.wav", gain=sfx_gain)
-sfx_gun = [load_wav(f"sfx/gun_{i}.wav", gain=sfx_gain) for i in range(1, 3)]
-sfx_molotov = load_wav("sfx/molotov.wav", gain=sfx_gain)
-sfx_bomb = load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)
+sfx_food = [load_wav("sfx/burp.wav")]
+sfx_ball = [load_wav("sfx/ball.wav")]
+sfx_gun = [load_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)]
+sfx_molotov = [load_wav("sfx/molotov.wav")]
+sfx_bomb = [load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)]
 sfx_strike = load_wav("sfx/lightning.wav")
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
@@ -238,15 +238,14 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                 else:
                     seg = seg.apply_gain(-15-seg.dBFS)
                 line_stripped_lower = line_stripped.lower()
-                if any(x in line_stripped_lower for x in ["boom", "bomb", "explosion", "explode", "fire in the hole"]):
-                    bombs.append(len(combined))
+                for keywords, collection in [(["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"], foods),
+                                             (["ball"], balls),
+                                             (["shoot", "shot", "kill", "murder", "gun"], guns),
+                                             (["fire", "molotov", "burn", "flame"], molotovs),
+                                             (["boom", "bomb", "explosion", "explode", "fire in the hole"], bombs)]:
+                    if any(x in line_stripped_lower for x in keywords) and not ("fire" in keywords and "fire in the hole" in line_stripped_lower):
+                        collection.append(len(combined) + random.randrange(len(seg)))
                 combined = combined.append(seg, 0)
-                if any(x in line_stripped_lower for x in ["fire", "molotov", "burn", "flame"]) and "fire in the hole" not in line_stripped_lower:
-                    molotovs.append(len(combined))
-                if any(x in line_stripped_lower for x in ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza"]):
-                    foods.append(len(combined))
-                if "ball" in line_stripped_lower:
-                    balls.append(len(combined))
                 if line[-1] in "-–—":
                     line = line[:-1] + "—"
                 elif random.randrange(10) == 0:
@@ -255,8 +254,6 @@ async def episode(inter: discord.Interaction, topic: str = ""):
                     line += "—"
                 else:
                     combined = combined.append(silence_line, 0)
-                if any(x in line_stripped_lower for x in ["shoot", "shot", "kill", "murder", "gun"]):
-                    guns.append(len(combined))
                 transcript.append(f"- {discord.utils.escape_markdown(line)}")
                 completed += 1
                 episode_progress = int(100 * (completed / remaining))
@@ -289,21 +286,11 @@ async def episode(inter: discord.Interaction, topic: str = ""):
             if rain_intensity > 0:
                 for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
                     combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
-        for food in foods:
-            if random.randrange(2) == 0:
-                combined = combined.overlay(sfx_food, food)
-        for ball in balls:
-            if random.randrange(2) == 0:
-                combined = combined.overlay(sfx_ball, ball)
-        for gun in guns:
-            if random.randrange(2) == 0:
-                combined = combined.overlay(random.choice(sfx_gun), gun)
-        for molotov in molotovs:
-            if random.randrange(2) == 0:
-                combined = combined.overlay(sfx_molotov, molotov)
-        for bomb in bombs:
-            if random.randrange(2) == 0:
-                combined = combined.overlay(sfx_bomb, bomb)
+        for items, item_sfx in [(foods, sfx_food), (balls, sfx_ball), (guns, sfx_gun), (molotovs, sfx_molotov), (bombs, sfx_bomb)]:
+            for item in items:
+                if random.randrange(5) > 0:
+                    choice = random.choice(item_sfx)
+                    combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-10, 0)) - choice.dBFS), item)
         combined = silence_transition.append(combined, 0).overlay(sfx_transition)
         for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
             choice = random.choices(list(sfx.keys()), list(sfx.values()))[0]
