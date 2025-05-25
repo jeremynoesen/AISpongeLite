@@ -39,6 +39,7 @@ embed_generating_tts = discord.Embed(title="Generating...", description="# 🔊"
 embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
 embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Invalid character.")
+embed_error_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_dark).set_image(url="attachment://explodeward.gif")
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -128,6 +129,12 @@ episode_progress = 0
 episode_cooldown = 300
 episode_cooldowns = {}
 start_time = int(time.time())
+bans = []
+if os.path.exists("bans.txt"):
+    with open("bans.txt", "r") as bans_file:
+        for user_id in bans_file:
+            bans.append(int(user_id))
+
 
 
 @command_tree.command(name="episode", description="Generate an episode.")
@@ -153,6 +160,9 @@ async def episode(inter: discord.Interaction, topic: str = ""):
         return
     if not inter.app_permissions.use_external_emojis:
         await inter.response.send_message(embed=embed_error_permissions)
+        return
+    if inter.user.id in bans:
+        await inter.response.send_message(embed=embed_error_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
         return
     try:
         episode_generating = True
@@ -329,6 +339,9 @@ async def chat(inter: discord.Interaction, character: str, message: str):
     if character not in characters.keys() or characters[character][2]:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_error_character)
         return
+    if inter.user.id in bans:
+        await inter.response.send_message(embed=embed_error_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+        return
     try:
         emoji = characters[character][1]
         character = character.title().replace("bob", "Bob")
@@ -365,6 +378,9 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         return
     if not inter.app_permissions.use_external_emojis:
         await inter.response.send_message(embed=embed_error_permissions)
+        return
+    if inter.user.id in bans:
+        await inter.response.send_message(embed=embed_error_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
         return
     try:
         await inter.response.send_message(embed=embed_generating_tts)
