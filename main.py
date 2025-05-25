@@ -36,9 +36,9 @@ embed_help = discord.Embed(title="See the App Directory for bot help.", descript
 help_button = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
 embed_generating_chat = discord.Embed(title="Generating...", description="# 💬", color=embed_color_light).set_footer(text=f"Sending message...")
 embed_generating_tts = discord.Embed(title="Generating...", description="# 🔊", color=embed_color_light).set_footer(text=f"Synthesizing speech...")
-embed_error_permissions = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Missing permissions.")
 embed_error_failed = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="An error occurred.")
-embed_error_character = discord.Embed(title="Generating...", description="# Failed", color=embed_color_dark).set_footer(text="Invalid character.")
+embed_error_permissions = discord.Embed(title="Error", description="# 🔑", color=embed_color_dark).set_footer(text="Missing permissions.")
+embed_error_character = discord.Embed(title="Error", description="# ❓", color=embed_color_dark).set_footer(text="Invalid character.")
 embed_error_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_dark).set_image(url="attachment://explodeward.gif")
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
@@ -417,22 +417,21 @@ async def stats(inter: discord.Interaction):
     tts_all = 0
     current_time = int(time.time())
     if os.path.exists("statistics.txt"):
-        with open("statistics.txt", "r") as file:
-            lines = file.read().strip().split("\n")
-        for line in lines:
-            parts = line.split(" ")
-            if parts[0] == "E":
-                episodes_all += 1
-                if current_time - int(parts[1]) < 86400:
-                    episodes_24h += 1
-            elif parts[0] == "C":
-                chats_all += 1
-                if current_time - int(parts[1]) < 86400:
-                    chats_24h += 1
-            elif parts[0] == "T":
-                tts_all += 1
-                if current_time - int(parts[1]) < 86400:
-                    tts_24h += 1
+        with open("statistics.txt", "r") as statistics_file:
+            for entry in statistics_file:
+                parts = entry.strip().split(" ")
+                if parts[0] == "E":
+                    episodes_all += 1
+                    if current_time - int(parts[1]) < 86400:
+                        episodes_24h += 1
+                elif parts[0] == "C":
+                    chats_all += 1
+                    if current_time - int(parts[1]) < 86400:
+                        chats_24h += 1
+                elif parts[0] == "T":
+                    tts_all += 1
+                    if current_time - int(parts[1]) < 86400:
+                        tts_24h += 1
     uptime = int(current_time - start_time)
     uptime_formatted = ""
     days = uptime // 86400
