@@ -97,9 +97,9 @@ songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
          load_wav("music/drunken_sailor.wav", gain=music_gain): 5,
          load_wav("music/stars_and_games.wav", gain=music_gain): 5,
          load_wav("music/comic_walk.wav", gain=music_gain): 5,
+         load_wav("music/gator.wav", gain=music_gain): 5,
          load_wav("music/rock_bottom.wav", gain=music_gain): 5,
          load_wav("music/grass_skirt_chase.wav", gain=music_gain): 1,
-         load_wav("music/gator.wav", gain=music_gain): 1,
          load_wav("music/sneaky_snitch.wav", gain=music_gain): 1,
          load_wav("music/better_call_saul.wav", gain=music_gain): 1}
 sfx_gain = -20
