@@ -174,7 +174,7 @@ async def episode(inter: discord.Interaction, topic: str):
         await inter.response.send_message(embed=embed_generating_episode_start)
         await client.change_presence(activity=discord.Game("Generating episode..."), status=discord.Status.dnd)
         log = await client.fetch_channel(moderation_channel_id)
-        await log.send(embed=discord.Embed(title=inter.user.id, description=topic, color=embed_color_logging))
+        await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(topic)}```", color=embed_color_logging))
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
@@ -345,7 +345,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
     try:
         await inter.response.send_message(embed=embed_generating_chat)
         log = await client.fetch_channel(moderation_channel_id)
-        await log.send(embed=discord.Embed(title=inter.user.id, description=message, color=embed_color_logging))
+        await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(message)}```", color=embed_color_logging))
         emoji = characters[character][1]
         character = character.title().replace("bob", "Bob")
         completion = await openai.completions.create(
@@ -387,7 +387,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
     try:
         await inter.response.send_message(embed=embed_generating_tts)
         log = await client.fetch_channel(moderation_channel_id)
-        await log.send(embed=discord.Embed(title=inter.user.id, description=text, color=embed_color_logging))
+        await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(text)}```", color=embed_color_logging))
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
@@ -471,17 +471,17 @@ async def ban(inter: discord.Interaction, id: str):
         return
     try:
         id = int(id)
-        user = await client.fetch_user(id)
+        await client.fetch_user(id)
     except:
         await inter.response.send_message(embed=discord.Embed(title="Unknown user.", description=f"No user exists with ID `{id}`.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
         return
     if id in bans:
-        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"`{id}`", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
+        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"User with ID `{id}` is already banned.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
         return
     bans.append(id)
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
-    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"`{id}`", color=embed_color_command_successful))
+    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"User with ID `{id}` has been banned.", color=embed_color_command_successful))
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
