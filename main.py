@@ -48,6 +48,7 @@ embed_unknown_character = discord.Embed(title="Unknown character.", description=
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
 embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_command_unsuccessful)
 embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on episode or TTS OGG files.", color=embed_color_command_unsuccessful)
+embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -488,13 +489,13 @@ async def convert(inter: discord.Interaction, message: discord.Message):
     if message.author != client.user or not message.attachments or message.attachments[0].filename[-3:].lower() != "ogg":
         await inter.response.send_message(embed=embed_no_file, ephemeral=True, delete_after=embed_delete_after)
         return
-    await inter.response.defer()
+    await inter.response.send_message(embed=embed_converting_file)
     with BytesIO() as input:
         await message.attachments[0].save(input)
         seg = AudioSegment.from_ogg(input)
     with BytesIO() as output:
         seg.export(output, "mp3")
-        await inter.edit_original_response(attachments=[discord.File(output, f"{message.attachments[0].filename[:-3]}mp3")])
+        await inter.edit_original_response(embed=None, attachments=[discord.File(output, f"{message.attachments[0].filename[:-3]}mp3")])
 
 
 @client.event
