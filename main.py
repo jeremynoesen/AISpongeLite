@@ -475,12 +475,12 @@ async def ban(inter: discord.Interaction, id: str):
         await inter.response.send_message(embed=discord.Embed(title="Unknown user.", description=f"No user exists with ID `{id}`.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
         return
     if id in bans:
-        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_command_unsuccessful).set_thumbnail(url=user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
+        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"`{id}`", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
         return
     bans.append(id)
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
-    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_command_successful).set_thumbnail(url=user.display_avatar.url))
+    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"`{id}`", color=embed_color_command_successful))
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
