@@ -30,22 +30,23 @@ client = discord.Client(intents=discord.Intents.default(), activity=discord.Game
 command_tree = app_commands.CommandTree(client)
 moderation_guild_id = int(os.getenv("MODERATION_GUILD_ID"))
 moderation_channel_id = int(os.getenv("MODERATION_CHANNEL_ID"))
-embed_color_dark = 0x04a3e7
-embed_color_light = 0x57f3ff
+embed_color_command_unsuccessful = 0x04a3e7
+embed_color_command_successful = 0x57f3ff
+embed_color_logging = 0x1848ae
 embed_delete_after = 10
-embed_help = discord.Embed(title="See the App Directory for bot help.", description="You will also find links to the support server and source code there.", color=embed_color_light)
+embed_help = discord.Embed(title="See the App Directory for bot help.", description="You will also find links to the support server and source code there.", color=embed_color_command_successful)
 help_button = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
-embed_in_use_episode = discord.Embed(title="Currently in use.", description="An episode is generating.", color=embed_color_dark)
-embed_in_use_tts = discord.Embed(title="Currently in use.", description="TTS unavailable while an episode is generating.", color=embed_color_dark)
-embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color_dark)
-embed_generating_episode_end = discord.Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color_dark)
-embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_dark)
-embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color_dark)
-embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_dark)
-embed_insufficient_permission = discord.Embed(title="Insufficient permission.", description="Allow *Use External Emoji* to use this command.", color=embed_color_dark)
-embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from the autocomplete list.", color=embed_color_dark)
-embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_dark).set_image(url="attachment://explodeward.gif")
-embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_dark)
+embed_in_use_episode = discord.Embed(title="Currently in use.", description="An episode is generating.", color=embed_color_command_unsuccessful)
+embed_in_use_tts = discord.Embed(title="Currently in use.", description="TTS unavailable while an episode is generating.", color=embed_color_command_unsuccessful)
+embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color_command_unsuccessful)
+embed_generating_episode_end = discord.Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color_command_unsuccessful)
+embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_command_unsuccessful)
+embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color_command_unsuccessful)
+embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_command_unsuccessful)
+embed_insufficient_permission = discord.Embed(title="Insufficient permission.", description="Allow *Use External Emoji* to use this command.", color=embed_color_command_unsuccessful)
+embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from the autocomplete list.", color=embed_color_command_unsuccessful)
+embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
+embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -156,7 +157,7 @@ async def episode(inter: discord.Interaction, topic: str):
         seconds = remaining % 60
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color_dark), view=discord.ui.View().add_item(remove_cooldown_button))
+        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color_command_unsuccessful), view=discord.ui.View().add_item(remove_cooldown_button))
         return
     if episode_generating:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_episode)
@@ -171,6 +172,8 @@ async def episode(inter: discord.Interaction, topic: str):
         episode_generating = True
         await inter.response.send_message(embed=embed_generating_episode_start)
         await client.change_presence(activity=discord.Game("Generating episode..."), status=discord.Status.dnd)
+        log = await client.fetch_channel(moderation_channel_id)
+        await log.send(embed=discord.Embed(title=inter.user.id, description=topic, color=embed_color_logging))
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
@@ -206,7 +209,7 @@ async def episode(inter: discord.Interaction, topic: str):
         combined = AudioSegment.empty()
         loop = asyncio.get_running_loop()
         for line in lines:
-            await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed}/{remaining}`...", color=embed_color_dark))
+            await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed}/{remaining}`...", color=embed_color_command_unsuccessful))
             line = line.strip()
             character = line.split(":")[0].lower()
             character_stripped = character.strip()
@@ -302,7 +305,7 @@ async def episode(inter: discord.Interaction, topic: str):
         combined = combined.fade_out(200)
         with BytesIO() as output:
             combined.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_light), attachments=[discord.File(output, f"{file_title}.ogg")])
+            await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_command_successful), attachments=[discord.File(output, f"{file_title}.ogg")])
         end_time = int(time.time())
         remove_cooldown = False
         for entitlement in inter.entitlements:
@@ -339,9 +342,11 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         await inter.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
         return
     try:
+        await inter.response.send_message(embed=embed_generating_chat)
+        log = await client.fetch_channel(moderation_channel_id)
+        await log.send(embed=discord.Embed(title=inter.user.id, description=message, color=embed_color_logging))
         emoji = characters[character][1]
         character = character.title().replace("bob", "Bob")
-        await inter.response.send_message(embed=embed_generating_chat)
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
@@ -350,7 +355,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         output = discord.utils.escape_markdown(re.compile(re.escape(f"{character}:"), re.IGNORECASE).sub("", completion.choices[0].text.strip(), 1).strip())
         if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
             output = output[1:-1].strip()
-        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_light).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url))
+        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
     except:
@@ -380,6 +385,8 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_tts)
+        log = await client.fetch_channel(moderation_channel_id)
+        await log.send(embed=discord.Embed(title=inter.user.id, description=text, color=embed_color_logging))
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
@@ -393,7 +400,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         seg = seg.apply_gain(-15-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(description=f"{characters[character][1]} {discord.utils.escape_markdown(text)}", color=embed_color_light), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
+            await inter.edit_original_response(embed=discord.Embed(description=f"{characters[character][1]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
         with open("statistics.txt", "a") as file:
             file.write(f"T {int(time.time())}\n")
     except:
@@ -442,7 +449,7 @@ async def stats(inter: discord.Interaction):
     seconds = uptime % 60
     if seconds > 0:
         uptime_formatted += f"{seconds}s"
-    await inter.response.send_message(embed=discord.Embed(color=embed_color_light)
+    await inter.response.send_message(embed=discord.Embed(color=embed_color_command_successful)
                                       .add_field(name="📺 Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
                                       .add_field(name="💬 Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
                                       .add_field(name="🔊 TTS", value=f"- 24h: `{tts_24h}`\n- All: `{tts_all}`", inline=False)
@@ -465,15 +472,15 @@ async def ban(inter: discord.Interaction, id: str):
         id = int(id)
         user = await client.fetch_user(id)
     except:
-        await inter.response.send_message(embed=discord.Embed(title="Unknown user.", description=f"No user exists with ID `{id}`.", color=embed_color_dark), ephemeral=True, delete_after=embed_delete_after)
+        await inter.response.send_message(embed=discord.Embed(title="Unknown user.", description=f"No user exists with ID `{id}`.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
         return
     if id in bans:
-        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_dark).set_thumbnail(url=user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
+        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_command_unsuccessful).set_thumbnail(url=user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
         return
     bans.append(id)
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
-    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_light).set_thumbnail(url=user.display_avatar.url))
+    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_command_successful).set_thumbnail(url=user.display_avatar.url))
 
 
 @client.event
