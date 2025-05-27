@@ -47,6 +47,7 @@ embed_insufficient_permission = discord.Embed(title="Insufficient permission.", 
 embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from the autocomplete list.", color=embed_color_command_unsuccessful)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
 embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_command_unsuccessful)
+embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on episode or TTS OGG files.", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -141,7 +142,6 @@ if os.path.exists("bans.txt"):
     with open("bans.txt", "r") as file:
         for line in file:
             bans.append(int(line))
-
 
 
 @command_tree.command(description="Generate an episode.")
@@ -481,6 +481,20 @@ async def ban(inter: discord.Interaction, id: str):
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
     await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_command_successful).set_thumbnail(url=user.display_avatar.url))
+
+
+@command_tree.context_menu(name="Convert OGG to MP3")
+async def convert(inter: discord.Interaction, message: discord.Message):
+    if message.author != client.user or not message.attachments or message.attachments[0].filename[-3:].lower() != "ogg":
+        await inter.response.send_message(embed=embed_no_file, ephemeral=True, delete_after=embed_delete_after)
+        return
+    await inter.response.defer()
+    with BytesIO() as input:
+        await message.attachments[0].save(input)
+        seg = AudioSegment.from_ogg(input)
+    with BytesIO() as output:
+        seg.export(output, "mp3")
+        await inter.edit_original_response(attachments=[discord.File(output, f"{message.attachments[0].filename[:-3]}mp3")])
 
 
 @client.event

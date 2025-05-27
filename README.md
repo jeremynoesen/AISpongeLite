@@ -11,23 +11,23 @@ AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes wit
 
 ### Characters
 
-The available characters are SpongeBob, Patrick, Squidward, Gary, Sandy, Mr. Krabs, Plankton, Karen, Mrs. Puff, 
-Squilliam, Larry, Bubble Bass, Bubble Buddy, DoodleBob, and the French Narrator. Some characters will sound different 
+The available characters are SpongeBob, Patrick, Squidward, Gary, Sandy, Mr. Krabs, Plankton, Karen, Mrs. Puff,
+Squilliam, Larry, Bubble Bass, Bubble Buddy, DoodleBob, and the French Narrator. Some characters will sound different
 from Rehydrated due to them using private models.
 
 ### Background Music
 
 The available background music is the SpongeBob SquarePants closing theme, The Tip Top Polka, The Rake Hornpipe,
-Seaweed, Hello Sailor (b), Drunken Sailor, Stars and Games, Comic Walk, and the Rock Bottom music from Rehydrated. One 
-of these is chosen at random per episode. There is also a rare chance that Grass Skirt Chase, Gator, Sneaky Snitch, or 
+Seaweed, Hello Sailor (b), Drunken Sailor, Stars and Games, Comic Walk, and the Rock Bottom music from Rehydrated. One
+of these is chosen at random per episode. There is also a rare chance that Grass Skirt Chase, Gator, Sneaky Snitch, or
 the Better Call Saul opening will be chosen as a callback to the original AI Sponge.
 
 ### Sound Effects
 
-The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, dolphin, bonk, fling, kick, 
-squish, kiss, dramatic cue, car passing by, "My leg!", "Oh brother this guy stinks!", "Boo you stink!", and "You what?". 
-One or more of these are chosen at random to play at random points in each episode. If it is raining, lightning strikes 
-with randomized intensity may occur as well. Every episode begins with the bubbles transition sound. Sound effects 
+The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, dolphin, bonk, fling, kick,
+squish, kiss, dramatic cue, car passing by, "My leg!", "Oh brother this guy stinks!", "Boo you stink!", and "You what?".
+One or more of these are chosen at random to play at random points in each episode. If it is raining, lightning strikes
+with randomized intensity may occur as well. Every episode begins with the bubbles transition sound. Sound effects
 triggered by words are burps, bouncing balls, gunshots, molotovs, and bombs.
 
 ### Ambiance
@@ -39,7 +39,7 @@ play on top of the other ambiance sounds.
 ### Random Events
 
 The available random events are speech cutoffs and loud events. Both of these can happen in an episode any number of
-times and will appear in the transcript. Loud events also occur when Loudward and Loudton speak, and when a line 
+times and will appear in the transcript. Loud events also occur when Loudward and Loudton speak, and when a line
 generates in all caps. Cutoffs also occur anytime a line ends with an em dash, en dash, or a hyphen.
 
 ### Strokes
@@ -49,16 +49,23 @@ are normalized, so strokes will not be full volume.
 
 ## Usage
 
+### Slash Commands
+
 - `/episode`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
   Generation may take a few minutes. Do not enter a topic to check generation status or remaining cooldown.
 - `/chat`: Chat with a character. This can be used at any time anywhere and does not have a cooldown.
-- `/tts`: Synthesize character speech. This can be used whenever an episode is not generating and does not have a 
+- `/tts`: Synthesize character speech. This can be used whenever an episode is not generating and does not have a
   cooldown.
-- `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all 
+- `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all
   time, and view the bot uptime.
 - `/help`: Show bot help. This will show a link to the Discord App Directory page.
+
+### Context Menu Commands
+
+- `Convert OGG to MP3`: Convert an episode or TTS output in OGG format to MP3, useful for devices that do not support
+  OGG format.
 
 ## Installation
 
@@ -68,7 +75,7 @@ instructions in the popup.
 ## Troubleshooting
 
 - If you encounter the error "Missing permissions.", make sure the bot has the "Use External Emojis" permission.
-- If you encounter the error "An error occurred.", try again later. If this occurs immediately after generation 
+- If you encounter the error "An error occurred.", try again later. If this occurs immediately after generation
   progresses past 0%, try rewording your topic. Quotation marks and similar punctuation can cause problems.
 
 ## Demonstration
