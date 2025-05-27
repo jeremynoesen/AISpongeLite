@@ -28,6 +28,8 @@ fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 fakeyou_timeout = 120
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
 command_tree = app_commands.CommandTree(client)
+moderation_guild_id = int(os.getenv("MODERATION_GUILD_ID"))
+moderation_channel_id = int(os.getenv("MODERATION_CHANNEL_ID"))
 embed_color_dark = 0x04a3e7
 embed_color_light = 0x57f3ff
 embed_delete_after = 10
@@ -43,6 +45,7 @@ embed_generation_failed = discord.Embed(title="Generation failed.", description=
 embed_insufficient_permission = discord.Embed(title="Insufficient permission.", description="Allow *Use External Emoji* to use this command.", color=embed_color_dark)
 embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from the autocomplete list.", color=embed_color_dark)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_dark).set_image(url="attachment://explodeward.gif")
+embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_dark)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
@@ -134,9 +137,9 @@ episode_cooldowns = {}
 start_time = int(time.time())
 bans = []
 if os.path.exists("bans.txt"):
-    with open("bans.txt", "r") as bans_file:
-        for user_id in bans_file:
-            bans.append(int(user_id))
+    with open("bans.txt", "r") as file:
+        for line in file:
+            bans.append(int(line))
 
 
 
@@ -452,9 +455,31 @@ async def help(inter: discord.Interaction):
     await inter.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=discord.ui.View().add_item(help_button))
 
 
+@command_tree.command(description="Ban a user.", guild=discord.Object(id=moderation_guild_id))
+@app_commands.describe(id="ID of user.")
+async def ban(inter: discord.Interaction, id: str):
+    if inter.channel.id != moderation_channel_id:
+        await inter.response.send_message(embed=embed_incorrect_channel, ephemeral=True, delete_after=embed_delete_after)
+        return
+    try:
+        id = int(id)
+        user = await client.fetch_user(id)
+    except:
+        await inter.response.send_message(embed=discord.Embed(title="Unknown user.", description=f"No user exists with ID `{id}`.", color=embed_color_dark), ephemeral=True, delete_after=embed_delete_after)
+        return
+    if id in bans:
+        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_dark).set_thumbnail(url=user.display_avatar.url), ephemeral=True, delete_after=embed_delete_after)
+        return
+    bans.append(id)
+    with open("bans.txt", "a") as file:
+        file.write(f"{id}\n")
+    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"**{user.display_name}**\n{user.name}\n-# {id}", color=embed_color_light).set_thumbnail(url=user.display_avatar.url))
+
+
 @client.event
 async def on_ready():
     await command_tree.sync()
+    await command_tree.sync(guild=discord.Object(id=moderation_guild_id))
 
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
