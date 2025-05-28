@@ -19,7 +19,7 @@ openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
 fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 fakeyou_timeout = 120
-client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready"), status=discord.Status.online)
+client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready to generate."), status=discord.Status.online)
 command_tree = app_commands.CommandTree(client)
 moderation_guild_id = int(os.getenv("MODERATION_GUILD_ID"))
 moderation_channel_id = int(os.getenv("MODERATION_CHANNEL_ID"))
@@ -314,7 +314,7 @@ async def episode(inter: discord.Interaction, topic: str):
             await inter.edit_original_response(embed=embed_generation_failed)
         except:
             pass
-    await client.change_presence(activity=discord.Game("Ready"), status=discord.Status.online)
+    await client.change_presence(activity=discord.Game("Ready to generate."), status=discord.Status.online)
     episode_generating = False
 
 
