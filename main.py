@@ -85,23 +85,23 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
               "all": (None, os.getenv("EMOJI_ALL"), True)}
 ambiance_gain = -45
-ambiance_time = [load_wav("ambiance/day.wav", gain=ambiance_gain),
-                 load_wav("ambiance/night.wav", gain=ambiance_gain)]
+ambiance_time = [load_wav("ambiance/day.wav"),
+                 load_wav("ambiance/night.wav")]
 ambiance_rain = load_wav("ambiance/rain.wav")
 music_gain = -35
-songs = {load_wav("music/closing_theme.wav", gain=music_gain): 10,
-         load_wav("music/tip_top_polka.wav", gain=music_gain): 10,
-         load_wav("music/rake_hornpipe.wav", gain=music_gain): 10,
-         load_wav("music/seaweed.wav", gain=music_gain): 10,
-         load_wav("music/hello_sailor_b.wav", gain=music_gain): 5,
-         load_wav("music/drunken_sailor.wav", gain=music_gain): 5,
-         load_wav("music/stars_and_games.wav", gain=music_gain): 5,
-         load_wav("music/comic_walk.wav", gain=music_gain): 5,
-         load_wav("music/gator.wav", gain=music_gain): 5,
-         load_wav("music/rock_bottom.wav", gain=music_gain): 5,
-         load_wav("music/grass_skirt_chase.wav", gain=music_gain): 1,
-         load_wav("music/sneaky_snitch.wav", gain=music_gain): 1,
-         load_wav("music/better_call_saul.wav", gain=music_gain): 1}
+songs = {load_wav("music/closing_theme.wav"): 10,
+         load_wav("music/tip_top_polka.wav"): 10,
+         load_wav("music/rake_hornpipe.wav"): 10,
+         load_wav("music/seaweed.wav"): 10,
+         load_wav("music/hello_sailor_b.wav"): 5,
+         load_wav("music/drunken_sailor.wav"): 5,
+         load_wav("music/stars_and_games.wav"): 5,
+         load_wav("music/comic_walk.wav"): 5,
+         load_wav("music/gator.wav"): 5,
+         load_wav("music/rock_bottom.wav"): 5,
+         load_wav("music/grass_skirt_chase.wav"): 1,
+         load_wav("music/sneaky_snitch.wav"): 1,
+         load_wav("music/better_call_saul.wav"): 1}
 sfx_gain = -20
 sfx = {AudioSegment.from_mp3("sfx/car.mp3"): 10,
        load_wav("sfx/steel_sting.wav"): 5,
@@ -274,12 +274,14 @@ async def episode(inter: discord.Interaction, topic: str):
         combined = combined.append(silence_line, 0)
         if random.randrange(20) > 0:
             music = random.choices(list(songs.keys()), list(songs.values()))[0]
+            music = music.apply_gain((music_gain + random.randint(-5, 5)) - music.dBFS)
             music_loop = silence_music.append(music.fade_in(10000), 0)
             while len(music_loop) < len(combined):
                 music_loop = music_loop.append(music, 0)
             combined = combined.overlay(music_loop)
         if random.randrange(10) > 0:
             ambiance = random.choice(ambiance_time)
+            ambiance = ambiance.apply_gain((ambiance_gain + random.randint(-5, 5)) - ambiance.dBFS)
             ambiance_loop = ambiance.fade_in(500)
             while len(ambiance_loop) < len(combined):
                 ambiance_loop = ambiance_loop.append(ambiance, 0)
