@@ -246,7 +246,7 @@ async def episode(inter: discord.Interaction, topic: str):
             else:
                 seg = seg.apply_gain(-15-seg.dBFS)
             line_stripped_lower = line_stripped.lower()
-            for keywords, collection in [(["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo"], foods),
+            for keywords, collection in [(["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo", "starv"], foods),
                                          (["ball", "bounc", "foul", "soccer", "goal"], balls),
                                          (["shoot", "shot", "kill", "murder", "gun"], guns),
                                          (["fire", "molotov", "burn", "flame", "ignite", "arson", "light"], molotovs),
