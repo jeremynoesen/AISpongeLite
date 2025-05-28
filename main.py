@@ -348,7 +348,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         output = discord.utils.escape_markdown(re.compile(re.escape(f"{character}:"), re.IGNORECASE).sub("", completion.choices[0].text.strip(), 1).strip())
         if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
             output = output[1:-1].strip()
-        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character, icon_url=client.get_emoji(int(emoji.split(":")[-1][:-1])).url))
+        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character, icon_url=(await client.fetch_application_emoji(int(emoji.split(":")[-1][:-1]))).url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
     except:
