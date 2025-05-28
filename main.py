@@ -140,6 +140,8 @@ if os.path.exists("bans.txt"):
 
 @command_tree.command(description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
+@app_commands.allowed_installs(True, True)
+@app_commands.allowed_contexts(True, True, True)
 async def episode(inter: discord.Interaction, topic: str):
     global episode_generating
     if inter.user.id in episode_cooldowns.keys() and int(time.time()) - episode_cooldowns[inter.user.id] <= episode_cooldown:
@@ -326,6 +328,8 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 @app_commands.describe(character="Character to chat with.")
 @app_commands.describe(message="Message to send.")
 @app_commands.autocomplete(character=character_autocomplete)
+@app_commands.allowed_installs(True, True)
+@app_commands.allowed_contexts(True, True, True)
 async def chat(inter: discord.Interaction, character: str, message: str):
     character = character.lower()
     if character not in characters.keys() or characters[character][2]:
@@ -362,6 +366,8 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 @app_commands.describe(character="Voice to use.")
 @app_commands.describe(text="Text to speak.")
 @app_commands.autocomplete(character=character_autocomplete)
+@app_commands.allowed_installs(True, True)
+@app_commands.allowed_contexts(True, True, True)
 async def tts(inter: discord.Interaction, character: str, text: str):
     character = character.lower()
     if character not in characters.keys() or characters[character][2]:
@@ -401,6 +407,8 @@ async def tts(inter: discord.Interaction, character: str, text: str):
 
 
 @command_tree.command(description="Show bot statistics.")
+@app_commands.allowed_installs(True, True)
+@app_commands.allowed_contexts(True, True, True)
 async def stats(inter: discord.Interaction):
     episodes_24h = 0
     episodes_all = 0
@@ -448,12 +456,16 @@ async def stats(inter: discord.Interaction):
 
 
 @command_tree.command(description="Show bot help.")
+@app_commands.allowed_installs(True, True)
+@app_commands.allowed_contexts(True, True, True)
 async def help(inter: discord.Interaction):
     await inter.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=discord.ui.View().add_item(help_button))
 
 
 @command_tree.command(description="Ban a user.", guild=discord.Object(id=moderation_guild_id))
 @app_commands.describe(id="ID of user.")
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
 async def ban(inter: discord.Interaction, id: str):
     if inter.channel.id != moderation_channel_id:
         await inter.response.send_message(embed=embed_incorrect_channel, ephemeral=True, delete_after=embed_delete_after)
@@ -474,6 +486,8 @@ async def ban(inter: discord.Interaction, id: str):
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
+@app_commands.allowed_installs(True, True)
+@app_commands.allowed_contexts(True, True, True)
 async def convert(inter: discord.Interaction, message: discord.Message):
     if message.author != client.user or not message.attachments or message.attachments[0].filename[-3:].lower() != "ogg":
         await inter.response.send_message(embed=embed_no_file, ephemeral=True, delete_after=embed_delete_after)
