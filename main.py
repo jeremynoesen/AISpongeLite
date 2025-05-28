@@ -447,10 +447,10 @@ async def stats(inter: discord.Interaction):
     if seconds > 0:
         uptime_formatted += f"{seconds}s"
     await inter.response.send_message(embed=discord.Embed(color=embed_color_command_successful)
-                                      .add_field(name="📺 Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
-                                      .add_field(name="💬 Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
-                                      .add_field(name="🔊 TTS", value=f"- 24h: `{tts_24h}`\n- All: `{tts_all}`", inline=False)
-                                      .add_field(name="🤖 Bot", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
+                                      .add_field(name="Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
+                                      .add_field(name="Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
+                                      .add_field(name="TTS", value=f"- 24h: `{tts_24h}`\n- All: `{tts_all}`", inline=False)
+                                      .add_field(name="Bot", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
                                       ephemeral=True, delete_after=embed_delete_after)
 
 
