@@ -40,9 +40,8 @@ instructions in the popup.
 
 ## Troubleshooting
 
-- If you encounter "Insufficient permission.", make sure the bot has the "Use External Emojis" permission.
-- If you encounter "Generation failed.", try again later. If this occurs immediately after generation
-  progresses past 0%, try rewording your topic. Quotation marks and similar punctuation can cause problems.
+If you encounter "Generation failed.", try again later. If this occurs immediately after generation progresses past 0%, 
+try rewording your topic. Quotation marks and similar punctuation can cause problems.
 
 ## Demonstration
 

@@ -36,7 +36,6 @@ embed_generating_episode_end = discord.Embed(title="Generating episode...", desc
 embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_command_unsuccessful)
 embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color_command_unsuccessful)
 embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_command_unsuccessful)
-embed_insufficient_permission = discord.Embed(title="Insufficient permission.", description="Allow *Use External Emoji* to use this command.", color=embed_color_command_unsuccessful)
 embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from autocomplete list.", color=embed_color_command_unsuccessful)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
 embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_command_unsuccessful)
@@ -156,9 +155,6 @@ async def episode(inter: discord.Interaction, topic: str):
         return
     if episode_generating:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_episode)
-        return
-    if not inter.app_permissions.use_external_emojis:
-        await inter.response.send_message(embed=embed_insufficient_permission)
         return
     if inter.user.id in bans:
         await inter.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
@@ -373,9 +369,6 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         return
     if episode_generating:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_tts)
-        return
-    if not inter.app_permissions.use_external_emojis:
-        await inter.response.send_message(embed=embed_insufficient_permission)
         return
     if inter.user.id in bans:
         await inter.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
