@@ -252,10 +252,10 @@ async def episode(inter: discord.Interaction, topic: str):
             else:
                 seg = seg.apply_gain(-15-seg.dBFS)
             line_stripped_lower = line_stripped.lower()
-            for keywords, collection in [(["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "eat", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo"], foods),
+            for keywords, collection in [(["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo"], foods),
                                          (["ball", "bounc", "foul", "soccer", "goal"], balls),
                                          (["shoot", "shot", "kill", "murder", "gun"], guns),
-                                         (["fire", "molotov", "burn", "flame", "ignite", "arson", "light", "lit"], molotovs),
+                                         (["fire", "molotov", "burn", "flame", "ignite", "arson", "light"], molotovs),
                                          (["boom", "bomb", "explosion", "explode", "fire in the hole", "blow up", "blew up"], bombs)]:
                 if any(x in line_stripped_lower for x in keywords) and not ("fire" in keywords and "fire in the hole" in line_stripped_lower):
                     collection.append(len(combined) + random.randrange(len(seg)))
