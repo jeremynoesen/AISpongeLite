@@ -6,46 +6,13 @@
 
 ## About
 
-AI Sponge Lite is a Discord bot that generates audio-only AI Sponge episodes with transcripts inspired by
+AI Sponge Lite is a Discord bot that generates AI Sponge audio episodes, chats, and TTS inspired by 
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
-### Characters
-
-The available characters are SpongeBob, Patrick, Squidward, Gary, Sandy, Mr. Krabs, Plankton, Karen, Mrs. Puff,
-Squilliam, Larry, Bubble Bass, Bubble Buddy, DoodleBob, and the French Narrator. Some characters will sound different
-from Rehydrated due to them using private models.
-
-### Background Music
-
-The available background music is the SpongeBob SquarePants closing theme, The Tip Top Polka, The Rake Hornpipe,
-Seaweed, Hello Sailor (b), Drunken Sailor, Stars and Games, Comic Walk, Gator, and the Rock Bottom music from 
-Rehydrated. One of these is chosen at random per episode. There is also a rare chance that Grass Skirt Chase, Sneaky 
-Snitch, or the Better Call Saul opening will be chosen as a callback to the original AI Sponge.
-
-### Sound Effects
-
-The available sound effects are steel sting, boowomp, vibe link (b), disgusting fog horn, dolphin, bonk, fling, kick,
-squish, kiss, dramatic cue, car passing by, "My leg!", "Oh brother this guy stinks!", "Boo you stink!", and "You what?".
-One or more of these are chosen at random to play at random points in each episode. If it is raining, lightning strikes
-with randomized intensity may occur as well. Every episode begins with the bubbles transition sound. Sound effects
-triggered by words are burps, bouncing balls, gunshots, molotovs, and bombs.
-
-### Ambiance
-
-The available ambiance includes underwater sounds, night crickets, and silence. One of these is chosen at random to play
-in the background of each episode below all other sounds. Rain sounds with randomized intensity also have a chance to
-play on top of the other ambiance sounds.
-
-### Random Events
-
-The available random events are speech cutoffs and loud events. Both of these can happen in an episode any number of
-times and will appear in the transcript. Loud events also occur when Loudward and Loudton speak, and when a line
-generates in all caps. Cutoffs also occur anytime a line ends with an em dash, en dash, or a hyphen.
-
-### Strokes
-
-Lite supports all strokes, which are when FakeYou glitches out and generates abnormal audio. The volumes of characters
-are normalized, so strokes will not be full volume.
+Available characters include SpongeBob, Patrick, Squidward, Gary, Sandy, Mr. Krabs, Plankton, Karen, Mrs. Puff, 
+Squilliam, Larry, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Some characters will sound different from 
+Rehydrated due to them using local models. There are also many character alts that can only appear in episodes when 
+mentioned in topics, which are up to you to discover!
 
 ## Usage
 
@@ -74,10 +41,14 @@ instructions in the popup.
 
 ## Troubleshooting
 
-- If you encounter the error "Missing permissions.", make sure the bot has the "Use External Emojis" permission.
-- If you encounter the error "An error occurred.", try again later. If this occurs immediately after generation
+- If you encounter "Insufficient permission.", make sure the bot has the "Use External Emojis" permission.
+- If you encounter "Generation failed.", try again later. If this occurs immediately after generation
   progresses past 0%, try rewording your topic. Quotation marks and similar punctuation can cause problems.
 
 ## Demonstration
 
-![Output](img/output.png)
+![Episode](img/episode.png)
+![Chat](img/chat.png)
+![TTS](img/tts.png)
+![Convert](img/convert.png)
+![Stats](img/stats.png)
