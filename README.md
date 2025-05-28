@@ -21,7 +21,6 @@ mentioned in topics, which are up to you to discover!
 - `/episode`: Generate an episode. Only one episode can be generated at a time globally. There is a 5-minute cooldown
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
-  Generation may take a few minutes. Do not enter a topic to check generation status or remaining cooldown.
 - `/chat`: Chat with a character. This can be used at any time anywhere and does not have a cooldown.
 - `/tts`: Synthesize character speech. This can be used whenever an episode is not generating and does not have a
   cooldown.
