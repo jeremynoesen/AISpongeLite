@@ -40,7 +40,7 @@ embed_insufficient_permission = discord.Embed(title="Insufficient permission.", 
 embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from autocomplete list.", color=embed_color_command_unsuccessful)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
 embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_command_unsuccessful)
-embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used with episode or TTS OGG files.", color=embed_color_command_unsuccessful)
+embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
