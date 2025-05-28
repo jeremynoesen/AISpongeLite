@@ -14,13 +14,6 @@ from openai import AsyncOpenAI
 from pydub import AudioSegment
 
 
-def load_wav(path, gain=None):
-    seg = AudioSegment.from_wav(path)
-    if gain is not None:
-        seg = seg.apply_gain(gain - seg.dBFS)
-    return seg
-
-
 load_dotenv()
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
@@ -85,50 +78,51 @@ characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI
               "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
               "all": (None, os.getenv("EMOJI_ALL"), True)}
 ambiance_gain = -45
-ambiance_time = [load_wav("ambiance/day.wav"),
-                 load_wav("ambiance/night.wav")]
-ambiance_rain = load_wav("ambiance/rain.wav")
+ambiance_time = [AudioSegment.from_wav("ambiance/day.wav"),
+                 AudioSegment.from_wav("ambiance/night.wav")]
+ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
 music_gain = -35
-songs = {load_wav("music/closing_theme.wav"): 10,
-         load_wav("music/tip_top_polka.wav"): 10,
-         load_wav("music/rake_hornpipe.wav"): 10,
-         load_wav("music/seaweed.wav"): 10,
-         load_wav("music/hello_sailor_b.wav"): 5,
-         load_wav("music/drunken_sailor.wav"): 5,
-         load_wav("music/stars_and_games.wav"): 5,
-         load_wav("music/comic_walk.wav"): 5,
-         load_wav("music/gator.wav"): 5,
-         load_wav("music/rock_bottom.wav"): 5,
-         load_wav("music/grass_skirt_chase.wav"): 1,
-         load_wav("music/sneaky_snitch.wav"): 1,
-         load_wav("music/better_call_saul.wav"): 1}
+songs = {AudioSegment.from_wav("music/closing_theme.wav"): 10,
+         AudioSegment.from_wav("music/tip_top_polka.wav"): 10,
+         AudioSegment.from_wav("music/rake_hornpipe.wav"): 10,
+         AudioSegment.from_wav("music/seaweed.wav"): 10,
+         AudioSegment.from_wav("music/hello_sailor_b.wav"): 5,
+         AudioSegment.from_wav("music/drunken_sailor.wav"): 5,
+         AudioSegment.from_wav("music/stars_and_games.wav"): 5,
+         AudioSegment.from_wav("music/comic_walk.wav"): 5,
+         AudioSegment.from_wav("music/gator.wav"): 5,
+         AudioSegment.from_wav("music/rock_bottom.wav"): 5,
+         AudioSegment.from_wav("music/grass_skirt_chase.wav"): 1,
+         AudioSegment.from_wav("music/sneaky_snitch.wav"): 1,
+         AudioSegment.from_wav("music/better_call_saul.wav"): 1}
 sfx_gain = -20
 sfx = {AudioSegment.from_mp3("sfx/car.mp3"): 10,
-       load_wav("sfx/steel_sting.wav"): 5,
-       load_wav("sfx/boowomp.wav"): 5,
-       load_wav("sfx/foghorn.wav"): 1,
-       load_wav("sfx/vibe_link_b.wav"): 1,
-       load_wav("sfx/this_guy_stinks.wav"): 1,
-       load_wav("sfx/my_leg_1.wav"): 1,
-       load_wav("sfx/my_leg_2.wav"): 1,
-       load_wav("sfx/you_what.wav"): 1,
-       load_wav("sfx/dolphin.wav"): 1,
-       load_wav("sfx/boo_you_stink.wav"): 1,
-       load_wav("sfx/bonk.wav"): 1,
-       load_wav("sfx/fling_1.wav"): 1,
-       load_wav("sfx/fling_2.wav"): 1,
-       load_wav("sfx/kick.wav"): 1,
-       load_wav("sfx/kiss.wav"): 1,
-       load_wav("sfx/squish_1.wav"): 1,
-       load_wav("sfx/squish_2.wav"): 1,
-       load_wav("sfx/dramatic_cue.wav"): 1}
-sfx_transition = load_wav("sfx/transition.wav", gain=sfx_gain)
-sfx_food = [load_wav("sfx/burp.wav")]
-sfx_ball = [load_wav("sfx/ball.wav")]
-sfx_gun = [load_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)]
-sfx_molotov = [load_wav("sfx/molotov.wav")]
-sfx_bomb = [load_wav("sfx/bomb_fuse.wav", gain=ambiance_gain) + load_wav("sfx/bomb_explosion.wav", gain=sfx_gain)]
-sfx_strike = load_wav("sfx/lightning.wav")
+       AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
+       AudioSegment.from_wav("sfx/boowomp.wav"): 5,
+       AudioSegment.from_wav("sfx/foghorn.wav"): 1,
+       AudioSegment.from_wav("sfx/vibe_link_b.wav"): 1,
+       AudioSegment.from_wav("sfx/this_guy_stinks.wav"): 1,
+       AudioSegment.from_wav("sfx/my_leg_1.wav"): 1,
+       AudioSegment.from_wav("sfx/my_leg_2.wav"): 1,
+       AudioSegment.from_wav("sfx/you_what.wav"): 1,
+       AudioSegment.from_wav("sfx/dolphin.wav"): 1,
+       AudioSegment.from_wav("sfx/boo_you_stink.wav"): 1,
+       AudioSegment.from_wav("sfx/bonk.wav"): 1,
+       AudioSegment.from_wav("sfx/fling_1.wav"): 1,
+       AudioSegment.from_wav("sfx/fling_2.wav"): 1,
+       AudioSegment.from_wav("sfx/kick.wav"): 1,
+       AudioSegment.from_wav("sfx/kiss.wav"): 1,
+       AudioSegment.from_wav("sfx/squish_1.wav"): 1,
+       AudioSegment.from_wav("sfx/squish_2.wav"): 1,
+       AudioSegment.from_wav("sfx/dramatic_cue.wav"): 1}
+sfx_transition = AudioSegment.from_wav("sfx/transition.wav")
+sfx_transition = sfx_transition.apply_gain(sfx_gain - sfx_transition.dBFS)
+sfx_food = [AudioSegment.from_wav("sfx/burp.wav")]
+sfx_ball = [AudioSegment.from_wav("sfx/ball.wav")]
+sfx_gun = [AudioSegment.from_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)]
+sfx_molotov = [AudioSegment.from_wav("sfx/molotov.wav")]
+sfx_bomb = [AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")]
+sfx_strike = AudioSegment.from_wav("sfx/lightning.wav")
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
 silence_line = AudioSegment.silent(200)
