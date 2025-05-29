@@ -43,84 +43,94 @@ embed_no_file = discord.Embed(title="No episode or TTS found.", description="Thi
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
-characters = {"spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
-              "freakbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_FREAKBOB"), True),
-              "sadbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SADBOB"), True),
-              "nerdbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_NERDBOB"), True),
-              "patrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PATRICK"), False),
-              "shortrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_SHORTRICK"), True),
-              "widerick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_WIDERICK"), True),
-              "pinhead": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PINHEAD"), True),
-              "squidward": ("TM:3psksme51515", os.getenv("EMOJI_SQUIDWARD"), False),
-              "loudward": ("TM:3psksme51515", os.getenv("EMOJI_LOUDWARD"), True),
-              "schizoward": ("TM:3psksme51515", os.getenv("EMOJI_SCHIZOWARD"), True),
-              "shadeward": ("TM:3psksme51515", os.getenv("EMOJI_SHADEWARD"), True),
-              "skodwarde": ("TM:3psksme51515", os.getenv("EMOJI_SKODWARDE"), True),
-              "spinward": ("TM:3psksme51515", os.getenv("EMOJI_SPINWARD"), True),
-              "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", os.getenv("EMOJI_GARY"), False),
-              "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON"), False),
-              "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_LOUDTON"), True),
-              "dickton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DICKTON"), True),
-              "servedton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_SERVEDTON"), True),
-              "suston": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_SUSTON"), True),
-              "dr. jr.": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DR_JR"), True),
-              "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_MR_KRABS"), False),
-              "shadowkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_SHADOWKRABS"), True),
-              "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", os.getenv("EMOJI_KAREN"), False),
-              "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", os.getenv("EMOJI_SANDY"), False),
-              "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", os.getenv("EMOJI_MRS_PUFF"), False),
-              "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", os.getenv("EMOJI_SQUILLIAM"), False),
-              "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", os.getenv("EMOJI_LARRY"), False),
-              "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLE_BASS"), False),
-              "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
-              "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
-              "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
-              "all": (None, os.getenv("EMOJI_ALL"), True)}
+characters = {
+    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
+    "freakbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_FREAKBOB"), True),
+    "sadbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SADBOB"), True),
+    "nerdbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_NERDBOB"), True),
+    "patrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PATRICK"), False),
+    "shortrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_SHORTRICK"), True),
+    "widerick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_WIDERICK"), True),
+    "pinhead": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PINHEAD"), True),
+    "squidward": ("TM:3psksme51515", os.getenv("EMOJI_SQUIDWARD"), False),
+    "loudward": ("TM:3psksme51515", os.getenv("EMOJI_LOUDWARD"), True),
+    "schizoward": ("TM:3psksme51515", os.getenv("EMOJI_SCHIZOWARD"), True),
+    "shadeward": ("TM:3psksme51515", os.getenv("EMOJI_SHADEWARD"), True),
+    "skodwarde": ("TM:3psksme51515", os.getenv("EMOJI_SKODWARDE"), True),
+    "spinward": ("TM:3psksme51515", os.getenv("EMOJI_SPINWARD"), True),
+    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", os.getenv("EMOJI_GARY"), False),
+    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON"), False),
+    "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_LOUDTON"), True),
+    "dickton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DICKTON"), True),
+    "servedton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_SERVEDTON"), True),
+    "suston": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_SUSTON"), True),
+    "dr. jr.": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DR_JR"), True),
+    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_MR_KRABS"), False),
+    "shadowkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_SHADOWKRABS"), True),
+    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", os.getenv("EMOJI_KAREN"), False),
+    "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", os.getenv("EMOJI_SANDY"), False),
+    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", os.getenv("EMOJI_MRS_PUFF"), False),
+    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", os.getenv("EMOJI_SQUILLIAM"), False),
+    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", os.getenv("EMOJI_LARRY"), False),
+    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLE_BASS"), False),
+    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
+    "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
+    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
+    "all": (None, os.getenv("EMOJI_ALL"), True)
+}
 ambiance_gain = -45
-ambiance_time = [AudioSegment.from_wav("ambiance/day.wav"),
-                 AudioSegment.from_wav("ambiance/night.wav")]
+ambiance_time = [
+    AudioSegment.from_wav("ambiance/day.wav"),
+    AudioSegment.from_wav("ambiance/night.wav")
+]
 ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
 music_gain = -35
-songs = {AudioSegment.from_wav("music/closing_theme.wav"): 10,
-         AudioSegment.from_wav("music/tip_top_polka.wav"): 10,
-         AudioSegment.from_wav("music/rake_hornpipe.wav"): 10,
-         AudioSegment.from_wav("music/seaweed.wav"): 10,
-         AudioSegment.from_wav("music/hello_sailor_b.wav"): 5,
-         AudioSegment.from_wav("music/drunken_sailor.wav"): 5,
-         AudioSegment.from_wav("music/stars_and_games.wav"): 5,
-         AudioSegment.from_wav("music/comic_walk.wav"): 5,
-         AudioSegment.from_wav("music/gator.wav"): 5,
-         AudioSegment.from_wav("music/rock_bottom.wav"): 5,
-         AudioSegment.from_wav("music/grass_skirt_chase.wav"): 1,
-         AudioSegment.from_wav("music/sneaky_snitch.wav"): 1,
-         AudioSegment.from_wav("music/better_call_saul.wav"): 1}
+songs = {
+    AudioSegment.from_wav("music/closing_theme.wav"): 10,
+    AudioSegment.from_wav("music/tip_top_polka.wav"): 10,
+    AudioSegment.from_wav("music/rake_hornpipe.wav"): 10,
+    AudioSegment.from_wav("music/seaweed.wav"): 10,
+    AudioSegment.from_wav("music/hello_sailor_b.wav"): 5,
+    AudioSegment.from_wav("music/drunken_sailor.wav"): 5,
+    AudioSegment.from_wav("music/stars_and_games.wav"): 5,
+    AudioSegment.from_wav("music/comic_walk.wav"): 5,
+    AudioSegment.from_wav("music/gator.wav"): 5,
+    AudioSegment.from_wav("music/rock_bottom.wav"): 5,
+    AudioSegment.from_wav("music/grass_skirt_chase.wav"): 1,
+    AudioSegment.from_wav("music/sneaky_snitch.wav"): 1,
+    AudioSegment.from_wav("music/better_call_saul.wav"): 1
+}
 sfx_gain = -20
-sfx = {AudioSegment.from_mp3("sfx/car.mp3"): 10,
-       AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
-       AudioSegment.from_wav("sfx/boowomp.wav"): 5,
-       AudioSegment.from_wav("sfx/foghorn.wav"): 1,
-       AudioSegment.from_wav("sfx/vibe_link_b.wav"): 1,
-       AudioSegment.from_wav("sfx/this_guy_stinks.wav"): 1,
-       AudioSegment.from_wav("sfx/my_leg_1.wav"): 1,
-       AudioSegment.from_wav("sfx/my_leg_2.wav"): 1,
-       AudioSegment.from_wav("sfx/you_what.wav"): 1,
-       AudioSegment.from_wav("sfx/dolphin.wav"): 1,
-       AudioSegment.from_wav("sfx/boo_you_stink.wav"): 1,
-       AudioSegment.from_wav("sfx/bonk.wav"): 1,
-       AudioSegment.from_wav("sfx/fling_1.wav"): 1,
-       AudioSegment.from_wav("sfx/fling_2.wav"): 1,
-       AudioSegment.from_wav("sfx/kick.wav"): 1,
-       AudioSegment.from_wav("sfx/kiss.wav"): 1,
-       AudioSegment.from_wav("sfx/squish_1.wav"): 1,
-       AudioSegment.from_wav("sfx/squish_2.wav"): 1,
-       AudioSegment.from_wav("sfx/dramatic_cue.wav"): 1}
+sfx_random = {
+    AudioSegment.from_mp3("sfx/car.mp3"): 10,
+    AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
+    AudioSegment.from_wav("sfx/boowomp.wav"): 5,
+    AudioSegment.from_wav("sfx/foghorn.wav"): 1,
+    AudioSegment.from_wav("sfx/vibe_link_b.wav"): 1,
+    AudioSegment.from_wav("sfx/this_guy_stinks.wav"): 1,
+    AudioSegment.from_wav("sfx/my_leg_1.wav"): 1,
+    AudioSegment.from_wav("sfx/my_leg_2.wav"): 1,
+    AudioSegment.from_wav("sfx/you_what.wav"): 1,
+    AudioSegment.from_wav("sfx/dolphin.wav"): 1,
+    AudioSegment.from_wav("sfx/boo_you_stink.wav"): 1,
+    AudioSegment.from_wav("sfx/bonk.wav"): 1,
+    AudioSegment.from_wav("sfx/fling_1.wav"): 1,
+    AudioSegment.from_wav("sfx/fling_2.wav"): 1,
+    AudioSegment.from_wav("sfx/kick.wav"): 1,
+    AudioSegment.from_wav("sfx/kiss.wav"): 1,
+    AudioSegment.from_wav("sfx/squish_1.wav"): 1,
+    AudioSegment.from_wav("sfx/squish_2.wav"): 1,
+    AudioSegment.from_wav("sfx/dramatic_cue.wav"): 1
+}
+sfx_triggered = {
+    "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo", "starv"]),
+    "ball": ([AudioSegment.from_wav("sfx/ball.wav")], ["ball", "bounc", "foul", "soccer", "goal"]),
+    "gun": ([AudioSegment.from_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)], ["shoot", "shot", "kill", "murder", "gun"]),
+    "molotov": ([AudioSegment.from_wav("sfx/molotov.wav")], ["fire", "molotov", "burn", "flame", "ignite", "arson", "light"]),
+    "bomb": ([AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "fire in the hole", "blow up", "blew up"])
+}
 sfx_transition = AudioSegment.from_wav("sfx/transition.wav")
 sfx_transition = sfx_transition.apply_gain(sfx_gain - sfx_transition.dBFS)
-sfx_food = [AudioSegment.from_wav("sfx/burp.wav")]
-sfx_ball = [AudioSegment.from_wav("sfx/ball.wav")]
-sfx_gun = [AudioSegment.from_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)]
-sfx_molotov = [AudioSegment.from_wav("sfx/molotov.wav")]
-sfx_bomb = [AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")]
 sfx_strike = AudioSegment.from_wav("sfx/lightning.wav")
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
@@ -193,11 +203,7 @@ async def episode(inter: discord.Interaction, topic: str):
         completed = 1
         remaining = len(lines)
         transcript = []
-        foods = []
-        balls = []
-        guns = []
-        molotovs = []
-        bombs = []
+        sfx_positions = {key: [] for key in sfx_triggered.keys()}
         spoken_characters = set()
         combined = AudioSegment.empty()
         loop = asyncio.get_running_loop()
@@ -244,11 +250,9 @@ async def episode(inter: discord.Interaction, topic: str):
             else:
                 seg = seg.apply_gain(-15-seg.dBFS)
             line_stripped_lower = line_stripped.lower()
-            for keywords, collection in [(["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo", "starv"], foods),
-                                         (["ball", "bounc", "foul", "soccer", "goal"], balls),
-                                         (["shoot", "shot", "kill", "murder", "gun"], guns),
-                                         (["fire", "molotov", "burn", "flame", "ignite", "arson", "light"], molotovs),
-                                         (["boom", "bomb", "explosion", "explode", "fire in the hole", "blow up", "blew up"], bombs)]:
+            for sfx in sfx_triggered.keys():
+                keywords = sfx_triggered[sfx][1]
+                collection = sfx_positions[sfx]
                 if any(x in line_stripped_lower for x in keywords) and not ("fire" in keywords and "fire in the hole" in line_stripped_lower):
                     collection.append(len(combined) + random.randrange(len(seg)))
             combined = combined.append(seg, 0)
@@ -288,14 +292,14 @@ async def episode(inter: discord.Interaction, topic: str):
             if rain_intensity > 0:
                 for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
                     combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
-        for items, item_sfx in [(foods, sfx_food), (balls, sfx_ball), (guns, sfx_gun), (molotovs, sfx_molotov), (bombs, sfx_bomb)]:
-            for item in items:
+        for sfx in sfx_triggered.keys():
+            for position in sfx_positions[sfx]:
                 if random.randrange(5) > 0:
-                    choice = random.choice(item_sfx)
-                    combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-10, 0)) - choice.dBFS), item)
+                    choice = random.choice(sfx_triggered[sfx][0])
+                    combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-10, 0)) - choice.dBFS), position)
         combined = silence_transition.append(combined, 0).overlay(sfx_transition)
         for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
-            choice = random.choices(list(sfx.keys()), list(sfx.values()))[0]
+            choice = random.choices(list(sfx_random.keys()), list(sfx_random.values()))[0]
             combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
         combined = combined.fade_out(200)
         with BytesIO() as output:
