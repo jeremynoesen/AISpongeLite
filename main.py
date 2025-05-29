@@ -320,12 +320,10 @@ async def episode(inter: discord.Interaction, topic: str):
         with open("statistics.txt", "a") as file:
             file.write(f"E {end_time}\n")
     except:
-        try:
-            await inter.edit_original_response(embed=embed_generation_failed)
-        except:
-            pass
-    await client.change_presence(activity=discord.Game("Ready to generate."), status=discord.Status.online)
-    episode_generating = False
+        await inter.edit_original_response(embed=embed_generation_failed)
+    finally:
+        await client.change_presence(activity=discord.Game("Ready to generate."), status=discord.Status.online)
+        episode_generating = False
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
@@ -364,10 +362,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
     except:
-        try:
-            await inter.edit_original_response(embed=embed_generation_failed)
-        except:
-            pass
+        await inter.edit_original_response(embed=embed_generation_failed)
 
 
 @command_tree.command(description="Synthesize character speech.")
@@ -408,10 +403,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         with open("statistics.txt", "a") as file:
             file.write(f"T {int(time.time())}\n")
     except:
-        try:
-            await inter.edit_original_response(embed=embed_generation_failed)
-        except:
-            pass
+        await inter.edit_original_response(embed=embed_generation_failed)
 
 
 @command_tree.command(description="Show bot statistics.")
