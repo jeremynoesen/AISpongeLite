@@ -80,7 +80,10 @@ characters = {
     "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
     "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
     "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
-    "all": (None, os.getenv("EMOJI_ALL"), True)
+    "all": (None, os.getenv("EMOJI_ALL"), True),
+    "every": (None, os.getenv("EMOJI_ALL"), True),
+    "unison": (None, os.getenv("EMOJI_ALL"), True),
+    "together": (None, os.getenv("EMOJI_ALL"), True)
 }
 ambiance_gain = -45
 ambiance_time = [
@@ -187,23 +190,14 @@ async def episode(inter: discord.Interaction, topic: str):
             prompt=f"Create a profanity-filled, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
         )
         lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
-        line = lines.pop(0).strip()
-        title = line.split(":")[0].lower()
-        if title.strip() == "title":
-            line = line[len(title) + 1:].strip()
-            if line[0] == line[-1] == "\"" or line[0] == line[-1] == "'":
-                line = line[1:-1].strip()
-            file_title = line.upper().replace("I", "i")
-            embed_title = ""
-            for character in discord.utils.escape_markdown(line):
-                if character.isupper() or character.isnumeric() or character in ".,!?":
-                    embed_title += f"**{character}**​"
-                else:
-                    embed_title += character
-            embed_title = embed_title.upper().replace("I", "i")
-        else:
-            file_title = "UNTiTLED EPiSODE"
-            embed_title = "**U**NTiTLED **E**PiSODE"
+        line_parts = lines.pop(0).split(":", 1)
+        file_title = "UNTiTLED EPiSODE"
+        embed_title = "**U**NTiTLED **E**PiSODE"
+        if len(line_parts) == 2 and "title" in line_parts[0].lower():
+            title = line_parts[1].strip(" \'\"")
+            if title:
+                file_title = title.upper().replace("I", "i")
+                embed_title = "".join(f"**{char}**​" if char.isupper() or char.isnumeric() or char in ".,!?" else char for char in discord.utils.escape_markdown(title)).upper().replace("I", "i")
         completed = 1
         remaining = len(lines)
         transcript = []
@@ -213,18 +207,17 @@ async def episode(inter: discord.Interaction, topic: str):
         loop = asyncio.get_running_loop()
         for line in lines:
             await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed}/{remaining}`...", color=embed_color_command_unsuccessful))
-            line = line.strip()
-            character = line.split(":")[0].lower()
-            character_stripped = character.strip()
-            if character_stripped not in characters.keys() and not any(x in character_stripped for x in ["all", "every", "unison", "together"]):
+            line_parts = line.split(":", 1)
+            character = next((key for key in characters.keys() if key in line_parts[0].lower()), "")
+            if len(line_parts) != 2 or not character:
                 remaining -= 1
                 continue
-            line_stripped = line[len(character) + 1:].strip()
-            if any(x in character_stripped for x in ["all", "every", "unison", "together"]):
-                line = f"{characters['all'][1]} {line_stripped}"
+            spoken_line = line_parts[1].strip()
+            output_line = f"{characters[character][1]} {spoken_line}"
+            if character in ["all", "every", "unison", "together"]:
                 segs = []
                 for spoken_character in spoken_characters:
-                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[spoken_character][0]), fakeyou_timeout)
+                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, characters[spoken_character][0]), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         segs.append(AudioSegment.from_wav(wav))
                     await asyncio.sleep(10)
@@ -232,43 +225,36 @@ async def episode(inter: discord.Interaction, topic: str):
                 seg = segs[0]
                 for i in range(1, len(segs)):
                     seg = seg.overlay(segs[i], 0)
-            elif character_stripped == "doodlebob":
-                line = f"{characters['doodlebob'][1]} {line_stripped}"
+            elif character == "doodlebob":
                 seg = random.choice(voice_doodlebob)
-            elif character_stripped == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", line_stripped, re.IGNORECASE)):
-                spoken_characters.add(character_stripped)
-                line = f"{characters['gary'][1]} {line_stripped}"
+            elif character == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", spoken_line, re.IGNORECASE)):
+                spoken_characters.add(character)
                 seg = random.choice(voice_gary)
             else:
-                spoken_characters.add(character_stripped)
-                line = f"{characters[character_stripped][1]} {line_stripped}"
-                fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
+                spoken_characters.add(character)
+                fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, characters[character][0]), fakeyou_timeout)
                 with BytesIO(fy_tts.content) as wav:
                     seg = AudioSegment.from_wav(wav)
                 await asyncio.sleep(10)
             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
-            if "loud" in character_stripped or line_stripped.isupper() or random.randrange(20) == 0:
+            if "loud" in character or spoken_line.isupper() or random.randrange(20) == 0:
                 seg = seg.apply_gain(20)
                 seg = seg.apply_gain(-10-seg.dBFS)
-                line = line.replace(line_stripped, line_stripped.upper())
+                output_line = output_line.replace(spoken_line, spoken_line.upper())
             else:
                 seg = seg.apply_gain(-15-seg.dBFS)
-            line_stripped_lower = line_stripped.lower()
+            spoken_line = spoken_line.lower()
             for sfx in sfx_triggered.keys():
                 keywords = sfx_triggered[sfx][1]
                 collection = sfx_positions[sfx]
-                if any(x in line_stripped_lower for x in keywords) and not ("fire" in keywords and "fire in the hole" in line_stripped_lower):
+                if any(keyword in spoken_line for keyword in keywords) and not ("fire" in keywords and "fire in the hole" in spoken_line):
                     collection.append(len(combined) + random.randrange(len(seg)))
             combined = combined.append(seg, 0)
-            if line[-1] in "-–—":
-                line = line[:-1] + "—"
-            elif random.randrange(10) == 0:
-                while line[-1] in ".!?…":
-                    line = line[:-1]
-                line += "—"
+            if output_line[-1] in "-–—" or random.randrange(10) == 0:
+                output_line = output_line[:-1] + "—"
             else:
                 combined = combined.append(silence_line, 0)
-            transcript.append(f"- {discord.utils.escape_markdown(line)}")
+            transcript.append(f"- {discord.utils.escape_markdown(output_line)}")
             completed += 1
         await inter.edit_original_response(embed=embed_generating_episode_end)
         combined = combined.append(silence_line, 0)
@@ -355,9 +341,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
             max_tokens=250,
             prompt=f"You are {character} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character}: <response>. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
-        output = discord.utils.escape_markdown(re.sub(fr"{character}\s*:\s*", "", completion.choices[0].text.strip(), 1, re.IGNORECASE))
-        if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
-            output = output[1:-1].strip()
+        output = discord.utils.escape_markdown(completion.choices[0].text.split(":", 1)[1].strip(" \'\""))
         await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character, icon_url=(await client.fetch_application_emoji(int(emoji.split(":")[-1][:-1]))).url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
@@ -420,18 +404,18 @@ async def stats(inter: discord.Interaction):
     if os.path.exists("statistics.txt"):
         with open("statistics.txt", "r") as file:
             for line in file:
-                parts = line.strip().split(" ")
-                if parts[0] == "E":
+                line_parts = line.strip().split(" ")
+                if line_parts[0] == "E":
                     episodes_all += 1
-                    if current_time - int(parts[1]) < 86400:
+                    if current_time - int(line_parts[1]) < 86400:
                         episodes_24h += 1
-                elif parts[0] == "C":
+                elif line_parts[0] == "C":
                     chats_all += 1
-                    if current_time - int(parts[1]) < 86400:
+                    if current_time - int(line_parts[1]) < 86400:
                         chats_24h += 1
-                elif parts[0] == "T":
+                elif line_parts[0] == "T":
                     tts_all += 1
-                    if current_time - int(parts[1]) < 86400:
+                    if current_time - int(line_parts[1]) < 86400:
                         tts_24h += 1
     uptime = int(current_time - start_time)
     uptime_formatted = ""
