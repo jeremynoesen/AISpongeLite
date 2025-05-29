@@ -219,8 +219,8 @@ async def episode(inter: discord.Interaction, topic: str):
             if any(x in character_stripped for x in ["all", "every", "unison", "together"]):
                 line = f"{characters['all'][1]} {line_stripped}"
                 segs = []
-                for character in spoken_characters:
-                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character][0]), fakeyou_timeout)
+                for spoken_character in spoken_characters:
+                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[spoken_character][0]), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         segs.append(AudioSegment.from_wav(wav))
                     await asyncio.sleep(5)
