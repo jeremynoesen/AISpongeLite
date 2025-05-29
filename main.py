@@ -18,7 +18,7 @@ load_dotenv()
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
 fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
-fakeyou_timeout = 120
+fakeyou_timeout = 180
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready to generate."), status=discord.Status.online)
 command_tree = app_commands.CommandTree(client)
 moderation_guild_id = int(os.getenv("MODERATION_GUILD_ID"))
@@ -227,7 +227,7 @@ async def episode(inter: discord.Interaction, topic: str):
                     fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[spoken_character][0]), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         segs.append(AudioSegment.from_wav(wav))
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(10)
                 segs.sort(key=lambda x: -len(x))
                 seg = segs[0]
                 for i in range(1, len(segs)):
@@ -245,7 +245,7 @@ async def episode(inter: discord.Interaction, topic: str):
                 fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, line_stripped, characters[character_stripped][0]), fakeyou_timeout)
                 with BytesIO(fy_tts.content) as wav:
                     seg = AudioSegment.from_wav(wav)
-                await asyncio.sleep(5)
+                await asyncio.sleep(10)
             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
             if "loud" in character_stripped or line_stripped.isupper() or random.randrange(20) == 0:
                 seg = seg.apply_gain(20)
