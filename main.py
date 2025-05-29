@@ -351,9 +351,9 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
-            prompt=f"You are {character} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
+            prompt=f"You are {character} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character}: <response>. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
-        output = discord.utils.escape_markdown(re.compile(re.escape(f"{character}:"), re.IGNORECASE).sub("", completion.choices[0].text.strip(), 1).strip())
+        output = discord.utils.escape_markdown(re.sub(fr"{character}\s*:\s*", "", completion.choices[0].text.strip(), 1, re.IGNORECASE))
         if output[0] == output[-1] == "\"" or output[0] == output[-1] == "'":
             output = output[1:-1].strip()
         await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character, icon_url=(await client.fetch_application_emoji(int(emoji.split(":")[-1][:-1]))).url))
