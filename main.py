@@ -193,7 +193,7 @@ async def episode(inter: discord.Interaction, topic: str):
             embed_title = ""
             for character in discord.utils.escape_markdown(line):
                 if character.isupper() or character.isnumeric() or character in ".,!?":
-                    embed_title += f"**{character}**"
+                    embed_title += f"**{character}**​"
                 else:
                     embed_title += character
             embed_title = embed_title.upper().replace("I", "i")
