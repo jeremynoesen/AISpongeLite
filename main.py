@@ -19,9 +19,11 @@ openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
 fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 fakeyou_timeout = 180
-client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Ready to generate."), status=discord.Status.online)
+activity_ready = discord.Game(os.getenv("MOTD", "Ready to generate."))
+activity_generating = discord.Game("Generating episode...")
+client = discord.Client(intents=discord.Intents.default(), activity=activity_ready, status=discord.Status.online)
 command_tree = app_commands.CommandTree(client)
-moderation_guild_id = int(os.getenv("MODERATION_GUILD_ID"))
+moderation_guild = discord.Object(id=os.getenv("MODERATION_GUILD_ID"))
 moderation_channel_id = int(os.getenv("MODERATION_CHANNEL_ID"))
 embed_color_command_unsuccessful = 0x04a3e7
 embed_color_command_successful = 0x57f3ff
@@ -185,7 +187,7 @@ async def episode(inter: discord.Interaction, topic: str):
     try:
         episode_generating = True
         await inter.response.send_message(embed=embed_generating_episode_start)
-        await client.change_presence(activity=discord.Game("Generating episode..."), status=discord.Status.dnd)
+        await client.change_presence(activity=activity_generating, status=discord.Status.dnd)
         log = await client.fetch_channel(moderation_channel_id)
         await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(topic)}```", color=embed_color_logging))
         completion = await openai.completions.create(
@@ -312,7 +314,7 @@ async def episode(inter: discord.Interaction, topic: str):
     except:
         await inter.edit_original_response(embed=embed_generation_failed)
     finally:
-        await client.change_presence(activity=discord.Game("Ready to generate."), status=discord.Status.online)
+        await client.change_presence(activity=activity_ready, status=discord.Status.online)
         episode_generating = False
 
 
@@ -450,7 +452,7 @@ async def help(inter: discord.Interaction):
     await inter.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=discord.ui.View().add_item(help_button))
 
 
-@command_tree.command(description="Ban a user.", guild=discord.Object(id=moderation_guild_id))
+@command_tree.command(description="Ban a user.", guild=moderation_guild)
 @app_commands.describe(id="ID of user.")
 @app_commands.allowed_installs(True, False)
 @app_commands.allowed_contexts(True, False, True)
@@ -492,7 +494,7 @@ async def convert(inter: discord.Interaction, message: discord.Message):
 @client.event
 async def on_ready():
     await command_tree.sync()
-    await command_tree.sync(guild=discord.Object(id=moderation_guild_id))
+    await command_tree.sync(guild=moderation_guild)
 
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
