@@ -21,7 +21,7 @@ fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
 fakeyou_timeout = 180
 activity_ready = discord.Game(os.getenv("MOTD", "Ready to generate."))
 activity_generating = discord.Game("Generating episode...")
-client = discord.Client(intents=discord.Intents.default(), activity=activity_ready, status=discord.Status.online)
+client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Starting bot..."), status=discord.Status.idle)
 command_tree = app_commands.CommandTree(client)
 moderation_guild = discord.Object(id=os.getenv("MODERATION_GUILD_ID"))
 moderation_channel = None
@@ -495,6 +495,7 @@ async def on_ready():
     emojis = {e.name: e for e in await client.fetch_application_emojis()}
     for x in ["every", "unison", "together"]:
         emojis[x] = emojis["all"]
+    await client.change_presence(activity=activity_ready, status=discord.Status.online)
 
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
