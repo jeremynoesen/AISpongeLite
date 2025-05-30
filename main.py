@@ -45,52 +45,52 @@ embed_no_file = discord.Embed(title="No episode or TTS found.", description="Thi
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
+emojis = {}
 characters = {
-    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SPONGEBOB"), False),
-    "loudbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_LOUDBOB"), True),
-    "freakbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_FREAKBOB"), True),
-    "sadbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SADBOB"), True),
-    "nerdbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_NERDBOB"), True),
-    "susbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", os.getenv("EMOJI_SUSBOB"), True),
-    "patrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PATRICK"), False),
-    "loudrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_LOUDRICK"), True),
-    "shortrick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_SHORTRICK"), True),
-    "widerick": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_WIDERICK"), True),
-    "pinhead": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PINHEAD"), True),
-    "patback": ("weight_154man2fzg19nrtc15drner7t", os.getenv("EMOJI_PATBACK"), True),
-    "squidward": ("TM:3psksme51515", os.getenv("EMOJI_SQUIDWARD"), False),
-    "loudward": ("TM:3psksme51515", os.getenv("EMOJI_LOUDWARD"), True),
-    "schizoward": ("TM:3psksme51515", os.getenv("EMOJI_SCHIZOWARD"), True),
-    "shadeward": ("TM:3psksme51515", os.getenv("EMOJI_SHADEWARD"), True),
-    "skodwarde": ("TM:3psksme51515", os.getenv("EMOJI_SKODWARDE"), True),
-    "spinward": ("TM:3psksme51515", os.getenv("EMOJI_SPINWARD"), True),
-    "gyattward": ("TM:3psksme51515", os.getenv("EMOJI_GYATTWARD"), True),
-    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", os.getenv("EMOJI_GARY"), False),
-    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_PLANKTON"), False),
-    "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_LOUDTON"), True),
-    "dickton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DICKTON"), True),
-    "servedton": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_SERVEDTON"), True),
-    "suston": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_SUSTON"), True),
-    "dr. jr.": ("weight_ahxbf2104ngsgyegncaefyy6j", os.getenv("EMOJI_DR_JR"), True),
-    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_MR_KRABS"), False),
-    "shadowkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_SHADOWKRABS"), True),
-    "suskrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_SUSKRABS"), True),
-    "spinkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_SPINKRABS"), True),
-    "mrcrack": ("weight_5bxbp9xqy61svfx03b25ezmwx", os.getenv("EMOJI_MR_CRACK"), True),
-    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", os.getenv("EMOJI_KAREN"), False),
-    "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", os.getenv("EMOJI_SANDY"), False),
-    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", os.getenv("EMOJI_MRS_PUFF"), False),
-    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", os.getenv("EMOJI_SQUILLIAM"), False),
-    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", os.getenv("EMOJI_LARRY"), False),
-    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", os.getenv("EMOJI_BUBBLE_BASS"), False),
-    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", os.getenv("EMOJI_BUBBLE_BUDDY"), False),
-    "doodlebob": (None, os.getenv("EMOJI_DOODLEBOB"), False),
-    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", os.getenv("EMOJI_FRENCH_NARRATOR"), False),
-    "all": (None, os.getenv("EMOJI_ALL"), True),
-    "every": (None, os.getenv("EMOJI_ALL"), True),
-    "unison": (None, os.getenv("EMOJI_ALL"), True),
-    "together": (None, os.getenv("EMOJI_ALL"), True)
+    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", False),
+    "loudbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
+    "freakbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
+    "sadbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
+    "nerdbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
+    "susbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
+    "patrick": ("weight_154man2fzg19nrtc15drner7t", False),
+    "loudrick": ("weight_154man2fzg19nrtc15drner7t", True),
+    "shortrick": ("weight_154man2fzg19nrtc15drner7t", True),
+    "widerick": ("weight_154man2fzg19nrtc15drner7t", True),
+    "pinhead": ("weight_154man2fzg19nrtc15drner7t", True),
+    "patback": ("weight_154man2fzg19nrtc15drner7t", True),
+    "squidward": ("TM:3psksme51515", False),
+    "loudward": ("TM:3psksme51515", True),
+    "schizoward": ("TM:3psksme51515", True),
+    "shadeward": ("TM:3psksme51515", True),
+    "skodwarde": ("TM:3psksme51515", True),
+    "spinward": ("TM:3psksme51515", True),
+    "gyattward": ("TM:3psksme51515", True),
+    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", False),
+    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", False),
+    "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
+    "dickton": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
+    "servedton": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
+    "suston": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
+    "dr. jr.": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
+    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", False),
+    "shadowkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
+    "suskrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
+    "spinkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
+    "mr. crack": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
+    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", False),
+    "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", False),
+    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", False),
+    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", False),
+    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", False),
+    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", False),
+    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", False),
+    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", False),
+    "doodlebob": (None, False),
+    "all": (None, True),
 }
+for x in ["every", "unison", "together"]:
+    characters[x] = characters["all"]
 ambiance_gain = -45
 ambiance_time = [
     AudioSegment.from_wav("ambiance/day.wav"),
@@ -219,7 +219,7 @@ async def episode(inter: discord.Interaction, topic: str):
                 remaining -= 1
                 continue
             spoken_line = line_parts[1].strip()
-            output_line = f"{characters[character][1]} {spoken_line}"
+            output_line = f"{emojis[character.replace(' ', '').replace('.', '')]} {spoken_line}"
             if character in ["all", "every", "unison", "together"]:
                 segs = []
                 for spoken_character in spoken_characters:
@@ -319,7 +319,7 @@ async def episode(inter: discord.Interaction, topic: str):
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
-    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if not characters[character][2]] if current.lower() in character.lower()]
+    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if not characters[character][1]] if current.lower() in character.lower()]
 
 
 @command_tree.command(description="Chat with a character.")
@@ -329,8 +329,8 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
 async def chat(inter: discord.Interaction, character: str, message: str):
-    character = character.lower()
-    if character not in characters.keys() or characters[character][2]:
+    character_lower = character.lower()
+    if character_lower not in characters.keys() or characters[character_lower][1]:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
         return
     if inter.user.id in bans:
@@ -342,13 +342,14 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(message)}```", color=embed_color_logging))
         emoji = characters[character][1]
         character = character.title().replace("bob", "Bob")
+        character_title = character.title().replace("bob", "Bob")
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
-            prompt=f"You are {character} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character}: <response>. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
+            prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
         output = discord.utils.escape_markdown(completion.choices[0].text.split(":", 1)[1].strip(" \'\""))
-        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character, icon_url=(await client.fetch_application_emoji(int(emoji.split(":")[-1][:-1]))).url))
+        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character_title, icon_url=emojis[character_lower.replace(' ', '').replace('.', '')].url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
     except:
@@ -363,7 +364,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 @app_commands.allowed_contexts(True, True, True)
 async def tts(inter: discord.Interaction, character: str, text: str):
     character = character.lower()
-    if character not in characters.keys() or characters[character][2]:
+    if character not in characters.keys() or characters[character][1]:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
         return
     if episode_generating:
@@ -389,7 +390,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         seg = seg.apply_gain(-15-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(description=f"{characters[character][1]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
+            await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
         with open("statistics.txt", "a") as file:
             file.write(f"T {int(time.time())}\n")
     except:
@@ -495,6 +496,10 @@ async def convert(inter: discord.Interaction, message: discord.Message):
 async def on_ready():
     await command_tree.sync()
     await command_tree.sync(guild=moderation_guild)
+    global moderation_channel, emojis
+    emojis = {e.name: e for e in await client.fetch_application_emojis()}
+    for x in ["every", "unison", "together"]:
+        emojis[x] = emojis["all"]
 
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
