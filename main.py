@@ -24,7 +24,7 @@ activity_generating = discord.Game("Generating episode...")
 client = discord.Client(intents=discord.Intents.default(), activity=activity_ready, status=discord.Status.online)
 command_tree = app_commands.CommandTree(client)
 moderation_guild = discord.Object(id=os.getenv("MODERATION_GUILD_ID"))
-moderation_channel_id = int(os.getenv("MODERATION_CHANNEL_ID"))
+moderation_channel = None
 embed_color_command_unsuccessful = 0x04a3e7
 embed_color_command_successful = 0x57f3ff
 embed_color_logging = 0x1848ae
@@ -40,7 +40,6 @@ embed_generating_tts = discord.Embed(title="Generating TTS...", description="Syn
 embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_command_unsuccessful)
 embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from autocomplete list.", color=embed_color_command_unsuccessful)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
-embed_incorrect_channel = discord.Embed(title="Incorrect channel.", description=f"This command can only be used in <#{moderation_channel_id}>.", color=embed_color_command_unsuccessful)
 embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
@@ -188,8 +187,7 @@ async def episode(inter: discord.Interaction, topic: str):
         episode_generating = True
         await inter.response.send_message(embed=embed_generating_episode_start)
         await client.change_presence(activity=activity_generating, status=discord.Status.dnd)
-        log = await client.fetch_channel(moderation_channel_id)
-        await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(topic)}```", color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(topic)}```", color=embed_color_logging))
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
@@ -338,10 +336,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_chat)
-        log = await client.fetch_channel(moderation_channel_id)
-        await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(message)}```", color=embed_color_logging))
-        emoji = characters[character][1]
-        character = character.title().replace("bob", "Bob")
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(message)}```", color=embed_color_logging))
         character_title = character.title().replace("bob", "Bob")
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
@@ -375,8 +370,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_tts)
-        log = await client.fetch_channel(moderation_channel_id)
-        await log.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(text)}```", color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(text)}```", color=embed_color_logging))
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
@@ -458,8 +452,8 @@ async def help(inter: discord.Interaction):
 @app_commands.allowed_installs(True, False)
 @app_commands.allowed_contexts(True, False, True)
 async def ban(inter: discord.Interaction, id: str):
-    if inter.channel.id != moderation_channel_id:
-        await inter.response.send_message(embed=embed_incorrect_channel, ephemeral=True, delete_after=embed_delete_after)
+    if inter.channel != moderation_channel:
+        await inter.response.send_message(embed=discord.Embed(title="Incorrect channel.", description=f"This command can only be used in {moderation_channel.mention}.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
         return
     try:
         id = int(id)
@@ -497,6 +491,7 @@ async def on_ready():
     await command_tree.sync()
     await command_tree.sync(guild=moderation_guild)
     global moderation_channel, emojis
+    moderation_channel = await client.fetch_channel(int(os.getenv("MODERATION_CHANNEL_ID")))
     emojis = {e.name: e for e in await client.fetch_application_emojis()}
     for x in ["every", "unison", "together"]:
         emojis[x] = emojis["all"]
