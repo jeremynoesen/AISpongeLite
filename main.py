@@ -304,7 +304,7 @@ async def episode(inter: discord.Interaction, topic: str):
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
-    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if character != "all"] if current.lower().replace(' ', '').replace('.', '') in character.lower().replace(' ', '').replace('.', '')]
+    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if character != "all" and current.lower() in character]]
 
 
 @command_tree.command(description="Chat with a character.")
