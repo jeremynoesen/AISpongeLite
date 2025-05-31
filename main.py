@@ -51,7 +51,7 @@ characters = {
     "squidward": ("TM:3psksme51515", ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde"]),
     "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", ["shadowkrabs", "suskrabs", "spinkrabs", "mr. crack"]),
     "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", ["loudton", "dickton", "servedton", "suston", "dr. jr."]),
-    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", []),
+    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", ["evilkaren", "snarkykaren", "smartkaren", "hydrakaren"]),
     "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", []),
     "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", []),
     "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", []),
