@@ -190,14 +190,14 @@ async def episode(inter: discord.Interaction, topic: str):
             for key in characters.keys():
                 model_token = characters[key][0]
                 line_parts[0] = line_parts[0].lower()
-                if key in line_parts[0]:
-                    character = key
-                    break
                 for alt in characters[key][1]:
                     if alt in line_parts[0]:
                         character = alt
                         break
                 if character:
+                    break
+                if key in line_parts[0]:
+                    character = key
                     break
             if len(line_parts) != 2 or not character:
                 remaining -= 1
