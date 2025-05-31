@@ -161,7 +161,7 @@ async def episode(inter: discord.Interaction, topic: str):
         episode_generating = True
         await inter.response.send_message(embed=embed_generating_episode_start)
         await client.change_presence(activity=activity_generating, status=discord.Status.dnd)
-        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(topic)}```", color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=discord.utils.escape_markdown(topic), color=embed_color_logging))
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
@@ -323,7 +323,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_chat)
-        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(message)}```", color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=discord.utils.escape_markdown(message), color=embed_color_logging))
         character_title = character.title().replace("bob", "Bob")
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
@@ -357,7 +357,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_tts)
-        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"```{discord.utils.escape_markdown(text)}```", color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=discord.utils.escape_markdown(text), color=embed_color_logging))
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
