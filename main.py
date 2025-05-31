@@ -161,7 +161,7 @@ async def episode(inter: discord.Interaction, topic: str):
         episode_generating = True
         await inter.response.send_message(embed=embed_generating_episode_start)
         await client.change_presence(activity=activity_generating, status=discord.Status.dnd)
-        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=discord.utils.escape_markdown(topic), color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"/episode `topic:`{discord.utils.escape_markdown(topic)}", color=embed_color_logging))
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
@@ -323,7 +323,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_chat)
-        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=discord.utils.escape_markdown(message), color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"/chat `character:`{character} `message:`{discord.utils.escape_markdown(message)}", color=embed_color_logging))
         character_title = character.title().replace("bob", "Bob")
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
@@ -345,8 +345,8 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
 async def tts(inter: discord.Interaction, character: str, text: str):
-    character = character.lower()
-    if character not in characters.keys() or character == "all":
+    character_lower = character.lower()
+    if character_lower not in characters.keys() or character_lower == "all":
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
         return
     if episode_generating:
@@ -357,21 +357,21 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         return
     try:
         await inter.response.send_message(embed=embed_generating_tts)
-        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=discord.utils.escape_markdown(text), color=embed_color_logging))
+        await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"/tts `character:`{character} `text:`{discord.utils.escape_markdown(text)}", color=embed_color_logging))
         loop = asyncio.get_running_loop()
-        if character == "doodlebob":
+        if character_lower == "doodlebob":
             seg = random.choice(voice_doodlebob)
-        elif character == "gary" and re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE):
+        elif character_lower == "gary" and re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE):
             seg = random.choice(voice_gary)
         else:
-            fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
+            fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character_lower][0]), fakeyou_timeout)
             with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
         seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
         seg = seg.apply_gain(-15-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
+            await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character_lower.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
         with open("statistics.txt", "a") as file:
             file.write(f"T {int(time.time())}\n")
     except:
