@@ -31,8 +31,8 @@ embed_color_logging = 0x1848ae
 embed_delete_after = 10
 embed_help = discord.Embed(title="See App Directory for bot help.", description="Support server and source code links are there as well.", color=embed_color_command_successful)
 help_button = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
-embed_in_use_episode = discord.Embed(title="Currently in use.", description="An episode is generating.", color=embed_color_command_unsuccessful)
-embed_in_use_tts = discord.Embed(title="Currently in use.", description="TTS unavailable while an episode is generating.", color=embed_color_command_unsuccessful)
+embed_in_use_episode = discord.Embed(title="Currently in use.", description="Another user is generating an episode.", color=embed_color_command_unsuccessful)
+embed_in_use_tts = discord.Embed(title="Currently in use.", description="TTS unavailable while another user is generating an episode.", color=embed_color_command_unsuccessful)
 embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color_command_unsuccessful)
 embed_generating_episode_end = discord.Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color_command_unsuccessful)
 embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_command_unsuccessful)
