@@ -46,50 +46,23 @@ remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 emojis = {}
 characters = {
-    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", False),
-    "loudbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
-    "freakbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
-    "sadbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
-    "nerdbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
-    "susbob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", True),
-    "patrick": ("weight_154man2fzg19nrtc15drner7t", False),
-    "loudrick": ("weight_154man2fzg19nrtc15drner7t", True),
-    "shortrick": ("weight_154man2fzg19nrtc15drner7t", True),
-    "widerick": ("weight_154man2fzg19nrtc15drner7t", True),
-    "pinhead": ("weight_154man2fzg19nrtc15drner7t", True),
-    "patback": ("weight_154man2fzg19nrtc15drner7t", True),
-    "squidward": ("TM:3psksme51515", False),
-    "loudward": ("TM:3psksme51515", True),
-    "schizoward": ("TM:3psksme51515", True),
-    "shadeward": ("TM:3psksme51515", True),
-    "skodwarde": ("TM:3psksme51515", True),
-    "spinward": ("TM:3psksme51515", True),
-    "gyattward": ("TM:3psksme51515", True),
-    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", False),
-    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", False),
-    "loudton": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
-    "dickton": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
-    "servedton": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
-    "suston": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
-    "dr. jr.": ("weight_ahxbf2104ngsgyegncaefyy6j", True),
-    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", False),
-    "shadowkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
-    "suskrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
-    "spinkrabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
-    "mr. crack": ("weight_5bxbp9xqy61svfx03b25ezmwx", True),
-    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", False),
-    "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", False),
-    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", False),
-    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", False),
-    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", False),
-    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", False),
-    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", False),
-    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", False),
-    "doodlebob": (None, False),
-    "all": (None, True),
+    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob"]),
+    "patrick": ("weight_154man2fzg19nrtc15drner7t", ["loudrick", "shortrick", "widerick", "pinhead", "patback"]),
+    "squidward": ("TM:3psksme51515", ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde"]),
+    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", ["shadowkrabs", "suskrabs", "spinkrabs", "mr. crack"]),
+    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", ["loudton", "dickton", "servedton", "suston", "dr. jr."]),
+    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", []),
+    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", []),
+    "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", []),
+    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", []),
+    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", []),
+    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", []),
+    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", []),
+    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", []),
+    "doodlebob": ("", []),
+    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", []),
+    "all": ("", ["every", "unison", "together", "both"])
 }
-for x in ["every", "unison", "together"]:
-    characters[x] = characters["all"]
 ambiance_gain = -45
 ambiance_time = [
     AudioSegment.from_wav("ambiance/day.wav"),
@@ -191,7 +164,7 @@ async def episode(inter: discord.Interaction, topic: str):
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
-            prompt=f"Create a profanity-filled, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Sandy. Rare characters include Gary, Larry, Mrs. Puff, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
+            prompt=f"Create a profanity-filled, morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters include Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters max. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
         )
         lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text).replace("\n\n", "\n").replace(":\n", ": ").replace("  ", " ").strip().split("\n")
         line_parts = lines.pop(0).split(":", 1)
@@ -206,22 +179,35 @@ async def episode(inter: discord.Interaction, topic: str):
         remaining = len(lines)
         transcript = []
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
-        spoken_characters = set()
+        used_model_tokens = set()
         combined = AudioSegment.empty()
         loop = asyncio.get_running_loop()
         for line in lines:
             await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed}/{remaining}`...", color=embed_color_command_unsuccessful))
             line_parts = line.split(":", 1)
-            character = next((key for key in characters.keys() if key in line_parts[0].lower()), "")
+            character = ""
+            model_token = ""
+            for key in characters.keys():
+                model_token = characters[key][0]
+                line_parts[0] = line_parts[0].lower()
+                if key in line_parts[0]:
+                    character = key
+                    break
+                for alt in characters[key][1]:
+                    if alt in line_parts[0]:
+                        character = alt
+                        break
+                if character:
+                    break
             if len(line_parts) != 2 or not character:
                 remaining -= 1
                 continue
             spoken_line = line_parts[1].strip()
             output_line = f"{emojis[character.replace(' ', '').replace('.', '')]} {spoken_line}"
-            if character in ["all", "every", "unison", "together"]:
+            if character == "all" or character in characters["all"][1]:
                 segs = []
-                for spoken_character in spoken_characters:
-                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, characters[spoken_character][0]), fakeyou_timeout)
+                for used_model_token in used_model_tokens:
+                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, used_model_token), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         segs.append(AudioSegment.from_wav(wav))
                     await asyncio.sleep(10)
@@ -229,14 +215,14 @@ async def episode(inter: discord.Interaction, topic: str):
                 seg = segs[0]
                 for i in range(1, len(segs)):
                     seg = seg.overlay(segs[i], 0)
-            elif character == "doodlebob":
+            elif character == "doodlebob" or character in characters["doodlebob"][1]:
                 seg = random.choice(voice_doodlebob)
-            elif character == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", spoken_line, re.IGNORECASE)):
-                spoken_characters.add(character)
+            elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(r"(\W*m+e+o+w+\W*)+", spoken_line, re.IGNORECASE):
+                used_model_tokens.add(model_token)
                 seg = random.choice(voice_gary)
             else:
-                spoken_characters.add(character)
-                fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, characters[character][0]), fakeyou_timeout)
+                used_model_tokens.add(model_token)
+                fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, model_token), fakeyou_timeout)
                 with BytesIO(fy_tts.content) as wav:
                     seg = AudioSegment.from_wav(wav)
                 await asyncio.sleep(10)
@@ -317,7 +303,7 @@ async def episode(inter: discord.Interaction, topic: str):
 
 
 async def character_autocomplete(interaction: discord.Interaction, current: str,):
-    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if not characters[character][1]] if current.lower() in character.lower()]
+    return [app_commands.Choice(name=character, value=character) for character in [character.title().replace("bob", "Bob") for character in characters.keys() if character != "all"] if current.lower().replace(' ', '').replace('.', '') in character.lower().replace(' ', '').replace('.', '')]
 
 
 @command_tree.command(description="Chat with a character.")
@@ -328,7 +314,7 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 @app_commands.allowed_contexts(True, True, True)
 async def chat(inter: discord.Interaction, character: str, message: str):
     character_lower = character.lower()
-    if character_lower not in characters.keys() or characters[character_lower][1]:
+    if character_lower not in characters.keys() or character_lower == "all":
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
         return
     if inter.user.id in bans:
@@ -359,7 +345,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 @app_commands.allowed_contexts(True, True, True)
 async def tts(inter: discord.Interaction, character: str, text: str):
     character = character.lower()
-    if character not in characters.keys() or characters[character][1]:
+    if character not in characters.keys() or character == "all":
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
         return
     if episode_generating:
@@ -374,7 +360,7 @@ async def tts(inter: discord.Interaction, character: str, text: str):
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
-        elif character == "gary" and bool(re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE)):
+        elif character == "gary" and re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE):
             seg = random.choice(voice_gary)
         else:
             fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
@@ -493,7 +479,7 @@ async def on_ready():
     global moderation_channel, emojis
     moderation_channel = await client.fetch_channel(int(os.getenv("MODERATION_CHANNEL_ID")))
     emojis = {e.name: e for e in await client.fetch_application_emojis()}
-    for x in ["every", "unison", "together"]:
+    for x in characters["all"][1]:
         emojis[x] = emojis["all"]
     await client.change_presence(activity=activity_ready, status=discord.Status.online)
 
