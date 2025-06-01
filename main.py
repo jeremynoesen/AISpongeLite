@@ -200,7 +200,7 @@ async def episode(inter: discord.Interaction, topic: str):
                 if key in line_parts[0]:
                     character = key
                     break
-            if len(line_parts) != 2 or not character:
+            if len(line_parts) != 2 or not character or len(line_parts[1].strip()) < 3:
                 remaining -= 1
                 continue
             spoken_line = line_parts[1].strip()
