@@ -308,8 +308,7 @@ async def character_autocomplete(interaction: discord.Interaction, current: str,
 
 
 @command_tree.command(description="Chat with a character.")
-@app_commands.describe(character="Character to chat with.")
-@app_commands.describe(message="Message to send.")
+@app_commands.describe(character="Character to chat with.", message="Message to send.")
 @app_commands.autocomplete(character=character_autocomplete)
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
@@ -339,12 +338,11 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 
 
 @command_tree.command(description="Synthesize character speech.")
-@app_commands.describe(character="Voice to use.")
-@app_commands.describe(text="Text to speak.")
+@app_commands.describe(character="Voice to use.", text="Text to speak.")
 @app_commands.autocomplete(character=character_autocomplete)
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def tts(inter: discord.Interaction, character: str, text: str):
+async def tts(inter: discord.Interaction, character: str, text: app_commands.Range[str, 3, None]):
     character_lower = character.lower()
     if character_lower not in characters.keys() or character_lower == "all":
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
