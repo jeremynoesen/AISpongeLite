@@ -12,6 +12,7 @@ from io import BytesIO
 from fakeyou import FakeYou
 from openai import AsyncOpenAI
 from pydub import AudioSegment
+from typing import Literal
 
 
 load_dotenv()
@@ -38,7 +39,6 @@ embed_generating_episode_end = discord.Embed(title="Generating episode...", desc
 embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_command_unsuccessful)
 embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color_command_unsuccessful)
 embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_command_unsuccessful)
-embed_unknown_character = discord.Embed(title="Unknown character.", description="Select a character from autocomplete list.", color=embed_color_command_unsuccessful)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
 embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
@@ -63,6 +63,7 @@ characters = {
     "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", []),
     "all": ("", ["every", "unison", "together", "both"])
 }
+characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "plankton", "karen", "gary", "sandy", "mrs. puff", "larry", "squilliam", "bubble bass", "bubble buddy", "doodlebob", "french narrator"]
 ambiance_gain = -45
 ambiance_time = [
     AudioSegment.from_wav("ambiance/day.wav"),
@@ -303,20 +304,11 @@ async def episode(inter: discord.Interaction, topic: str):
         episode_generating = False
 
 
-async def character_autocomplete(interaction: discord.Interaction, current: str,):
-    return [app_commands.Choice(name=character.title().replace("bob", "Bob"), value=character) for character in characters.keys() if character != "all" and current.lower() in character]
-
-
 @command_tree.command(description="Chat with a character.")
 @app_commands.describe(character="Character to chat with.", message="Message to send.")
-@app_commands.autocomplete(character=character_autocomplete)
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def chat(inter: discord.Interaction, character: str, message: str):
-    character_lower = character.lower()
-    if character_lower not in characters.keys() or character_lower == "all":
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
-        return
+async def chat(inter: discord.Interaction, character: characters_literal, message: str):
     if inter.user.id in bans:
         await inter.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
         return
@@ -330,7 +322,7 @@ async def chat(inter: discord.Interaction, character: str, message: str):
             prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
         output = discord.utils.escape_markdown(completion.choices[0].text.split(":", 1)[1].strip(" \'\""))
-        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character_title, icon_url=emojis[character_lower.replace(' ', '').replace('.', '')].url))
+        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
     except:
@@ -339,14 +331,9 @@ async def chat(inter: discord.Interaction, character: str, message: str):
 
 @command_tree.command(description="Synthesize character speech.")
 @app_commands.describe(character="Voice to use.", text="Text to speak.")
-@app_commands.autocomplete(character=character_autocomplete)
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def tts(inter: discord.Interaction, character: str, text: app_commands.Range[str, 3, None]):
-    character_lower = character.lower()
-    if character_lower not in characters.keys() or character_lower == "all":
-        await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_unknown_character)
-        return
+async def tts(inter: discord.Interaction, character: characters_literal, text: app_commands.Range[str, 3, None]):
     if episode_generating:
         await inter.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_tts)
         return
@@ -357,19 +344,19 @@ async def tts(inter: discord.Interaction, character: str, text: app_commands.Ran
         await inter.response.send_message(embed=embed_generating_tts)
         await moderation_channel.send(embed=discord.Embed(title=inter.user.id, description=f"/tts `character:`{character} `text:`{discord.utils.escape_markdown(text)}", color=embed_color_logging))
         loop = asyncio.get_running_loop()
-        if character_lower == "doodlebob":
+        if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
-        elif character_lower == "gary" and re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE):
+        elif character == "gary" and re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE):
             seg = random.choice(voice_gary)
         else:
-            fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character_lower][0]), fakeyou_timeout)
+            fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
             with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
         seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
         seg = seg.apply_gain(-15-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character_lower.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
+            await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
         with open("statistics.txt", "a") as file:
             file.write(f"T {int(time.time())}\n")
     except:
