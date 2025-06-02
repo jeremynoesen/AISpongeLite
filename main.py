@@ -230,7 +230,7 @@ async def episode(inter: discord.Interaction, topic: str):
                 if len(segs) == 0:
                     remaining -= 1
                     continue
-                segs.sort(key=lambda x: -len(x))
+                segs.sort(key=lambda seg: -len(seg))
                 seg = segs[0]
                 for i in range(1, len(segs)):
                     seg = seg.overlay(segs[i], 0)
@@ -491,8 +491,8 @@ async def on_ready():
     global moderation_channel, emojis
     moderation_channel = await client.fetch_channel(int(os.getenv("MODERATION_CHANNEL_ID")))
     emojis = {e.name: e for e in await client.fetch_application_emojis()}
-    for x in characters["all"][1]:
-        emojis[x] = emojis["all"]
+    for alt in characters["all"][1]:
+        emojis[alt] = emojis["all"]
     await client.change_presence(activity=activity_ready, status=discord.Status.online)
 
 
