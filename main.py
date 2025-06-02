@@ -31,7 +31,7 @@ embed_color_command_successful = 0x57f3ff
 embed_color_logging = 0x1848ae
 embed_delete_after = 10
 embed_help = discord.Embed(title="See App Directory for bot help.", description="Support server and source code links are there as well.", color=embed_color_command_successful)
-help_button = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
+button_help = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
 embed_in_use_episode = discord.Embed(title="Currently in use.", description="Another user is generating an episode.", color=embed_color_command_unsuccessful)
 embed_in_use_tts = discord.Embed(title="Currently in use.", description="TTS unavailable while another user is generating an episode.", color=embed_color_command_unsuccessful)
 embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color_command_unsuccessful)
@@ -44,6 +44,9 @@ embed_no_file = discord.Embed(title="No episode or TTS found.", description="Thi
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
+regex_actions = r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)"
+regex_replacement = r"\3"
+regex_meow = r"(\W*m+e+o+w+\W*)+"
 emojis = {}
 characters = {
     "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob"]),
@@ -64,14 +67,19 @@ characters = {
     "all": ("", ["every", "unison", "together", "both"])
 }
 characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "plankton", "karen", "gary", "sandy", "mrs. puff", "larry", "squilliam", "bubble bass", "bubble buddy", "doodlebob", "french narrator"]
-ambiance_gain = -45
+gain_ambiance = -45
+gain_music = -35
+gain_sfx = -20
+gain_voice = -15
+gain_voice_distort = 20
+gain_voice_loud = -10
+fade_ambiance = 500
 ambiance_time = [
     AudioSegment.from_wav("ambiance/day.wav"),
     AudioSegment.from_wav("ambiance/night.wav")
 ]
 ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
-music_gain = -35
-songs = {
+musics = {
     AudioSegment.from_wav("music/closing_theme.wav"): 10,
     AudioSegment.from_wav("music/tip_top_polka.wav"): 10,
     AudioSegment.from_wav("music/rake_hornpipe.wav"): 10,
@@ -86,7 +94,6 @@ songs = {
     AudioSegment.from_wav("music/sneaky_snitch.wav"): 1,
     AudioSegment.from_wav("music/better_call_saul.wav"): 1
 }
-sfx_gain = -20
 sfx_random = {
     AudioSegment.from_mp3("sfx/car.mp3"): 10,
     AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
@@ -117,7 +124,7 @@ sfx_triggered = {
     "bomb": ([AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "fire in the hole", "blow up", "blew up"])
 }
 sfx_transition = AudioSegment.from_wav("sfx/transition.wav")
-sfx_transition = sfx_transition.apply_gain(sfx_gain - sfx_transition.dBFS)
+sfx_transition = sfx_transition.apply_gain(gain_sfx - sfx_transition.dBFS)
 sfx_strike = AudioSegment.from_wav("sfx/lightning.wav")
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
@@ -168,7 +175,7 @@ async def episode(inter: discord.Interaction, topic: str):
             max_tokens=700,
             prompt=f"Create a chaotic, profanity-filled, and morally incorrect script for a scene from SpongeBob SquarePants where characters discuss a topic. Common characters include SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters include Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant 1 - 2 word title with format: Title: <title>. The topic is: {topic}."
         )
-        lines = re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
+        lines = re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
         line_parts = lines.pop(0).split(":", 1)
         file_title = "UNTiTLED EPiSODE"
         embed_title = "**U**NTiTLED **E**PiSODE"
@@ -229,7 +236,7 @@ async def episode(inter: discord.Interaction, topic: str):
                     seg = seg.overlay(segs[i], 0)
             elif character == "doodlebob" or character in characters["doodlebob"][1]:
                 seg = random.choice(voice_doodlebob)
-            elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(r"(\W*m+e+o+w+\W*)+", spoken_line, re.IGNORECASE):
+            elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(regex_meow, spoken_line, re.IGNORECASE):
                 seg = random.choice(voice_gary)
                 used_model_tokens.add(model_token)
             else:
@@ -245,11 +252,11 @@ async def episode(inter: discord.Interaction, topic: str):
                     await asyncio.sleep(10)
             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
             if "loud" in character or spoken_line.isupper() or random.randrange(20) == 0:
-                seg = seg.apply_gain(20)
-                seg = seg.apply_gain(-10-seg.dBFS)
+                seg = seg.apply_gain(gain_voice_distort)
+                seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
                 output_line = output_line.replace(spoken_line, spoken_line.upper())
             else:
-                seg = seg.apply_gain(-15-seg.dBFS)
+                seg = seg.apply_gain(gain_voice-seg.dBFS)
             spoken_line = spoken_line.lower()
             for sfx in sfx_triggered.keys():
                 keywords = sfx_triggered[sfx][1]
@@ -266,39 +273,39 @@ async def episode(inter: discord.Interaction, topic: str):
         await inter.edit_original_response(embed=embed_generating_episode_end)
         combined = combined.append(silence_line, 0)
         if random.randrange(20) > 0:
-            music = random.choices(list(songs.keys()), list(songs.values()))[0]
-            music = music.apply_gain((music_gain + random.randint(-5, 5)) - music.dBFS)
+            music = random.choices(list(musics.keys()), list(musics.values()))[0]
+            music = music.apply_gain((gain_music + random.randint(-5, 5)) - music.dBFS)
             music_loop = silence_music.append(music.fade_in(10000), 0)
             while len(music_loop) < len(combined):
                 music_loop = music_loop.append(music, 0)
             combined = combined.overlay(music_loop)
         if random.randrange(10) > 0:
             ambiance = random.choice(ambiance_time)
-            ambiance = ambiance.apply_gain((ambiance_gain + random.randint(-5, 5)) - ambiance.dBFS)
-            ambiance_loop = ambiance.fade_in(500)
+            ambiance = ambiance.apply_gain((gain_ambiance + random.randint(-5, 5)) - ambiance.dBFS)
+            ambiance_loop = ambiance.fade_in(fade_ambiance)
             while len(ambiance_loop) < len(combined):
                 ambiance_loop = ambiance_loop.append(ambiance, 0)
             combined = combined.overlay(ambiance_loop)
         if random.randrange(5) == 0:
             rain_intensity = random.randint(-5, 5)
-            rain_randomized = ambiance_rain.apply_gain((ambiance_gain + rain_intensity) - ambiance_rain.dBFS)
-            rain_loop = rain_randomized.fade_in(500)
+            rain_randomized = ambiance_rain.apply_gain((gain_ambiance + rain_intensity) - ambiance_rain.dBFS)
+            rain_loop = rain_randomized.fade_in(fade_ambiance)
             while len(rain_loop) < len(combined):
                 rain_loop = rain_loop.append(rain_randomized, 0)
             combined = combined.overlay(rain_loop)
             if rain_intensity > 0:
                 for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
-                    combined = combined.overlay(sfx_strike.apply_gain((sfx_gain + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
+                    combined = combined.overlay(sfx_strike.apply_gain((gain_sfx + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
         for sfx in sfx_triggered.keys():
             for position in sfx_positions[sfx]:
                 if random.randrange(5) > 0:
                     choice = random.choice(sfx_triggered[sfx][0])
-                    combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-10, 0)) - choice.dBFS), position)
+                    combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-10, 0)) - choice.dBFS), position)
         combined = silence_transition.append(combined, 0).overlay(sfx_transition)
         for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
             choice = random.choices(list(sfx_random.keys()), list(sfx_random.values()))[0]
-            combined = combined.overlay(choice.apply_gain((sfx_gain + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
-        combined = combined.fade_out(200)
+            combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
+        combined = combined.fade_out(len(silence_line))
         with BytesIO() as output:
             combined.export(output, "ogg")
             await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_command_successful), attachments=[discord.File(output, f"{file_title}.ogg")])
@@ -336,7 +343,7 @@ async def chat(inter: discord.Interaction, character: characters_literal, messag
             max_tokens=250,
             prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, chaotic, and exaggerated response. {inter.user.display_name} says: {message}."
         )
-        output = discord.utils.escape_markdown(re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).split(":", 1)[1].strip().strip("\'\""))
+        output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).split(":", 1)[1].strip().strip("\'\""))
         await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
@@ -361,7 +368,7 @@ async def tts(inter: discord.Interaction, character: characters_literal, text: a
         loop = asyncio.get_running_loop()
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
-        elif character == "gary" and re.fullmatch(r"(\W*m+e+o+w+\W*)+", text, re.IGNORECASE):
+        elif character == "gary" and re.fullmatch(regex_meow, text, re.IGNORECASE):
             seg = random.choice(voice_gary)
         else:
             fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
@@ -369,10 +376,10 @@ async def tts(inter: discord.Interaction, character: characters_literal, text: a
                 seg = AudioSegment.from_wav(wav)
         seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
         if text.isupper():
-            seg = seg.apply_gain(20)
-            seg = seg.apply_gain(-10-seg.dBFS)
+            seg = seg.apply_gain(gain_voice_distort)
+            seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
         else:
-            seg = seg.apply_gain(-15-seg.dBFS)
+            seg = seg.apply_gain(gain_voice-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
             await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
@@ -435,7 +442,7 @@ async def stats(inter: discord.Interaction):
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
 async def help(inter: discord.Interaction):
-    await inter.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=discord.ui.View().add_item(help_button))
+    await inter.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=discord.ui.View().add_item(button_help))
 
 
 @command_tree.command(description="Ban a user.", guild=moderation_guild)
