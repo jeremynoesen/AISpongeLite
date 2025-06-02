@@ -19,7 +19,7 @@ load_dotenv()
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
 fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
-fakeyou_timeout = 180
+fakeyou_timeout = 60
 activity_ready = discord.Game(os.getenv("MOTD", "Ready to generate."))
 activity_generating = discord.Game("Generating episode...")
 client = discord.Client(intents=discord.Intents.default(), activity=discord.Game("Starting bot..."), status=discord.Status.idle)
@@ -187,6 +187,9 @@ async def episode(inter: discord.Interaction, topic: str):
         for line in lines:
             await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed}/{remaining}`...", color=embed_color_command_unsuccessful))
             line_parts = line.split(":", 1)
+            if len(line_parts) != 2 or len(line_parts[1].strip()) < 3:
+                remaining -= 1
+                continue
             character = ""
             model_token = ""
             for key in characters.keys():
@@ -201,7 +204,7 @@ async def episode(inter: discord.Interaction, topic: str):
                 if key in line_parts[0]:
                     character = key
                     break
-            if len(line_parts) != 2 or not character or len(line_parts[1].strip()) < 3:
+            if not character:
                 remaining -= 1
                 continue
             spoken_line = line_parts[1].strip()
@@ -209,10 +212,17 @@ async def episode(inter: discord.Interaction, topic: str):
             if character == "all" or character in characters["all"][1]:
                 segs = []
                 for used_model_token in used_model_tokens:
-                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, used_model_token), fakeyou_timeout)
-                    with BytesIO(fy_tts.content) as wav:
-                        segs.append(AudioSegment.from_wav(wav))
-                    await asyncio.sleep(10)
+                    try:
+                        fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, used_model_token), fakeyou_timeout)
+                        with BytesIO(fy_tts.content) as wav:
+                            segs.append(AudioSegment.from_wav(wav))
+                    except:
+                        continue
+                    finally:
+                        await asyncio.sleep(10)
+                if len(segs) == 0:
+                    remaining -= 1
+                    continue
                 segs.sort(key=lambda x: -len(x))
                 seg = segs[0]
                 for i in range(1, len(segs)):
@@ -220,14 +230,19 @@ async def episode(inter: discord.Interaction, topic: str):
             elif character == "doodlebob" or character in characters["doodlebob"][1]:
                 seg = random.choice(voice_doodlebob)
             elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(r"(\W*m+e+o+w+\W*)+", spoken_line, re.IGNORECASE):
-                used_model_tokens.add(model_token)
                 seg = random.choice(voice_gary)
-            else:
                 used_model_tokens.add(model_token)
-                fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, model_token), fakeyou_timeout)
-                with BytesIO(fy_tts.content) as wav:
-                    seg = AudioSegment.from_wav(wav)
-                await asyncio.sleep(10)
+            else:
+                try:
+                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, model_token), fakeyou_timeout)
+                    with BytesIO(fy_tts.content) as wav:
+                        seg = AudioSegment.from_wav(wav)
+                    used_model_tokens.add(model_token)
+                except:
+                    remaining -= 1
+                    continue
+                finally:
+                    await asyncio.sleep(10)
             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
             if "loud" in character or spoken_line.isupper() or random.randrange(20) == 0:
                 seg = seg.apply_gain(20)
