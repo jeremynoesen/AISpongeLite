@@ -173,7 +173,7 @@ async def episode(inter: discord.Interaction, topic: str):
         file_title = "UNTiTLED EPiSODE"
         embed_title = "**U**NTiTLED **E**PiSODE"
         if len(line_parts) == 2 and "title" in line_parts[0].lower():
-            title = line_parts[1].strip(" \'\"")
+            title = line_parts[1].strip().strip("\'\"")
             if title:
                 file_title = title.upper().replace("I", "i")
                 embed_title = "".join(f"**{char}**​" if char.isupper() or char.isnumeric() or char in ".,!?" else char for char in discord.utils.escape_markdown(title)).upper().replace("I", "i")
@@ -336,7 +336,7 @@ async def chat(inter: discord.Interaction, character: characters_literal, messag
             max_tokens=250,
             prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, exaggerated response. {inter.user.display_name} says: {message}."
         )
-        output = discord.utils.escape_markdown(completion.choices[0].text.split(":", 1)[1].strip(" \'\""))
+        output = discord.utils.escape_markdown(re.sub(r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)", r"\3", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).split(":", 1)[1].strip().strip("\'\""))
         await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
