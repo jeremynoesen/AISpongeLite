@@ -368,7 +368,11 @@ async def tts(inter: discord.Interaction, character: characters_literal, text: a
             with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
         seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
-        seg = seg.apply_gain(-15-seg.dBFS)
+        if text.isupper():
+            seg = seg.apply_gain(20)
+            seg = seg.apply_gain(-10-seg.dBFS)
+        else:
+            seg = seg.apply_gain(-15-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
             await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
