@@ -18,7 +18,10 @@ from typing import Literal
 load_dotenv()
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 fakeyou = FakeYou()
-fakeyou.login(os.getenv("FAKEYOU_USERNAME"), os.getenv("FAKEYOU_PASSWORD"))
+fakeyou_username = os.getenv("FAKEYOU_USERNAME")
+fakeyou_password = os.getenv("FAKEYOU_PASSWORD")
+if fakeyou_username and fakeyou_password:
+    fakeyou.login(fakeyou_username, fakeyou_password)
 fakeyou_timeout = 60
 activity_ready = discord.Game(os.getenv("MOTD", "Ready to generate."))
 activity_generating = discord.Game("Generating episode...")
