@@ -43,6 +43,8 @@ embed_generating_chat = discord.Embed(title="Generating chat...", description="G
 embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color_command_unsuccessful)
 embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_command_unsuccessful)
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
+embed_unknown_user = discord.Embed(title="Unknown user.", description="That user does not exist.", color=embed_color_command_unsuccessful)
+embed_already_banned = discord.Embed(title="User already banned.", description="That user is already banned.", color=embed_color_command_unsuccessful)
 embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
@@ -187,18 +189,18 @@ async def episode(inter: discord.Interaction, topic: str):
             if title:
                 file_title = title.upper().replace("I", "i")
                 embed_title = "".join(f"**{char}**​" if char.isupper() or char.isnumeric() or char in ".,!?" else char for char in discord.utils.escape_markdown(title)).upper().replace("I", "i")
-        completed = 1
-        remaining = len(lines)
-        transcript = []
+        completed_lines = 1
+        total_lines = len(lines)
+        output_embed = discord.Embed(title=embed_title, color=embed_color_command_successful).set_footer(text=topic, icon_url=inter.user.display_avatar.url)
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
         used_model_tokens = set()
         combined = AudioSegment.empty()
         loop = asyncio.get_running_loop()
         for line in lines:
-            await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed}/{remaining}`...", color=embed_color_command_unsuccessful))
+            await inter.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed_lines}/{total_lines}`...", color=embed_color_command_unsuccessful))
             line_parts = line.split(":", 1)
             if len(line_parts) != 2 or len(line_parts[1].strip()) < 3:
-                remaining -= 1
+                total_lines -= 1
                 continue
             character = ""
             model_token = ""
@@ -215,15 +217,14 @@ async def episode(inter: discord.Interaction, topic: str):
                     character = key
                     break
             if not character:
-                remaining -= 1
+                total_lines -= 1
                 continue
-            spoken_line = line_parts[1].strip()
-            output_line = f"{emojis[character.replace(' ', '').replace('.', '')]} {spoken_line}"
+            output_line = line_parts[1].strip()
             if character == "all" or character in characters["all"][1]:
                 segs = []
                 for used_model_token in used_model_tokens:
                     try:
-                        fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, used_model_token), fakeyou_timeout)
+                        fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, output_line, used_model_token), fakeyou_timeout)
                         with BytesIO(fy_tts.content) as wav:
                             segs.append(AudioSegment.from_wav(wav))
                     except:
@@ -231,7 +232,7 @@ async def episode(inter: discord.Interaction, topic: str):
                     finally:
                         await asyncio.sleep(10)
                 if len(segs) == 0:
-                    remaining -= 1
+                    total_lines -= 1
                     continue
                 segs.sort(key=lambda seg: -len(seg))
                 seg = segs[0]
@@ -239,40 +240,40 @@ async def episode(inter: discord.Interaction, topic: str):
                     seg = seg.overlay(segs[i], 0)
             elif character == "doodlebob" or character in characters["doodlebob"][1]:
                 seg = random.choice(voice_doodlebob)
-            elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(regex_meow, spoken_line, re.IGNORECASE):
+            elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(regex_meow, output_line, re.IGNORECASE):
                 seg = random.choice(voice_gary)
                 used_model_tokens.add(model_token)
             else:
                 try:
-                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, spoken_line, model_token), fakeyou_timeout)
+                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, output_line, model_token), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
                     used_model_tokens.add(model_token)
                 except:
-                    remaining -= 1
+                    total_lines -= 1
                     continue
                 finally:
                     await asyncio.sleep(10)
             seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
-            if "loud" in character or spoken_line.isupper() or random.randrange(20) == 0:
+            if "loud" in character or output_line.isupper() or random.randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
-                output_line = output_line.replace(spoken_line, spoken_line.upper())
+                output_line = output_line.upper()
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
-            spoken_line = spoken_line.lower()
+            output_line_lower = output_line.lower()
             for sfx in sfx_triggered.keys():
                 keywords = sfx_triggered[sfx][1]
                 collection = sfx_positions[sfx]
-                if any(keyword in spoken_line for keyword in keywords) and not ("fire" in keywords and "fire in the hole" in spoken_line):
+                if any(keyword in output_line_lower for keyword in keywords) and not ("fire" in keywords and "fire in the hole" in output_line_lower):
                     collection.append(len(combined) + random.randrange(len(seg)))
             combined = combined.append(seg, 0)
             if output_line[-1] in "-–—" or random.randrange(10) == 0:
                 output_line = output_line[:-1] + "—"
             else:
                 combined = combined.append(silence_line, 0)
-            transcript.append(f"- {discord.utils.escape_markdown(output_line)}")
-            completed += 1
+            output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {discord.utils.escape_markdown(output_line)}", inline=False)
+            completed_lines += 1
         await inter.edit_original_response(embed=embed_generating_episode_end)
         combined = combined.append(silence_line, 0)
         if random.randrange(20) > 0:
@@ -297,7 +298,7 @@ async def episode(inter: discord.Interaction, topic: str):
                 rain_loop = rain_loop.append(rain_randomized, 0)
             combined = combined.overlay(rain_loop)
             if rain_intensity > 0:
-                for i in range(random.randint(1, math.ceil(len(transcript) / 10))):
+                for i in range(random.randint(1, math.ceil(total_lines / 10))):
                     combined = combined.overlay(sfx_strike.apply_gain((gain_sfx + random.randint(-10 + rain_intensity, 0)) - sfx_strike.dBFS), random.randrange(len(combined)))
         for sfx in sfx_triggered.keys():
             for position in sfx_positions[sfx]:
@@ -305,13 +306,13 @@ async def episode(inter: discord.Interaction, topic: str):
                     choice = random.choice(sfx_triggered[sfx][0])
                     combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-10, 0)) - choice.dBFS), position)
         combined = silence_transition.append(combined, 0).overlay(sfx_transition)
-        for i in range(random.randint(1, math.ceil(len(transcript) / 5))):
+        for i in range(random.randint(1, math.ceil(total_lines / 5))):
             choice = random.choices(list(sfx_random.keys()), list(sfx_random.values()))[0]
             combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
         combined = combined.fade_out(len(silence_line))
         with BytesIO() as output:
             combined.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(title=embed_title, description="\n".join(transcript) + f"\n\n-# > *{discord.utils.escape_markdown(topic)}*", color=embed_color_command_successful), attachments=[discord.File(output, f"{file_title}.ogg")])
+            await inter.edit_original_response(embed=output_embed, attachments=[discord.File(output, f"{file_title}.ogg")])
         end_time = int(time.time())
         remove_cooldown = False
         for entitlement in inter.entitlements:
@@ -347,7 +348,7 @@ async def chat(inter: discord.Interaction, character: characters_literal, messag
             prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, chaotic, and exaggerated response. {inter.user.display_name} says: {message}."
         )
         output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).split(":", 1)[1].strip().strip("\'\""))
-        await inter.edit_original_response(embed=discord.Embed(description=f"{output}\n\n-# > *{discord.utils.escape_markdown(message)}*", color=embed_color_command_successful).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
+        await inter.edit_original_response(embed=discord.Embed(description=output, color=embed_color_command_successful).set_footer(text=message, icon_url=inter.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
     except:
@@ -385,7 +386,8 @@ async def tts(inter: discord.Interaction, character: characters_literal, text: a
             seg = seg.apply_gain(gain_voice-seg.dBFS)
         with BytesIO() as output:
             seg.export(output, "ogg")
-            await inter.edit_original_response(embed=discord.Embed(description=f"{emojis[character.replace(' ', '').replace('.', '')]} {discord.utils.escape_markdown(text)}", color=embed_color_command_successful), attachments=[discord.File(output, f"{character.title().replace('bob', 'Bob')} — {text}.ogg")])
+            character_title = character.title().replace('bob', 'Bob')
+            await inter.edit_original_response(embed=discord.Embed(color=embed_color_command_successful).set_footer(text=text, icon_url=inter.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[discord.File(output, f"{character_title} — {text}.ogg")])
         with open("statistics.txt", "a") as file:
             file.write(f"T {int(time.time())}\n")
     except:
@@ -434,10 +436,10 @@ async def stats(inter: discord.Interaction):
     if seconds > 0:
         uptime_formatted += f"{seconds}s"
     await inter.response.send_message(embed=discord.Embed(color=embed_color_command_successful)
-                                      .add_field(name="Episodes", value=f"- 24h: `{episodes_24h}`\n- All: `{episodes_all}`", inline=False)
-                                      .add_field(name="Chats", value=f"- 24h: `{chats_24h}`\n- All: `{chats_all}`", inline=False)
-                                      .add_field(name="TTS", value=f"- 24h: `{tts_24h}`\n- All: `{tts_all}`", inline=False)
-                                      .add_field(name="Bot", value=f"- Latency: `{int(1000 * client.latency)}ms`\n- Uptime: `{uptime_formatted}`\n- Guilds: `{len(client.guilds)}`", inline=False),
+                                      .add_field(name="Episodes", value=f"24h: `{episodes_24h}`\nAll: `{episodes_all}`", inline=False)
+                                      .add_field(name="Chats", value=f"24h: `{chats_24h}`\nAll: `{chats_all}`", inline=False)
+                                      .add_field(name="TTS", value=f"24h: `{tts_24h}`\nAll: `{tts_all}`", inline=False)
+                                      .add_field(name="Bot", value=f"Guilds: `{len(client.guilds)}`\nLatency: `{int(1000 * client.latency)}ms`\nUptime: `{uptime_formatted}`", inline=False),
                                       ephemeral=True, delete_after=embed_delete_after)
 
 
@@ -460,15 +462,15 @@ async def ban(inter: discord.Interaction, id: str):
         id = int(id)
         await client.fetch_user(id)
     except:
-        await inter.response.send_message(embed=discord.Embed(title="Unknown user.", description=f"No user exists with ID `{id}`.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
+        await inter.response.send_message(embed=embed_unknown_user, ephemeral=True, delete_after=embed_delete_after)
         return
     if id in bans:
-        await inter.response.send_message(embed=discord.Embed(title="User already banned.", description=f"User with ID `{id}` is already banned.", color=embed_color_command_unsuccessful), ephemeral=True, delete_after=embed_delete_after)
+        await inter.response.send_message(embed=embed_already_banned, ephemeral=True, delete_after=embed_delete_after)
         return
     bans.append(id)
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
-    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"User with ID `{id}` has been banned.", color=embed_color_command_successful))
+    await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"`{id}`", color=embed_color_command_successful))
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
