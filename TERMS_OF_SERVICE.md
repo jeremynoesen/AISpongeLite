@@ -20,6 +20,6 @@
 - We are not responsible for any real-life or virtual damages caused by your use of the Service.
 - Any use of the Service for any illegal and/or malicious behavior may result in revoking your rights to the Service.
 - We are not responsible for any malicious use of the Service done by others.
-- Self-bots and/or the use of macros are prohibited while using the bot, and may lead to denial of your access to the
+- Self-bots and/or the use of macros are prohibited while using the Service, and may lead to denial of your access to the
   Service.
-- Self-bots and macros include, but are not limited to, using an automated system to interact with the bot.
+- Self-bots and macros include, but are not limited to, using an automated system to interact with the Service.
