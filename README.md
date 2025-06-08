@@ -6,7 +6,7 @@
 
 ## About
 
-AI Sponge Lite is a Discord bot that generates AI Sponge audio episodes, chats, and TTS inspired by 
+AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by 
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
 Available characters include SpongeBob, Patrick, Squidward, Gary, Sandy, Mr. Krabs, Plankton, Karen, Mrs. Puff, 
