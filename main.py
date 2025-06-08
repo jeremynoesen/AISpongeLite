@@ -46,6 +46,7 @@ embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", 
 embed_unknown_user = discord.Embed(title="Unknown user.", description="That user does not exist.", color=embed_color_command_unsuccessful)
 embed_already_banned = discord.Embed(title="User already banned.", description="That user is already banned.", color=embed_color_command_unsuccessful)
 embed_not_banned = discord.Embed(title="User not banned.", description="That user is not banned.", color=embed_color_command_unsuccessful)
+embed_clearing_logs = discord.Embed(title="Clearing recent logs...", description="Deleting messages...", color=embed_color_command_unsuccessful)
 embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
@@ -494,6 +495,17 @@ async def unban(inter: discord.Interaction, id: str):
         for line in bans:
             file.write(f"{line}\n")
     await inter.response.send_message(embed=discord.Embed(title="Unbanned user.", description=f"`{id}`", color=embed_color_command_successful))
+
+
+@command_tree.command(description="Clear recent logs.", guild=moderation_guild)
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
+@app_commands.default_permissions(manage_messages=True)
+async def clear(inter: discord.Interaction):
+    await inter.response.send_message(embed=embed_clearing_logs)
+    response = await inter.original_response()
+    deleted = await logging_channel.purge(check=lambda message: message.author == client.user and message != response)
+    await inter.edit_original_response(embed=discord.Embed(title="Cleared recent logs.", description=f"Deleted `{len(deleted)}` message(s).", color=embed_color_command_successful))
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
