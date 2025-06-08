@@ -262,6 +262,8 @@ async def episode(inter: discord.Interaction, topic: str):
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
             output_line_lower = output_line.lower()
+            if "release the" in output_line_lower and "fish" in output_line_lower:
+                output_embed.set_thumbnail(url=emojis["lagfish"].url)
             for sfx in sfx_triggered.keys():
                 keywords = sfx_triggered[sfx][1]
                 collection = sfx_positions[sfx]
