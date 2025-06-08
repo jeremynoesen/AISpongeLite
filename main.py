@@ -45,6 +45,7 @@ embed_generation_failed = discord.Embed(title="Generation failed.", description=
 embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
 embed_unknown_user = discord.Embed(title="Unknown user.", description="That user does not exist.", color=embed_color_command_unsuccessful)
 embed_already_banned = discord.Embed(title="User already banned.", description="That user is already banned.", color=embed_color_command_unsuccessful)
+embed_not_banned = discord.Embed(title="User not banned.", description="That user is not banned.", color=embed_color_command_unsuccessful)
 embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
 embed_converting_file = discord.Embed(title="Converting file...", description="Converting from OGG to MP3...", color=embed_color_command_unsuccessful)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
@@ -471,6 +472,28 @@ async def ban(inter: discord.Interaction, id: str):
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
     await inter.response.send_message(embed=discord.Embed(title="Banned user.", description=f"`{id}`", color=embed_color_command_successful))
+
+
+@command_tree.command(description="Unban a user.", guild=moderation_guild)
+@app_commands.describe(id="ID of user.")
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
+@app_commands.default_permissions(ban_members=True)
+async def unban(inter: discord.Interaction, id: str):
+    try:
+        id = int(id)
+        await client.fetch_user(id)
+    except:
+        await inter.response.send_message(embed=embed_unknown_user, ephemeral=True, delete_after=embed_delete_after)
+        return
+    if id not in bans:
+        await inter.response.send_message(embed=embed_not_banned, ephemeral=True, delete_after=embed_delete_after)
+        return
+    bans.remove(id)
+    with open("bans.txt", "w") as file:
+        for line in bans:
+            file.write(f"{line}\n")
+    await inter.response.send_message(embed=discord.Embed(title="Unbanned user.", description=f"`{id}`", color=embed_color_command_successful))
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
