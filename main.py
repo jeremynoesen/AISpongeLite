@@ -54,13 +54,13 @@ regex_replacement = r"\3"
 regex_meow = r"(\W*m+e+o+w+\W*)+"
 emojis = {}
 characters = {
-    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob"]),
+    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob", "spongemeal"]),
     "patrick": ("weight_154man2fzg19nrtc15drner7t", ["loudrick", "shortrick", "widerick", "pinhead", "patback"]),
     "squidward": ("TM:3psksme51515", ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde"]),
     "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", ["shadow krabs", "sus krabs", "spin krabs", "ketamine krabs"]),
     "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", ["loudton", "dickton", "deathton", "suston", "freakton", "dr. jr."]),
     "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
-    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", []),
+    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", ["weird gary"]),
     "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", []),
     "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", []),
     "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", []),
