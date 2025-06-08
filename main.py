@@ -349,7 +349,7 @@ async def chat(inter: discord.Interaction, character: characters_literal, messag
             max_tokens=250,
             prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {inter.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, chaotic, and exaggerated response. {inter.user.display_name} says: {message}."
         )
-        output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).split(":", 1)[1].strip().strip("\'\""))
+        output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip().strip("\'\""))
         await inter.edit_original_response(embed=discord.Embed(description=output, color=embed_color_command_successful).set_footer(text=message, icon_url=inter.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
         with open("statistics.txt", "a") as file:
             file.write(f"C {int(time.time())}\n")
