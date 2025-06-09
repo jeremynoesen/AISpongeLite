@@ -214,6 +214,11 @@ async def episode(interaction: discord.Interaction, topic: str):
     # Get global variable
     global episode_generating
 
+    # Check if the user is banned
+    if interaction.user.id in bans:
+        await interaction.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+        return
+
     # Check if the user is on cooldown
     if interaction.user.id in episode_cooldowns.keys() and int(time.time()) - episode_cooldowns[interaction.user.id] <= episode_cooldown:
         remaining = episode_cooldown - (int(time.time()) - episode_cooldowns[interaction.user.id])
@@ -230,11 +235,6 @@ async def episode(interaction: discord.Interaction, topic: str):
     # Check if an episode is generating
     if episode_generating:
         await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_episode)
-        return
-
-    # Check if the user is banned
-    if interaction.user.id in bans:
-        await interaction.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
         return
 
     # Start generation
@@ -567,14 +567,14 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
     :return: None
     """
 
-    # Check if an episode is generating
-    if episode_generating:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_tts)
-        return
-
     # Check if the user is banned
     if interaction.user.id in bans:
         await interaction.response.send_message(embed=embed_banned, file=discord.File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+        return
+
+    # Check if an episode is generating
+    if episode_generating:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_tts)
         return
 
     # Start generation
