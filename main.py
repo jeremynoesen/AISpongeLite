@@ -289,7 +289,7 @@ async def episode(interaction: discord.Interaction, topic: str):
         for line in lines:
 
             # Update generation status
-            await interaction.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{current_line}/{total_lines}`...", color=embed_color_command_unsuccessful))
+            await interaction.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{current_line}/{min(total_lines, 25)}`...", color=embed_color_command_unsuccessful))
 
             # Skip line if it is too short or improperly formatted
             line_parts = line.split(":", 1)
@@ -458,7 +458,7 @@ async def episode(interaction: discord.Interaction, topic: str):
 
             # Add lightning if rain is intense
             if rain_intensity > 0:
-                for i in range(random.randint(1, math.ceil(total_lines / 10))):
+                for i in range(random.randint(1, math.ceil(min(total_lines, 25) / 10))):
                     combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + random.randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), random.randrange(len(combined)))
 
         # Add word-activated SFX to the episode
@@ -472,7 +472,7 @@ async def episode(interaction: discord.Interaction, topic: str):
         combined = silence_transition.append(combined, 0).overlay(sfx_transition)
 
         # Add random SFX to the episode
-        for i in range(random.randint(1, math.ceil(total_lines / 5))):
+        for i in range(random.randint(1, math.ceil(min(total_lines, 25) / 5))):
             choice = random.choices(list(sfx_random.keys()), list(sfx_random.values()))[0]
             combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
 
