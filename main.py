@@ -185,7 +185,7 @@ silence_music = AudioSegment.silent(3000)
 episode_generating = False
 
 # Episode cooldown settings
-episode_cooldown = 300
+episode_cooldown = 600
 episode_cooldowns = {}
 
 # Bot start time for uptime calculation
