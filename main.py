@@ -791,7 +791,7 @@ async def unban(interaction: discord.Interaction, id: str):
 @app_commands.default_permissions(manage_messages=True)
 async def clear(interaction: discord.Interaction):
     """
-    Clear the 100 most recent logs from the logging channel.
+    Clear the 500 most recent logs from the logging channel.
     :param interaction: Interaction created by the command
     :return: None
     """
@@ -801,7 +801,7 @@ async def clear(interaction: discord.Interaction):
     response = await interaction.original_response()
 
     # Purge messages from the logging channel
-    deleted = await logging_channel.purge(check=lambda message: message.author == client.user and message != response)
+    deleted = await logging_channel.purge(limit=500, check=lambda message: message.author == client.user and message != response)
 
     # Show how many messages were deleted
     await interaction.edit_original_response(embed=discord.Embed(title="Cleared recent logs.", description=f"Deleted `{len(deleted)}` message(s).", color=embed_color_command_successful))
