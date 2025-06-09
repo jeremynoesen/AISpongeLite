@@ -21,27 +21,22 @@ mentioned in topics, which are up to you to discover!
 - `/episode`: Generate an episode. Only one episode can be generated at a time globally. There is a 10-minute cooldown
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
-- `/chat`: Chat with a character. This can be used at any time anywhere and does not have a cooldown.
-- `/tts`: Synthesize character speech. This can be used whenever an episode is not generating and does not have a
-  cooldown.
+- `/chat`: Chat with a character. You can only generate one chat at a time. There is no cooldown.
+- `/tts`: Synthesize character speech. You can only generate one TTS at a time. TTS generation is unavailable while an 
+  episode is generating. There is no cooldown.
 - `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all
-  time, and view the bot uptime.
-- `/help`: Show bot help. This will show a link to the Discord App Directory page.
+  time, as well as the number of servers the bot is in, API latency, and uptime.
+- `/help`: Show bot help. This will show a link to the Discord App Directory.
 
 ### Context Menu Commands
 
-- `Convert OGG to MP3`: Convert an episode or TTS output in OGG format to MP3, useful for devices that do not support
-  OGG format.
+- `Convert OGG to MP3`: Convert episode or TTS output in OGG format to MP3. Useful for devices that do not support OGG 
+  format.
 
 ## Installation
 
-Click the link in the "About" section of the repository, then click "Add App" on the next page. After that, follow the
-instructions in the popup.
-
-## Troubleshooting
-
-If you encounter "Generation failed.", try again later. If this occurs immediately after generation progresses past 0%, 
-try rewording your topic. Quotation marks and similar punctuation can cause problems.
+Click the link in the repository description, then click "Add App" on the next page. After that, follow the instructions
+in the popup.
 
 ## Demonstration
 
