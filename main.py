@@ -270,8 +270,8 @@ async def episode(interaction: discord.Interaction, topic: str):
                 file_title = title.upper().replace("I", "i")
                 embed_title = "".join(f"**{char}**​" if char.isupper() or char.isnumeric() or char in ".,!?" else char for char in discord.utils.escape_markdown(title)).upper().replace("I", "i")
 
-        # Keep track of completed lines and the total number of lines
-        completed_lines = 1
+        # Keep track of current line and the total number of lines
+        current_line = 1
         total_lines = len(lines)
 
         # Create the embed for the output
@@ -289,7 +289,7 @@ async def episode(interaction: discord.Interaction, topic: str):
         for line in lines:
 
             # Update generation status
-            await interaction.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{completed_lines}/{total_lines}`...", color=embed_color_command_unsuccessful))
+            await interaction.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{current_line}/{total_lines}`...", color=embed_color_command_unsuccessful))
 
             # Skip line if it is too short or improperly formatted
             line_parts = line.split(":", 1)
@@ -417,7 +417,11 @@ async def episode(interaction: discord.Interaction, topic: str):
             output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {discord.utils.escape_markdown(output_line)}", inline=False)
 
             # Line completed
-            completed_lines += 1
+            current_line += 1
+
+            # Embeds have a 25 field limit. Skip remaining lines.
+            if current_line > 25:
+                break
 
         # Show final generating message
         await interaction.edit_original_response(embed=embed_generating_episode_end)
