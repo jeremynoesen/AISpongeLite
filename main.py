@@ -192,11 +192,11 @@ episode_cooldowns = {}
 start_time = int(time.time())
 
 # Load bans
-bans = []
+bans = set()
 if os.path.exists("bans.txt"):
     with open("bans.txt", "r") as file:
         for line in file:
-            bans.append(int(line))
+            bans.add(int(line))
 
 
 @command_tree.command(description="Generate an episode.")
@@ -745,7 +745,7 @@ async def ban(interaction: discord.Interaction, id: str):
         return
 
     # Add the user to the bans list and file
-    bans.append(id)
+    bans.add(id)
     with open("bans.txt", "a") as file:
         file.write(f"{id}\n")
 
