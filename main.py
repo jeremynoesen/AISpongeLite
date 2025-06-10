@@ -252,7 +252,7 @@ async def episode(interaction: discord.Interaction, topic: str):
         await client.change_presence(activity=activity_generating, status=discord.Status.dnd)
 
         # Log the interaction
-        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/episode `topic:`{discord.utils.escape_markdown(topic)}", color=embed_color_logging))
+        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/episode topic:{discord.utils.escape_markdown(topic)}", color=embed_color_logging))
 
         # Generate the script
         completion = await openai.completions.create(
@@ -545,7 +545,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
         await interaction.response.send_message(embed=embed_generating_chat)
 
         # Log the interaction
-        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/chat `character:`{character} `message:`{discord.utils.escape_markdown(message)}", color=embed_color_logging))
+        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/chat character:{character} message:{discord.utils.escape_markdown(message)}", color=embed_color_logging))
 
         # Generate the chat response using OpenAI
         character_title = character.title().replace("bob", "Bob")
@@ -612,7 +612,7 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
         await interaction.response.send_message(embed=embed_generating_tts)
 
         # Log the interaction
-        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/tts `character:`{character} `text:`{discord.utils.escape_markdown(text)}", color=embed_color_logging))
+        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/tts character:{character} text:{discord.utils.escape_markdown(text)}", color=embed_color_logging))
 
         # Loop to run FakeYou requests in
         loop = asyncio.get_running_loop()
@@ -778,7 +778,7 @@ async def ban(interaction: discord.Interaction, id: str):
         file.write(f"{id}\n")
 
     # Show the ban message
-    await interaction.response.send_message(embed=discord.Embed(title="Banned user.", description=f"`{id}`", color=embed_color_command_successful))
+    await interaction.response.send_message(embed=discord.Embed(title="Banned user.", description=f"{id}", color=embed_color_command_successful))
 
 
 @command_tree.command(description="Unban a user.", guild=moderation_guild)
@@ -814,7 +814,7 @@ async def unban(interaction: discord.Interaction, id: str):
             file.write(f"{line}\n")
 
     # Show the unban message
-    await interaction.response.send_message(embed=discord.Embed(title="Unbanned user.", description=f"`{id}`", color=embed_color_command_successful))
+    await interaction.response.send_message(embed=discord.Embed(title="Unbanned user.", description=f"{id}", color=embed_color_command_successful))
 
 
 @command_tree.command(description="Clear recent logs.", guild=moderation_guild)
