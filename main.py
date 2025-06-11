@@ -462,7 +462,7 @@ async def episode(interaction: discord.Interaction, topic: str):
 
             # Add lightning if rain is intense
             if rain_intensity > 0:
-                for i in range(random.randint(1, math.ceil(min(total_lines, 25) / 10))):
+                for i in range(random.randint(1, math.ceil(min(total_lines, 25) / (10 - rain_intensity)))):
                     combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + random.randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), random.randrange(len(combined)))
 
         # Add word-activated SFX to the episode
