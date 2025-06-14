@@ -12,7 +12,6 @@ import re
 import time
 import discord
 import os
-import pydub.effects
 from dotenv import load_dotenv
 from discord import app_commands
 from io import BytesIO
@@ -210,7 +209,7 @@ if os.path.exists("bans.txt"):
 @app_commands.describe(topic="Topic of episode.")
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def episode(interaction: discord.Interaction, topic: str):
+async def episode(interaction: discord.Interaction, topic: app_commands.Range[str, None, 1024]):
     """
     Generate an audio episode where characters discuss a topic.
     :param interaction: Interaction created by the command
@@ -541,7 +540,7 @@ async def episode(interaction: discord.Interaction, topic: str):
 @app_commands.describe(character="Character to chat with.", message="Message to send.")
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def chat(interaction: discord.Interaction, character: characters_literal, message: str):
+async def chat(interaction: discord.Interaction, character: characters_literal, message: app_commands.Range[str, None, 1024]):
     """
     Chat with one of the characters, excluding alts and "all".
     :param interaction: Interaction created by the command
@@ -603,7 +602,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
 @app_commands.describe(character="Voice to use.", text="Text to speak.")
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def tts(interaction: discord.Interaction, character: characters_literal, text: app_commands.Range[str, 3, None]):
+async def tts(interaction: discord.Interaction, character: characters_literal, text: app_commands.Range[str, 3, 1024]):
     """
     Synthesize text-to-speech for a character, excluding alts and "all".
     :param interaction: Interaction created by the command
@@ -773,7 +772,7 @@ async def help(interaction: discord.Interaction):
 @app_commands.allowed_installs(True, False)
 @app_commands.allowed_contexts(True, False, True)
 @app_commands.default_permissions(ban_members=True)
-async def ban(interaction: discord.Interaction, id: str):
+async def ban(interaction: discord.Interaction, id: app_commands.Range[str, 17, 19]):
     """
     Ban a user by their ID.
     :param interaction: Interaction created by the command
@@ -808,7 +807,7 @@ async def ban(interaction: discord.Interaction, id: str):
 @app_commands.allowed_installs(True, False)
 @app_commands.allowed_contexts(True, False, True)
 @app_commands.default_permissions(ban_members=True)
-async def unban(interaction: discord.Interaction, id: str):
+async def unban(interaction: discord.Interaction, id: app_commands.Range[str, 17, 19]):
     """
     Unban a user by their ID.
     :param interaction: Interaction created by the command
