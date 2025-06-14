@@ -387,9 +387,6 @@ async def episode(interaction: discord.Interaction, topic: str):
                 finally:
                     await asyncio.sleep(10)
 
-            # Remove long silence
-            seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
-
             # Apply gain, forcing a loud event sometimes
             if "loud" in character or output_line.isupper() or random.randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
@@ -658,9 +655,6 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
             fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
             with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
-
-        # Remove long silence
-        seg = pydub.effects.strip_silence(seg, 1000, -80, 0)
 
         # Apply gain, forcing a loud event if the text is uppercase
         if text.isupper():
