@@ -117,11 +117,14 @@ gain_voice_loud = -10
 fade_ambiance = 500
 
 # Ambiance audio segments
-ambiance_time = [
-    AudioSegment.from_wav("ambiance/day.wav"),
-    AudioSegment.from_wav("ambiance/night.wav")
-]
+ambiance_time = {
+    AudioSegment.from_wav("ambiance/day.wav"): ["day", "bright", "morning", "noon", "dawn"],
+    AudioSegment.from_wav("ambiance/night.wav"): ["night", "dark", "evening", "dusk"]
+}
 ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
+storm_keywords = ["storm", "thunder", "lightning", "tornado", "hurricane"]
+rain_keywords = ["rain", "drizzle", "shower", "sprinkle", "wet"]
+clear_keywords = ["clear", "dry"]
 
 # Music audio segments
 musics = {
@@ -285,6 +288,7 @@ async def episode(interaction: discord.Interaction, topic: str):
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
         used_model_tokens = set()
         combined = AudioSegment.empty()
+        script_lower = ""
 
         # Loop to run FakeYou requests in
         loop = asyncio.get_running_loop()
@@ -394,14 +398,8 @@ async def episode(interaction: discord.Interaction, topic: str):
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
 
-            # Lowercase version of the line for easier processing
-            output_line_lower = output_line.lower()
-
-            # Check if the lag fish should appear
-            if "release the" in output_line_lower and "fish" in output_line_lower:
-                output_embed.set_thumbnail(url=emojis["lagfish"].url)
-
             # Check if any of the word-activated SFX should happen
+            output_line_lower = output_line.lower()
             for sfx in sfx_triggered.keys():
                 keywords = sfx_triggered[sfx][1]
                 collection = sfx_positions[sfx]
@@ -417,8 +415,9 @@ async def episode(interaction: discord.Interaction, topic: str):
             else:
                 combined = combined.append(silence_line, 0)
 
-            # Add the line to the output embed
+            # Add the line to the output script
             output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {discord.utils.escape_markdown(output_line)}", inline=False)
+            script_lower += output_line_lower + "\n"
 
             # Line completed
             current_line += 1
@@ -442,18 +441,47 @@ async def episode(interaction: discord.Interaction, topic: str):
                 music_loop = music_loop.append(music, 0)
             combined = combined.overlay(music_loop)
 
-        # Add day or night ambiance to the episode
-        if random.randrange(10) > 0:
-            ambiance = random.choice(ambiance_time)
-            ambiance = ambiance.apply_gain((gain_ambiance + random.randint(-5, 5)) - ambiance.dBFS)
-            ambiance_loop = ambiance.fade_in(fade_ambiance)
-            while len(ambiance_loop) < len(combined):
-                ambiance_loop = ambiance_loop.append(ambiance, 0)
-            combined = combined.overlay(ambiance_loop)
+        # Lowercase version of topic for processing
+        topic_lower = topic.lower()
 
-        # Add rain sounds to the episode
+        # Check if the lag fish should appear
+        if "release the fish" in topic_lower or "release the fish" in script_lower:
+            output_embed.set_thumbnail(url=emojis["lagfish"].url)
+
+        # Add day or night ambiance to the episode if topic or script contains keywords or randomly
+        ambiance = random.choice(list(ambiance_time.keys()))
+        for text in (topic_lower, script_lower):
+            for key in ambiance_time.keys():
+                if any(word in text for word in ambiance_time[key]):
+                    ambiance = key
+                    break
+            if ambiance:
+                break
+
+        # Apply random gain, fade in, and loop the ambiance sound
+        ambiance = ambiance.apply_gain((gain_ambiance + random.randint(-5, 5)) - ambiance.dBFS)
+        ambiance_loop = ambiance.fade_in(fade_ambiance)
+        while len(ambiance_loop) < len(combined):
+            ambiance_loop = ambiance_loop.append(ambiance, 0)
+        combined = combined.overlay(ambiance_loop)
+
+        # Add rain sounds to the episode if topic contains keywords or randomly
+        rain_intensity = None
         if random.randrange(5) == 0:
             rain_intensity = random.randint(-5, 5)
+        for text in (topic_lower, script_lower):
+            if any(word in text for word in storm_keywords):
+                rain_intensity = random.randint(1, 5)
+                break
+            elif any(word in text for word in rain_keywords):
+                rain_intensity = random.randint(-5, 0)
+                break
+            elif any(word in text for word in clear_keywords):
+                rain_intensity = None
+                break
+        if rain_intensity is not None:
+
+            # Apply random gain, fade in, and loop the rain sound
             rain_randomized = ambiance_rain.apply_gain((gain_ambiance + rain_intensity) - ambiance_rain.dBFS)
             rain_loop = rain_randomized.fade_in(fade_ambiance)
             while len(rain_loop) < len(combined):
