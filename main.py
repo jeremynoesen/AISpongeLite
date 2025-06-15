@@ -92,7 +92,7 @@ characters = {
     "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", ["loudton", "dickton", "deathton", "suston", "freakton", "dr. jr."]),
     "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
     "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", ["weird gary"]),
-    "sandy": ("weight_tzgp5df2xzwz7y7jzz7at96jf", []),
+    "sandy": ("TM:214sp1nxxd63", []),
     "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", []),
     "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", []),
     "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", []),
