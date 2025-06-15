@@ -576,7 +576,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=250,
-            prompt=f"You are {character_title} from SpongeBob SquarePants chatting with {interaction.user.display_name} on Discord. Use the format: {character_title}: <response>. Respond only with a brief, chaotic, and exaggerated response. {interaction.user.display_name} says: {message}."
+            prompt=f"Create a brief, chaotic, and morally incorrect response to a Discord message as {character_title} from SpongeBob SquarePants. Use the format: {character_title}: <response>. Only reply with {character_title}'s coherent response. The message from {interaction.user.display_name} is: \"{message}\"."
         )
 
         # Clean the response text
