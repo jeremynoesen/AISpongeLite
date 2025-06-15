@@ -96,7 +96,7 @@ characters = {
     "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", []),
     "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", []),
     "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", []),
-    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", []),
+    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", ["bubble ass"]),
     "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", []),
     "doodlebob": ("", []),
     "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", []),
