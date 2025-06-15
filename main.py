@@ -99,12 +99,13 @@ characters = {
     "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", []),
     "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", []),
     "doodlebob": ("", []),
+    "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", []),
     "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", []),
     "all": ("", ["every", "unison", "together", "both"])
 }
 
 # Characters literal type for command arguments
-characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "plankton", "karen", "gary", "sandy", "mrs. puff", "larry", "squilliam", "bubble bass", "bubble buddy", "doodlebob", "french narrator"]
+characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "plankton", "karen", "gary", "sandy", "mrs. puff", "larry", "squilliam", "bubble bass", "bubble buddy", "doodlebob", "realistic fish head", "french narrator"]
 
 # Gain settings for audio segments
 gain_ambiance = -45
@@ -260,7 +261,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         completion = await openai.completions.create(
             model="gpt-3.5-turbo-instruct",
             max_tokens=700,
-            prompt=f"Create a chaotic, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant and funny 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\"."
+            prompt=f"Create a chaotic, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with uncensored, coherent character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a relevant and funny 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\"."
         )
 
         # Clean the script
