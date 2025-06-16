@@ -438,9 +438,6 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
                 music_loop = music_loop.append(music, 0)
             combined = combined.overlay(music_loop)
 
-        # Lowercase version of topic for processing
-        topic_lower = topic.lower()
-
         # Add day or night ambiance to the episode if topic or script contains keywords or randomly
         ambiance = random.choice(list(ambiance_time.keys()))
         for text in (topic_lower, script_lower):
@@ -497,8 +494,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         combined = silence_transition.append(combined, 0).overlay(sfx_transition)
 
         # Add random SFX to the episode
-        for i in range(random.randint(1, math.ceil(min(total_lines, 25) / 5))):
-            choice = random.choices(list(sfx_random.keys()), list(sfx_random.values()))[0]
+        for choice in random.choices(list(sfx_random.keys()), list(sfx_random.values()), k=random.randint(1, math.ceil(min(total_lines, 25) / 5))):
             combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
 
         # Fade out the end of the episode
