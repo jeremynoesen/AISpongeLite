@@ -147,6 +147,7 @@ musics = {
 sfx_random = {
     AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
     AudioSegment.from_wav("sfx/boowomp.wav"): 5,
+    AudioSegment.from_wav("sfx/kiss.wav"): 5,
     AudioSegment.from_mp3("sfx/car.mp3"): 5,
     AudioSegment.from_wav("sfx/my_leg_1.wav"): 5,
     AudioSegment.from_wav("sfx/my_leg_2.wav"): 5,
@@ -160,7 +161,6 @@ sfx_random = {
     AudioSegment.from_wav("sfx/fling_1.wav"): 1,
     AudioSegment.from_wav("sfx/fling_2.wav"): 1,
     AudioSegment.from_wav("sfx/kick.wav"): 1,
-    AudioSegment.from_wav("sfx/kiss.wav"): 1,
     AudioSegment.from_wav("sfx/squish_1.wav"): 1,
     AudioSegment.from_wav("sfx/squish_2.wav"): 1,
     AudioSegment.from_wav("sfx/dramatic_cue_a.wav"): 1,
