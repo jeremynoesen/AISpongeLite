@@ -439,7 +439,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
             combined = combined.overlay(music_loop)
 
         # Add day or night ambiance to the episode if topic or script contains keywords or randomly
-        ambiance = random.choice(list(ambiance_time.keys()))
+        ambiance = None
         for text in (topic_lower, script_lower):
             for key in ambiance_time.keys():
                 if any(word in text for word in ambiance_time[key]):
@@ -447,6 +447,8 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
                     break
             if ambiance:
                 break
+        if not ambiance:
+            ambiance = random.choice(list(ambiance_time.keys()))
 
         # Apply random gain, fade in, and loop the ambiance sound
         ambiance = ambiance.apply_gain((gain_ambiance + random.randint(-5, 5)) - ambiance.dBFS)
