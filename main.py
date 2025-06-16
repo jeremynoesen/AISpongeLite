@@ -145,9 +145,9 @@ musics = {
 
 # SFX audio segments
 sfx_random = {
-    AudioSegment.from_mp3("sfx/car.mp3"): 10,
     AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
     AudioSegment.from_wav("sfx/boowomp.wav"): 5,
+    AudioSegment.from_mp3("sfx/car.mp3"): 5,
     AudioSegment.from_wav("sfx/my_leg_1.wav"): 5,
     AudioSegment.from_wav("sfx/my_leg_2.wav"): 5,
     AudioSegment.from_wav("sfx/foghorn.wav"): 1,
