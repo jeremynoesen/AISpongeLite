@@ -441,10 +441,6 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         # Lowercase version of topic for processing
         topic_lower = topic.lower()
 
-        # Check if the lag fish should appear
-        if "release the fish" in topic_lower or "release the fish" in script_lower:
-            output_embed.set_thumbnail(url=emojis["lagfish"].url)
-
         # Add day or night ambiance to the episode if topic or script contains keywords or randomly
         ambiance = random.choice(list(ambiance_time.keys()))
         for text in (topic_lower, script_lower):
@@ -507,6 +503,10 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 
         # Fade out the end of the episode
         combined = combined.fade_out(len(silence_line))
+
+        # Check if the lag fish should appear
+        if "release the fish" in topic_lower or "release the fish" in script_lower:
+            output_embed.set_thumbnail(url=emojis["lagfish"].url)
 
         # Export the episode and send it
         with BytesIO() as output:
