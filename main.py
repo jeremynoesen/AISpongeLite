@@ -151,6 +151,7 @@ sfx_random = {
     AudioSegment.from_mp3("sfx/car.mp3"): 5,
     AudioSegment.from_wav("sfx/my_leg_1.wav"): 5,
     AudioSegment.from_wav("sfx/my_leg_2.wav"): 5,
+    AudioSegment.from_wav("sfx/glass_shatter.wav"): 5,
     AudioSegment.from_wav("sfx/foghorn.wav"): 1,
     AudioSegment.from_wav("sfx/vibe_link_b.wav"): 1,
     AudioSegment.from_wav("sfx/this_guy_stinks.wav"): 1,
