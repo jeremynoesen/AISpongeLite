@@ -127,20 +127,67 @@ rain_keywords = ["rain", "drizzle", "shower", "sprinkle", "wet"]
 clear_keywords = ["clear", "dry"]
 
 # Music audio segments
-musics = {
-    AudioSegment.from_wav("music/closing_theme.wav"): 10,
-    AudioSegment.from_wav("music/tip_top_polka.wav"): 10,
-    AudioSegment.from_wav("music/rake_hornpipe.wav"): 10,
-    AudioSegment.from_wav("music/seaweed.wav"): 10,
-    AudioSegment.from_wav("music/hello_sailor_b.wav"): 5,
-    AudioSegment.from_wav("music/drunken_sailor.wav"): 5,
-    AudioSegment.from_wav("music/stars_and_games.wav"): 5,
-    AudioSegment.from_wav("music/comic_walk.wav"): 5,
-    AudioSegment.from_wav("music/gator.wav"): 5,
-    AudioSegment.from_wav("music/rock_bottom.wav"): 5,
-    AudioSegment.from_wav("music/grass_skirt_chase.wav"): 1,
-    AudioSegment.from_wav("music/sneaky_snitch.wav"): 1,
-    AudioSegment.from_wav("music/better_call_saul.wav"): 1
+music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav")
+music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav")
+music_rake_hornpipe = AudioSegment.from_wav("music/rake_hornpipe.wav")
+music_seaweed = AudioSegment.from_wav("music/seaweed.wav")
+music_hello_sailor_b = AudioSegment.from_wav("music/hello_sailor_b.wav")
+music_drunken_sailor = AudioSegment.from_wav("music/drunken_sailor.wav")
+music_stars_and_games = AudioSegment.from_wav("music/stars_and_games.wav")
+music_comic_walk = AudioSegment.from_wav("music/comic_walk.wav")
+music_gator = AudioSegment.from_wav("music/gator.wav")
+music_rock_bottom = AudioSegment.from_wav("music/rock_bottom.wav")
+music_breaking_news = AudioSegment.from_wav("music/breaking_news.wav")
+music_grass_skirt_chase = AudioSegment.from_wav("music/grass_skirt_chase.wav")
+
+# Locations with their assigned music segments
+music_locations = {
+    "spongebob's house": {
+        music_stars_and_games: 5,
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "patrick's house": {
+        music_gator: 5,
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "squidward's house": {
+        music_comic_walk: 5,
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "sandy's treedome": {
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "krusty krab": {
+        music_tip_top_polka: 5,
+        music_rake_hornpipe: 5,
+        music_drunken_sailor: 5,
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "chum bucket": {
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "boating school": {
+        music_hello_sailor_b: 5,
+        music_seaweed: 1,
+        music_closing_theme: 1
+    },
+    "news studio": {
+        music_breaking_news: 1
+    },
+    "rock bottom": {
+        music_rock_bottom: 1
+    },
+    "bikini bottom": {
+        music_closing_theme: 5,
+        music_grass_skirt_chase: 1,
+        music_gator: 1
+    }
 }
 
 # SFX audio segments
@@ -430,14 +477,28 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         # Add silence at the end of the episode
         combined = combined.append(silence_line, 0)
 
-        # Add music to the episode
-        if random.randrange(20) > 0:
-            music = random.choices(list(musics.keys()), list(musics.values()))[0]
-            music = music.apply_gain((gain_music + random.randint(-5, 5)) - music.dBFS)
-            music_loop = silence_music.append(music.fade_in(10000), 0)
-            while len(music_loop) < len(combined):
-                music_loop = music_loop.append(music, 0)
-            combined = combined.overlay(music_loop)
+        # Lowercase version of topic for processing
+        topic_lower = topic.lower()
+
+        # Add music to the episode based on location or randomly
+        location = None
+        for text in (topic_lower, script_lower):
+            for key in music_locations.keys():
+                if key in text:
+                    location = key
+                    break
+            if location:
+                break
+        if not location:
+            location = random.choice(list(music_locations.keys()))
+        music = random.choices(list(music_locations[location].keys()), list(music_locations[location].values()))[0]
+
+        # Apply random gain, fade in, and loop the music
+        music = music.apply_gain((gain_music + random.randint(-5, 5)) - music.dBFS)
+        music_loop = silence_music.append(music.fade_in(10000), 0)
+        while len(music_loop) < len(combined):
+            music_loop = music_loop.append(music, 0)
+        combined = combined.overlay(music_loop)
 
         # Add day or night ambiance to the episode if topic or script contains keywords or randomly
         ambiance = None
