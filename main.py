@@ -140,54 +140,54 @@ music_rock_bottom = AudioSegment.from_wav("music/rock_bottom.wav")
 music_breaking_news = AudioSegment.from_wav("music/breaking_news.wav")
 music_grass_skirt_chase = AudioSegment.from_wav("music/grass_skirt_chase.wav")
 
-# Locations with their assigned music segments
-music_locations = {
-    "spongebob's house": {
+# Locations with their assigned music segments and embed colors
+locations = {
+    "spongebob's house": ({
         music_stars_and_games: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "patrick's house": {
+    }, 0xd97d00),
+    "patrick's house": ({
         music_gator: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "squidward's house": {
+    }, 0x521b1d),
+    "squidward's house": ({
         music_comic_walk: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "sandy's treedome": {
+    }, 0x285663),
+    "sandy's treedome": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "krusty krab": {
+    }, 0x387c00),
+    "krusty krab": ({
         music_tip_top_polka: 5,
         music_rake_hornpipe: 5,
         music_drunken_sailor: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "chum bucket": {
+    }, 0x6b3c0f),
+    "chum bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "boating school": {
+    }, 0x001848),
+    "boating school": ({
         music_hello_sailor_b: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    },
-    "news studio": {
+    }, 0xc7b208),
+    "news studio": ({
         music_breaking_news: 1
-    },
-    "rock bottom": {
+    }, 0x4385d2),
+    "rock bottom": ({
         music_rock_bottom: 1
-    },
-    "bikini bottom": {
+    }, 0x0b091c),
+    "bikini bottom": ({
         music_closing_theme: 5,
         music_grass_skirt_chase: 1,
         music_gator: 1
-    }
+    }, 0xc2a36b)
 }
 
 # SFX audio segments
@@ -330,7 +330,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         total_lines = len(lines)
 
         # Create the embed for the output
-        output_embed = discord.Embed(title=embed_title, color=embed_color_command_successful).set_footer(text=topic, icon_url=interaction.user.display_avatar.url)
+        output_embed = discord.Embed(title=embed_title).set_footer(text=topic, icon_url=interaction.user.display_avatar.url)
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -483,15 +483,18 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         # Add music to the episode based on location or randomly
         location = None
         for text in (topic_lower, script_lower):
-            for key in music_locations.keys():
+            for key in locations.keys():
                 if key in text:
                     location = key
                     break
             if location:
                 break
         if not location:
-            location = random.choice(list(music_locations.keys()))
-        music = random.choices(list(music_locations[location].keys()), list(music_locations[location].values()))[0]
+            location = random.choice(list(locations.keys()))
+        music = random.choices(list(locations[location][0].keys()), list(locations[location][0].values()))[0]
+
+        # Set the embed color based on the location
+        output_embed.colour = locations[location][1]
 
         # Apply random gain, fade in, and loop the music
         music = music.apply_gain((gain_music + random.randint(-5, 5)) - music.dBFS)
