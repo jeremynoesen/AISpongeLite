@@ -59,7 +59,6 @@ button_help = discord.ui.Button(style=discord.ButtonStyle.link, label="App Direc
 embed_in_use_episode = discord.Embed(title="Currently in use.", description="Only one episode can be generated at a time globally.", color=embed_color_command_unsuccessful)
 embed_in_use_chat = discord.Embed(title="Currently in use.", description="You can only generate one chat at a time.", color=embed_color_command_unsuccessful)
 embed_in_use_tts = discord.Embed(title="Currently in use.", description="You can only generate one TTS at a time.", color=embed_color_command_unsuccessful)
-embed_in_use_tts_episode = discord.Embed(title="Currently in use.", description="TTS generation is unavailable while an episode is generating.", color=embed_color_command_unsuccessful)
 embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color_command_unsuccessful)
 embed_generating_episode_end = discord.Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color_command_unsuccessful)
 embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_command_unsuccessful)
@@ -683,11 +682,6 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
     # Check if the user is using already generating TTS
     if interaction.user.id in tts_generating:
         await interaction.response.send_message(embed=embed_in_use_tts, ephemeral=True, delete_after=embed_delete_after)
-        return
-
-    # Check if an episode is generating
-    if episode_generating:
-        await interaction.response.send_message(embed=embed_in_use_tts_episode, ephemeral=True, delete_after=embed_delete_after)
         return
 
     # Start generation

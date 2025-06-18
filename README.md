@@ -25,8 +25,7 @@ News Studio, Rock Bottom, and Bikini Bottom.
   upon successful generation, unless you purchase the
   ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
 - `/chat`: Chat with a character. You can only generate one chat at a time. There is no cooldown.
-- `/tts`: Synthesize character speech. You can only generate one TTS at a time. TTS generation is unavailable while an 
-  episode is generating. There is no cooldown.
+- `/tts`: Synthesize character speech. You can only generate one TTS at a time. There is no cooldown.
 - `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all
   time, as well as the number of servers the bot is in, API latency, and uptime.
 - `/help`: Show bot help. This will show a link to the Discord App Directory.
