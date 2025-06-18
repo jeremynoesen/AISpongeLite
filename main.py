@@ -82,25 +82,25 @@ regex_meow = r"(\W*m+e+o+w+\W*)+"
 # Emojis for the characters
 emojis = {}
 
-# Characters dictionary with their model tokens and alts
+# Characters dictionary with their model tokens, embed colors, and alts
 characters = {
-    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob", "spongemeal"]),
-    "patrick": ("weight_154man2fzg19nrtc15drner7t", ["loudrick", "shortrick", "widerick", "pinhead", "patback"]),
-    "squidward": ("TM:3psksme51515", ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde", "brokenward"]),
-    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", ["shadow krabs", "sus krabs", "spin krabs", "ketamine krabs"]),
-    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", ["loudton", "dickton", "deathton", "suston", "freakton", "wideton", "dr. jr."]),
-    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
-    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", ["weird gary"]),
-    "sandy": ("TM:214sp1nxxd63", []),
-    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", []),
-    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", []),
-    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", []),
-    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", ["bubble ass"]),
-    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", []),
-    "doodlebob": ("", []),
-    "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", []),
-    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", []),
-    "all": ("", ["every", "unison", "together", "both"])
+    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", 0xd4b937, ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob", "spongemeal"]),
+    "patrick": ("weight_154man2fzg19nrtc15drner7t", 0xf3a18a, ["loudrick", "shortrick", "widerick", "pinhead", "patback"]),
+    "squidward": ("TM:3psksme51515", 0x9fc3b9, ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde", "brokenward"]),
+    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", 0xda1503, ["shadow krabs", "sus krabs", "spin krabs", "ketamine krabs"]),
+    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", 0x044a07, ["loudton", "dickton", "deathton", "suston", "freakton", "wideton", "dr. jr."]),
+    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", 0x7891b8, ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
+    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", 0xca8e93, ["weird gary"]),
+    "sandy": ("TM:214sp1nxxd63", 0xede0db, []),
+    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", 0xd8ab72, []),
+    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", 0xe46704, []),
+    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", 0xd5f0d7, []),
+    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", 0xd9c481, ["bubble ass"]),
+    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", 0x79919b, []),
+    "doodlebob": ("", 0x9a96a1, []),
+    "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", 0x988f6e, []),
+    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", 0xa8865f, []),
+    "all": ("", 0, ["every", "unison", "together", "both"])
 }
 
 # Characters literal type for command arguments
@@ -358,7 +358,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
             for key in characters.keys():
                 model_token = characters[key][0]
                 line_parts[0] = line_parts[0].lower()
-                for alt in characters[key][1]:
+                for alt in characters[key][2]:
                     if alt in line_parts[0]:
                         character = alt
                         break
@@ -377,7 +377,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
             output_line = line_parts[1].strip()
 
             # Synthesize speech using FakeYou for all characters that have spoken
-            if character == "all" or character in characters["all"][1]:
+            if character == "all" or character in characters["all"][2]:
                 segs = []
                 for used_model_token in used_model_tokens:
 
@@ -407,11 +407,11 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
                     seg = seg.overlay(segs[i], 0)
 
             # Synthesize speech using voice files for DoodleBob
-            elif character == "doodlebob" or character in characters["doodlebob"][1]:
+            elif character == "doodlebob" or character in characters["doodlebob"][2]:
                 seg = random.choice(voice_doodlebob)
 
             # Synthesize speech using voice files for Gary
-            elif (character == "gary" or character in characters["gary"][1]) and re.fullmatch(regex_meow, output_line, re.IGNORECASE):
+            elif (character == "gary" or character in characters["gary"][2]) and re.fullmatch(regex_meow, output_line, re.IGNORECASE):
                 seg = random.choice(voice_gary)
                 used_model_tokens.add(model_token)
 
@@ -646,7 +646,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
         output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
 
         # Send the response
-        await interaction.edit_original_response(embed=discord.Embed(description=output, color=embed_color_command_successful).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
+        await interaction.edit_original_response(embed=discord.Embed(description=output, color=characters[character][1]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
         # Record successful chat generation in statistics
         with open("statistics.txt", "a") as file:
@@ -724,7 +724,7 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
         with BytesIO() as output:
             seg.export(output, "ogg")
             character_title = character.title().replace('bob', 'Bob')
-            await interaction.edit_original_response(embed=discord.Embed(color=embed_color_command_successful).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[discord.File(output, f"{character_title} — {text}.ogg")])
+            await interaction.edit_original_response(embed=discord.Embed(color=characters[character][1]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[discord.File(output, f"{character_title} — {text}.ogg")])
 
         # Record successful TTS generation in statistics
         with open("statistics.txt", "a") as file:
@@ -959,7 +959,7 @@ async def on_ready():
     global logging_channel, emojis
     logging_channel = await client.fetch_channel(int(os.getenv("LOGGING_CHANNEL_ID")))
     emojis = {e.name: e for e in await client.fetch_application_emojis()}
-    for alt in characters["all"][1]:
+    for alt in characters["all"][2]:
         emojis[alt] = emojis["all"]
 
     # Sync command trees
