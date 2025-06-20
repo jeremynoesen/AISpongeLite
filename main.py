@@ -73,7 +73,7 @@ remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 
 # Regex patterns
-regex_meow = r"(\W*m+e+o+w+\W*)+"
+regex_meow = r"(\W*m+e+o+w+s*\W*)+"
 
 # Emojis for the characters
 emojis = {}
