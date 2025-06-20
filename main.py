@@ -641,7 +641,6 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
         )
 
         # Clean the response text
-        output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
         output = discord.utils.escape_markdown(completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip())
 
         # Send the response
