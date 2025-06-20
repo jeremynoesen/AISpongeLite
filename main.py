@@ -73,8 +73,6 @@ remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 
 # Regex patterns
-regex_actions = r"(^|\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+|$)"
-regex_replacement = r"\3"
 regex_meow = r"(\W*m+e+o+w+\W*)+"
 
 # Emojis for the characters
@@ -312,7 +310,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         )
 
         # Clean the script
-        lines = re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
+        lines = completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
@@ -644,6 +642,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
 
         # Clean the response text
         output = discord.utils.escape_markdown(re.sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
+        output = discord.utils.escape_markdown(completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip())
 
         # Send the response
         await interaction.edit_original_response(embed=discord.Embed(description=output, color=characters[character][1]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
