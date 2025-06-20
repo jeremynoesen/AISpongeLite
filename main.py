@@ -211,7 +211,9 @@ sfx_random = {
     AudioSegment.from_wav("sfx/squish_1.wav"): 1,
     AudioSegment.from_wav("sfx/squish_2.wav"): 1,
     AudioSegment.from_wav("sfx/dramatic_cue_a.wav"): 1,
-    AudioSegment.from_wav("sfx/dramatic_cue_d.wav"): 1
+    AudioSegment.from_wav("sfx/dramatic_cue_d.wav"): 1,
+    AudioSegment.from_wav("sfx/alarm.wav"): 1,
+    AudioSegment.from_wav("sfx/phone_call.wav"): 1
 }
 sfx_triggered = {
     "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patt", "food", "burger", "hungry", "ice cream", "pizza", "pie", "fries", "fry", "consum", "cake", "shake", "fish", "sushi", "ketchup", "mustard", "mayo", "starv"]),
