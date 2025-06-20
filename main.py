@@ -35,7 +35,7 @@ if fakeyou_username and fakeyou_password:
     fakeyou.login(fakeyou_username, fakeyou_password)
 
 # Set the FakeYou timeout before a line fails
-fakeyou_timeout = 60
+fakeyou_timeout = 90
 
 # Discord activity settings
 activity_ready = discord.Game(os.getenv("MOTD", "Ready to generate."))
