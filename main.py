@@ -50,27 +50,25 @@ moderation_guild = discord.Object(id=os.getenv("MODERATION_GUILD_ID"))
 logging_channel = None
 
 # Embed settings and static embeds
-embed_color_command_unsuccessful = 0x04a3e7
-embed_color_command_successful = 0x57f3ff
-embed_color_logging = 0x1848ae
+embed_color = discord.Color.dark_embed()
 embed_delete_after = 10
-embed_help = discord.Embed(title="See App Directory for help.", description="You will find links to the support server, source code, donations, terms of service, and privacy policy there as well.", color=embed_color_command_successful)
+embed_help = discord.Embed(title="See App Directory for help.", description="You will find links to the support server, source code, donations, terms of service, and privacy policy there as well.", color=embed_color)
 button_help = discord.ui.Button(style=discord.ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
-embed_in_use_episode = discord.Embed(title="Currently in use.", description="Only one episode can be generated at a time globally.", color=embed_color_command_unsuccessful)
-embed_in_use_chat = discord.Embed(title="Currently in use.", description="You can only generate one chat at a time.", color=embed_color_command_unsuccessful)
-embed_in_use_tts = discord.Embed(title="Currently in use.", description="You can only generate one TTS at a time.", color=embed_color_command_unsuccessful)
-embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color_command_unsuccessful)
-embed_generating_episode_end = discord.Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color_command_unsuccessful)
-embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color_command_unsuccessful)
-embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color_command_unsuccessful)
-embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color_command_unsuccessful)
-embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color_command_unsuccessful).set_image(url="attachment://explodeward.gif")
-embed_unknown_user = discord.Embed(title="Unknown user.", description="That user does not exist.", color=embed_color_command_unsuccessful)
-embed_already_banned = discord.Embed(title="User already banned.", description="That user is already banned.", color=embed_color_command_unsuccessful)
-embed_not_banned = discord.Embed(title="User not banned.", description="That user is not banned.", color=embed_color_command_unsuccessful)
-embed_clearing_logs = discord.Embed(title="Clearing recent logs...", description="Deleting messages...", color=embed_color_command_unsuccessful)
-embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color_command_unsuccessful)
-embed_converting_file = discord.Embed(title="Converting file...", description="Converting file from OGG to MP3...", color=embed_color_command_unsuccessful)
+embed_in_use_episode = discord.Embed(title="Currently in use.", description="Only one episode can be generated at a time globally.", color=embed_color)
+embed_in_use_chat = discord.Embed(title="Currently in use.", description="You can only generate one chat at a time.", color=embed_color)
+embed_in_use_tts = discord.Embed(title="Currently in use.", description="You can only generate one TTS at a time.", color=embed_color)
+embed_generating_episode_start = discord.Embed(title="Generating episode...", description="Generating script...", color=embed_color)
+embed_generating_episode_end = discord.Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color)
+embed_generating_chat = discord.Embed(title="Generating chat...", description="Generating response...", color=embed_color)
+embed_generating_tts = discord.Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color)
+embed_generation_failed = discord.Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
+embed_banned = discord.Embed(title="You are banned from using AI Sponge Lite.", color=embed_color).set_image(url="attachment://explodeward.gif")
+embed_unknown_user = discord.Embed(title="Unknown user.", description="That user does not exist.", color=embed_color)
+embed_already_banned = discord.Embed(title="User already banned.", description="That user is already banned.", color=embed_color)
+embed_not_banned = discord.Embed(title="User not banned.", description="That user is not banned.", color=embed_color)
+embed_clearing_logs = discord.Embed(title="Clearing recent logs...", description="Deleting messages...", color=embed_color)
+embed_no_file = discord.Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color)
+embed_converting_file = discord.Embed(title="Converting file...", description="Converting file from OGG to MP3...", color=embed_color)
 remove_cooldown_sku = int(os.getenv("REMOVE_COOLDOWN_SKU"))
 remove_cooldown_button = discord.ui.Button(style=discord.ButtonStyle.premium, sku_id=remove_cooldown_sku)
 
@@ -285,7 +283,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         seconds = remaining % 60
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color_command_unsuccessful), view=discord.ui.View().add_item(remove_cooldown_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=discord.Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color), view=discord.ui.View().add_item(remove_cooldown_button))
         return
 
     # Check if an episode is generating
@@ -304,7 +302,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         await client.change_presence(activity=activity_generating, status=discord.Status.dnd)
 
         # Log the interaction
-        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/episode topic:{discord.utils.escape_markdown(topic)}", color=embed_color_logging))
+        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/episode topic:{discord.utils.escape_markdown(topic)}", color=embed_color))
 
         # Generate the script
         completion = await openai.completions.create(
@@ -346,7 +344,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         for line in lines:
 
             # Update generation status
-            await interaction.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{current_line}/{min(total_lines, 25)}`...", color=embed_color_command_unsuccessful))
+            await interaction.edit_original_response(embed=discord.Embed(title="Generating episode...", description=f"Synthesizing line `{current_line}/{min(total_lines, 25)}`...", color=embed_color))
 
             # Skip line if it is too short or improperly formatted
             line_parts = line.split(":", 1)
@@ -634,7 +632,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
         await interaction.response.send_message(embed=embed_generating_chat)
 
         # Log the interaction
-        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/chat character:{character} message:{discord.utils.escape_markdown(message)}", color=embed_color_logging))
+        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/chat character:{character} message:{discord.utils.escape_markdown(message)}", color=embed_color))
 
         # Generate the chat response using OpenAI
         character_title = character.title().replace("bob", "Bob")
@@ -696,7 +694,7 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
         await interaction.response.send_message(embed=embed_generating_tts)
 
         # Log the interaction
-        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/tts character:{character} text:{discord.utils.escape_markdown(text)}", color=embed_color_logging))
+        await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/tts character:{character} text:{discord.utils.escape_markdown(text)}", color=embed_color))
 
         # Loop to run FakeYou requests in
         loop = asyncio.get_running_loop()
@@ -805,7 +803,7 @@ async def stats(interaction: discord.Interaction):
         uptime_formatted += f"{seconds}s"
 
     # Send the statistics message
-    await interaction.response.send_message(embed=discord.Embed(color=embed_color_command_successful)
+    await interaction.response.send_message(embed=discord.Embed(color=embed_color)
                                       .add_field(name="Episodes", value=f"24h: `{episodes_24h}`\nAll: `{episodes_all}`", inline=False)
                                       .add_field(name="Chats", value=f"24h: `{chats_24h}`\nAll: `{chats_all}`", inline=False)
                                       .add_field(name="TTS", value=f"24h: `{tts_24h}`\nAll: `{tts_all}`", inline=False)
@@ -859,7 +857,7 @@ async def ban(interaction: discord.Interaction, id: app_commands.Range[str, 17, 
         file.write(f"{id}\n")
 
     # Show the ban message
-    await interaction.response.send_message(embed=discord.Embed(title="Banned user.", description=f"{id}", color=embed_color_command_successful))
+    await interaction.response.send_message(embed=discord.Embed(title="Banned user.", description=f"{id}", color=embed_color))
 
 
 @command_tree.command(description="Unban a user.", guild=moderation_guild)
@@ -895,7 +893,7 @@ async def unban(interaction: discord.Interaction, id: app_commands.Range[str, 17
             file.write(f"{line}\n")
 
     # Show the unban message
-    await interaction.response.send_message(embed=discord.Embed(title="Unbanned user.", description=f"{id}", color=embed_color_command_successful))
+    await interaction.response.send_message(embed=discord.Embed(title="Unbanned user.", description=f"{id}", color=embed_color))
 
 
 @command_tree.command(description="Clear recent logs.", guild=moderation_guild)
@@ -917,7 +915,7 @@ async def clear(interaction: discord.Interaction):
     deleted = len(await logging_channel.purge(limit=500, check=lambda message: message.author == client.user and message != response))
 
     # Show how many messages were deleted
-    await interaction.edit_original_response(embed=discord.Embed(title="Cleared recent logs.", description=f"Deleted `{deleted}` message{('s' if deleted == 0 or deleted > 1 else '')}.", color=embed_color_command_successful))
+    await interaction.edit_original_response(embed=discord.Embed(title="Cleared recent logs.", description=f"Deleted `{deleted}` message{('s' if deleted == 0 or deleted > 1 else '')}.", color=embed_color))
 
 
 @command_tree.context_menu(name="Convert OGG to MP3")
