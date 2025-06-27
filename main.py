@@ -37,6 +37,10 @@ if fakeyou_username and fakeyou_password:
 # Set the FakeYou timeout before a line fails
 fakeyou_timeout = 90
 
+# Set the input and output char limits, determined based on what FakeYou actually generates
+char_limit_min = 3
+char_limit_max = 256
+
 # Discord activity settings
 activity_ready = discord.Game(os.getenv("MOTD", "Ready to generate."))
 activity_generating = discord.Game("Generating episode...")
@@ -255,7 +259,7 @@ if os.path.exists("bans.txt"):
 @app_commands.describe(topic="Topic of episode.")
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def episode(interaction: discord.Interaction, topic: app_commands.Range[str, None, 1024]):
+async def episode(interaction: discord.Interaction, topic: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
     Generate an audio episode where characters discuss a topic.
     :param interaction: Interaction created by the command
@@ -319,6 +323,8 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         if len(line_parts) == 2 and "title" in line_parts[0].lower():
             title = line_parts[1].strip()
             if title:
+                if len(title) > char_limit_max:
+                    title = title[:char_limit_max - 3] + "..."
                 file_title = title.upper().replace("I", "i")
                 embed_title = "".join(f"**{char}**​" if char.isupper() or char.isnumeric() or char in ".,!?" else char for char in discord.utils.escape_markdown(title)).upper().replace("I", "i")
 
@@ -346,7 +352,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 
             # Skip line if it is too short or improperly formatted
             line_parts = line.split(":", 1)
-            if len(line_parts) != 2 or len(line_parts[1].strip()) < 3:
+            if len(line_parts) != 2 or len(line_parts[1].strip()) < char_limit_min:
                 total_lines -= 1
                 continue
 
@@ -373,6 +379,8 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 
             # Set the text to synthesize and to show
             output_line = line_parts[1].strip()
+            if len(output_line) > char_limit_max:
+                output_line = output_line[:char_limit_max - 3] + "..."
 
             # Synthesize speech using FakeYou for all characters that have spoken
             if character == "all" or character in characters["all"][2]:
@@ -601,7 +609,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 @app_commands.describe(character="Character to chat with.", message="Message to send.")
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def chat(interaction: discord.Interaction, character: characters_literal, message: app_commands.Range[str, None, 1024]):
+async def chat(interaction: discord.Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
     Chat with one of the characters, excluding alts and "all".
     :param interaction: Interaction created by the command
@@ -642,6 +650,8 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
 
         # Clean the response text
         output = discord.utils.escape_markdown(completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip())
+        if len(output) > char_limit_max:
+            output = output[:char_limit_max - 3] + "..."
 
         # Send the response
         await interaction.edit_original_response(embed=discord.Embed(description=output, color=characters[character][1]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
@@ -663,7 +673,7 @@ async def chat(interaction: discord.Interaction, character: characters_literal, 
 @app_commands.describe(character="Voice to use.", text="Text to speak.")
 @app_commands.allowed_installs(True, True)
 @app_commands.allowed_contexts(True, True, True)
-async def tts(interaction: discord.Interaction, character: characters_literal, text: app_commands.Range[str, 3, 1024]):
+async def tts(interaction: discord.Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
     Synthesize text-to-speech for a character, excluding alts and "all".
     :param interaction: Interaction created by the command
