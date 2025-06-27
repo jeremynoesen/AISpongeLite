@@ -562,15 +562,12 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
                     choice = random.choice(sfx_triggered[sfx][0])
                     combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-10, 0)) - choice.dBFS), position)
 
-        # Add the transition SFX to the beginning of the episode
-        combined = silence_transition.append(combined, 0).overlay(sfx_transition)
-
         # Add random SFX to the episode
         for choice in random.choices(list(sfx_random.keys()), list(sfx_random.values()), k=random.randint(1, math.ceil(min(total_lines, 25) / 5))):
             combined = combined.overlay(choice.apply_gain((gain_sfx + random.randint(-5, 5)) - choice.dBFS), random.randrange(len(combined)))
 
-        # Fade out the end of the episode
-        combined = combined.fade_out(len(silence_line))
+        # Add the transition SFX to the beginning of the episode and fade out the end
+        combined = silence_transition.append(combined, 0).overlay(sfx_transition).fade_out(len(silence_line))
 
         # Check if the lag fish should appear
         if "release the fish" in topic_lower or "release the fish" in script_lower:
