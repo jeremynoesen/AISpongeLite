@@ -601,8 +601,8 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 
     # Unblock generation for all users
     finally:
-        await client.change_presence(activity=activity_ready, status=discord.Status.online)
         episode_generating = False
+        await client.change_presence(activity=activity_ready, status=discord.Status.online)
 
 
 @command_tree.command(description="Chat with a character.")
