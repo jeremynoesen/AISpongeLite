@@ -109,11 +109,10 @@ characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "
 # Gain settings for audio segments
 gain_ambiance = -45
 gain_music = -35
-gain_sfx = -20
+gain_sfx = -25
 gain_voice = -15
-gain_voice_distort = 20
 gain_voice_loud = -10
-fade_ambiance = 500
+gain_voice_distort = 20
 
 # Ambiance audio segments
 ambiance_time = {
@@ -124,6 +123,7 @@ ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
 storm_keywords = ["storm", "thunder", "lightning", "tornado", "hurricane"]
 rain_keywords = ["rain", "drizzle", "shower", "sprinkle", "wet"]
 clear_keywords = ["clear", "dry"]
+fade_ambiance = 500
 
 # Music audio segments
 music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav")
