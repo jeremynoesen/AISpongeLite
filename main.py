@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 from discord import app_commands
 from io import BytesIO
-from fakeyou import FakeYou
+from fakeyou import AsyncFakeYou
 from openai import AsyncOpenAI
 from pydub import AudioSegment
 from typing import Literal
@@ -27,12 +27,8 @@ load_dotenv()
 # Log in to OpenAI
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Log in to FakeYou
-fakeyou = FakeYou()
-fakeyou_username = os.getenv("FAKEYOU_USERNAME")
-fakeyou_password = os.getenv("FAKEYOU_PASSWORD")
-if fakeyou_username and fakeyou_password:
-    fakeyou.login(fakeyou_username, fakeyou_password)
+# FakeYou instance
+fakeyou = AsyncFakeYou()
 
 # Set the FakeYou timeout before a line fails
 fakeyou_timeout = 90
@@ -341,9 +337,6 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
         combined = AudioSegment.empty()
         script_lower = ""
 
-        # Loop to run FakeYou requests in
-        loop = asyncio.get_running_loop()
-
         # Process each line
         for line in lines:
 
@@ -389,7 +382,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 
                     # Attempt to synthesize speech
                     try:
-                        fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, output_line, used_model_token), fakeyou_timeout)
+                        fy_tts = await asyncio.wait_for(fakeyou.say(output_line, used_model_token), fakeyou_timeout)
                         with BytesIO(fy_tts.content) as wav:
                             segs.append(AudioSegment.from_wav(wav))
 
@@ -426,7 +419,7 @@ async def episode(interaction: discord.Interaction, topic: app_commands.Range[st
 
                 # Attempt to synthesize speech
                 try:
-                    fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, output_line, model_token), fakeyou_timeout)
+                    fy_tts = await asyncio.wait_for(fakeyou.say(output_line, model_token), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
                     used_model_tokens.add(model_token)
@@ -701,9 +694,6 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
         # Log the interaction
         await logging_channel.send(embed=discord.Embed(title=interaction.user.id, description=f"/tts character:{character} text:{discord.utils.escape_markdown(text)}", color=embed_color))
 
-        # Loop to run FakeYou requests in
-        loop = asyncio.get_running_loop()
-
         # Synthesize speech using voice files for DoodleBob
         if character == "doodlebob":
             seg = random.choice(voice_doodlebob)
@@ -714,7 +704,7 @@ async def tts(interaction: discord.Interaction, character: characters_literal, t
 
         # Synthesize speech using FakeYou for all other characters
         else:
-            fy_tts = await asyncio.wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
+            fy_tts = await asyncio.wait_for(fakeyou.say(text, characters[character][0]), fakeyou_timeout)
             with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
 
@@ -959,6 +949,12 @@ async def on_ready():
     Event handler for when the bot has successfully connected to Discord.
     :return: None
     """
+
+    # Login to FakeYou
+    fakeyou_username = os.getenv("FAKEYOU_USERNAME")
+    fakeyou_password = os.getenv("FAKEYOU_PASSWORD")
+    if fakeyou_username and fakeyou_password:
+        await fakeyou.login(fakeyou_username, fakeyou_password)
 
     # Fetch logging channel and all emojis
     global logging_channel, emojis
