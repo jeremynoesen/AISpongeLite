@@ -948,29 +948,37 @@ async def convert(interaction: Interaction, message: Message):
 @client.event
 async def on_ready():
     """
-    Event handler for when the bot has successfully connected to Discord.
+    Final initializations once the bot has logged in to the Discord API. If this fails, the program will stop.
     :return: None
     """
 
-    # Login to FakeYou
-    fakeyou_username = getenv("FAKEYOU_USERNAME")
-    fakeyou_password = getenv("FAKEYOU_PASSWORD")
-    if fakeyou_username and fakeyou_password:
-        await fakeyou.login(fakeyou_username, fakeyou_password)
+    try:
 
-    # Fetch logging channel and all emojis
-    global logging_channel, emojis
-    logging_channel = await client.fetch_channel(int(getenv("LOGGING_CHANNEL_ID")))
-    emojis = {e.name: e for e in await client.fetch_application_emojis()}
-    for alt in characters["all"][2]:
-        emojis[alt] = emojis["all"]
+        # Login to FakeYou
+        fakeyou_username = getenv("FAKEYOU_USERNAME")
+        fakeyou_password = getenv("FAKEYOU_PASSWORD")
+        if fakeyou_username and fakeyou_password:
+            await fakeyou.login(fakeyou_username, fakeyou_password)
 
-    # Sync command trees
-    await command_tree.sync()
-    await command_tree.sync(guild=moderation_guild)
+        # Fetch logging channel and all emojis
+        global logging_channel, emojis
+        logging_channel = await client.fetch_channel(int(getenv("LOGGING_CHANNEL_ID")))
+        emojis = {e.name: e for e in await client.fetch_application_emojis()}
+        for alt in characters["all"][2]:
+            emojis[alt] = emojis["all"]
 
-    # Set status to ready
-    await client.change_presence(activity=activity_ready, status=Status.online)
+        # Sync command trees
+        await command_tree.sync()
+        await command_tree.sync(guild=moderation_guild)
+
+        # Set status to ready
+        await client.change_presence(activity=activity_ready, status=Status.online)
+
+    except Exception as e:
+
+        # Stop bot if any of the above fails
+        print(e)
+        exit(1)
 
 
 # Start bot (must be at the end of the file)
