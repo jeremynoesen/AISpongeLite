@@ -10,7 +10,7 @@
 
 - We reserve the right to revoke access to the Service at any time for any reason.
 - While using the Service, you agree to obey the following rules:
-  1. No input related to pedophilia, heinous crimes, or non-consensual or detailed sex.
+  1. No input related to pedophilia, heinous crimes, or non-consensual or detailed sexual activities.
   2. No input relating to past or present tragic events or controversial people, political events, or ideas.
   3. No input discriminating based on sex, race, orientation, cultural background, gender identity, or religion.
   4. No input that intimidates, harasses, or repeatedly makes others uncomfortable.
