@@ -130,7 +130,7 @@ music_stars_and_games = AudioSegment.from_wav("music/stars_and_games.wav")
 music_comic_walk = AudioSegment.from_wav("music/comic_walk.wav")
 music_gator = AudioSegment.from_wav("music/gator.wav")
 music_rock_bottom = AudioSegment.from_wav("music/rock_bottom.wav")
-music_breaking_news = AudioSegment.from_wav("music/breaking_news.wav")
+music_just_breaking_softer = AudioSegment.from_mp3("music/just_breaking_softer.mp3")
 music_grass_skirt_chase = AudioSegment.from_wav("music/grass_skirt_chase.wav")
 
 # Locations with their assigned music segments and embed colors
@@ -171,7 +171,7 @@ locations = {
         music_closing_theme: 1
     }, 0xc7b208),
     "news studio": ({
-        music_breaking_news: 1
+        music_just_breaking_softer: 1
     }, 0x4385d2),
     "rock bottom": ({
         music_rock_bottom: 1
