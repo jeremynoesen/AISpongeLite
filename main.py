@@ -13,7 +13,7 @@ from random import randint, randrange, choice, choices
 from re import fullmatch, IGNORECASE
 from time import time
 from typing import Literal
-from discord import Status, Message, Embed, Interaction, Color, Game, ui, utils, Intents, Object, Client, ButtonStyle, File, app_commands
+from discord import Status, Message, Embed, Interaction, Color, Game, ui, utils, Intents, Object, Client, ButtonStyle, File, app_commands, NotFound
 from dotenv import load_dotenv
 from fakeyou import AsyncFakeYou
 from openai import AsyncOpenAI
@@ -385,7 +385,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                             segs.append(AudioSegment.from_wav(wav))
 
                     # Skip line part on failure
-                    except:
+                    except Exception as e:
+                        print(e)
                         continue
 
                     # Avoid rate limiting
@@ -424,7 +425,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                     used_model_tokens.add(model_token)
 
                 # Skip line on failure
-                except:
+                except Exception as e:
+                    print(e)
                     total_lines -= 1
                     continue
 
@@ -586,7 +588,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             file.write(f"E {end_time}\n")
 
     # Generation failed
-    except:
+    except Exception as e:
+        print(e)
         await interaction.edit_original_response(embed=embed_generation_failed)
 
     # Unblock generation for all users
@@ -651,7 +654,8 @@ async def chat(interaction: Interaction, character: characters_literal, message:
             file.write(f"C {int(time())}\n")
 
     # Generation failed
-    except:
+    except Exception as e:
+        print(e)
         await interaction.edit_original_response(embed=embed_generation_failed)
 
     # Unblock generation for this user
@@ -727,7 +731,8 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             file.write(f"T {int(time())}\n")
 
     # Generation failed
-    except:
+    except Exception as e:
+        print(e)
         await interaction.edit_original_response(embed=embed_generation_failed)
 
     # Unblock generation for this user
@@ -838,7 +843,8 @@ async def ban(interaction: Interaction, id: app_commands.Range[str, 17, 19]):
     try:
         id = int(id)
         await client.fetch_user(id)
-    except:
+    except NotFound as e:
+        print(e)
         await interaction.response.send_message(embed=embed_unknown_user, ephemeral=True, delete_after=embed_delete_after)
         return
 
@@ -873,7 +879,8 @@ async def unban(interaction: Interaction, id: app_commands.Range[str, 17, 19]):
     try:
         id = int(id)
         await client.fetch_user(id)
-    except:
+    except NotFound as e:
+        print(e)
         await interaction.response.send_message(embed=embed_unknown_user, ephemeral=True, delete_after=embed_delete_after)
         return
 
@@ -974,9 +981,8 @@ async def on_ready():
         # Set status to ready
         await client.change_presence(activity=activity_ready, status=Status.online)
 
+    # Stop bot if any of the above fails
     except Exception as e:
-
-        # Stop bot if any of the above fails
         print(e)
         exit(1)
 
