@@ -6,17 +6,19 @@
 
 ## About
 
-AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by 
+AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
 ### Characters
-SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Gary*, Sandy, Mrs. Puff, Larry*, Squilliam*, Bubble Bass*, 
+
+SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Gary*, Sandy, Mrs. Puff, Larry*, Squilliam*, Bubble Bass*,
 Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator.
 
 *voice differs from current Rehydrated voice.
 
 ### Locations
-SpongeBob's House, Patrick's House, Squidward's House, Sandy's Treedome, Krusty Krab, Chum Bucket, Boating School, 
+
+SpongeBob's House, Patrick's House, Squidward's House, Sandy's Treedome, Krusty Krab, Chum Bucket, Boating School,
 News Studio, Rock Bottom, and Bikini Bottom.
 
 ## Usage
@@ -34,7 +36,7 @@ News Studio, Rock Bottom, and Bikini Bottom.
 
 ### Context Menu Commands
 
-- `Convert OGG to MP3`: Convert episode or TTS output in OGG format to MP3. Useful for devices that do not support OGG 
+- `Convert OGG to MP3`: Convert episode or TTS output in OGG format to MP3. Useful for devices that do not support OGG
   format.
 
 ## Installation
