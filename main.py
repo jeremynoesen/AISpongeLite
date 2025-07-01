@@ -80,7 +80,7 @@ emojis = {}
 characters = {
     "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", 0xd4b937, ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob", "spongemeal"]),
     "patrick": ("weight_154man2fzg19nrtc15drner7t", 0xf3a18a, ["loudrick", "shortrick", "widerick", "pinhead", "patback"]),
-    "squidward": ("TM:3psksme51515", 0x9fc3b9, ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde", "brokenward"]),
+    "squidward": ("TM:3psksme51515", 0x9fc3b9, ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde", "brokenward", "mikuward"]),
     "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", 0xda1503, ["shadow krabs", "sus krabs", "spin krabs", "ketamine krabs", "annoyed krabs"]),
     "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", 0x044a07, ["loudton", "dickton", "deathton", "suston", "freakton", "wideton", "pickleton", "dr. jr."]),
     "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", 0x7891b8, ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
