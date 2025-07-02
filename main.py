@@ -288,7 +288,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         seconds = remaining % 60
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another episode in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
         return
 
     # Check if an episode is generating
@@ -638,7 +638,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         seconds = remaining % 60
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another chat in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
         return
 
     # Check if the user is using already generating a chat
@@ -726,7 +726,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         seconds = remaining % 60
         if seconds > 0:
             remaining_formatted += f"{seconds}s"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"You are on cooldown.", description=f"`{remaining_formatted}` remaining.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another TTS in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
         return
 
     # Check if the user is using already generating TTS
