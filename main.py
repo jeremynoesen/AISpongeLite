@@ -59,6 +59,7 @@ button_help = ui.Button(style=ButtonStyle.link, label="App Directory", url="http
 embed_in_use_episode = Embed(title="Currently in use.", description="Only one episode can be generated at a time globally.", color=embed_color)
 embed_in_use_chat = Embed(title="Currently in use.", description="You can only generate one chat at a time.", color=embed_color)
 embed_in_use_tts = Embed(title="Currently in use.", description="You can only generate one TTS at a time.", color=embed_color)
+embed_in_use_tts_episode = Embed(title="Currently in use.", description="TTS generation is unavailable while an episode is generating.", color=embed_color)
 embed_generating_episode_start = Embed(title="Generating episode...", description="Generating script...", color=embed_color)
 embed_generating_episode_end = Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color)
 embed_generating_chat = Embed(title="Generating chat...", description="Generating response...", color=embed_color)
@@ -691,6 +692,11 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     # Check if the user is using already generating TTS
     if interaction.user.id in tts_generating:
         await interaction.response.send_message(embed=embed_in_use_tts, ephemeral=True, delete_after=embed_delete_after)
+        return
+
+    # Check if an episode is generating
+    if episode_generating:
+        await interaction.response.send_message(embed=embed_in_use_tts_episode, ephemeral=True, delete_after=embed_delete_after)
         return
 
     # Start generation
