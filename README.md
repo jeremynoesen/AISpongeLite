@@ -26,10 +26,11 @@ News Studio, Rock Bottom, and Bikini Bottom.
 ### Slash Commands
 
 - `/episode`: Generate an episode. Only one episode can be generated at a time globally. There is a 10-minute cooldown
-  upon successful generation, unless you purchase the
-  ["Remove Cooldown" subscription ($1.99/Mo)](https://discord.com/discovery/applications/1254296070599610469/store/1343274119084638239).
-- `/chat`: Chat with a character. You can only generate one chat at a time. There is no cooldown.
-- `/tts`: Synthesize character speech. You can only generate one TTS at a time. There is no cooldown.
+  upon successful generation.
+- `/chat`: Chat with a character. You can only generate one chat at a time. There is a 10-second cooldown upon 
+  successful generation.
+- `/tts`: Synthesize character speech. You can only generate one TTS at a time. There is a 30-second cooldown upon 
+  successful generation.
 - `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all
   time, as well as the number of servers the bot is in, API latency, and uptime.
 - `/help`: Show bot help. This will show a link to the Discord App Directory.
