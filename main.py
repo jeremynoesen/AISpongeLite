@@ -12,7 +12,7 @@ from os import path, getenv
 from random import randint, randrange, choice, choices
 from time import time
 from typing import Literal
-from discord import Status, Message, Embed, Interaction, Color, Game, ui, utils, Intents, Object, Client, ButtonStyle, File, app_commands, NotFound
+from discord import Status, Embed, Interaction, Color, Game, ui, utils, Intents, Client, ButtonStyle, File, app_commands
 from dotenv import load_dotenv
 from fakeyou import FakeYou
 from openai import AsyncOpenAI
@@ -42,10 +42,6 @@ activity_generating = Game("Generating episode...")
 client = Client(intents=Intents.default(), activity=Game("Starting bot..."), status=Status.idle)
 command_tree = app_commands.CommandTree(client)
 
-# Moderation guild and logging channel
-moderation_guild = Object(id=getenv("MODERATION_GUILD_ID"))
-logging_channel = None
-
 # Embed settings and static embeds
 embed_color = Color.dark_embed()
 embed_delete_after = 10
@@ -60,11 +56,6 @@ embed_generating_episode_end = Embed(title="Generating episode...", description=
 embed_generating_chat = Embed(title="Generating chat...", description="Generating response...", color=embed_color)
 embed_generating_tts = Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color)
 embed_generation_failed = Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
-embed_banned = Embed(title="You are banned from using AI Sponge Lite.", color=embed_color).set_image(url="attachment://explodeward.gif")
-embed_unknown_user = Embed(title="Unknown user.", description="That user does not exist.", color=embed_color)
-embed_already_banned = Embed(title="User already banned.", description="That user is already banned.", color=embed_color)
-embed_not_banned = Embed(title="User not banned.", description="That user is not banned.", color=embed_color)
-embed_clearing_logs = Embed(title="Clearing recent logs...", description="Deleting messages...", color=embed_color)
 
 # Emojis for the characters
 emojis = {}
@@ -238,13 +229,6 @@ tts_cooldowns = {}
 # Bot start time for uptime calculation
 start_time = int(time())
 
-# Load bans
-bans = set()
-if path.exists("bans.txt"):
-    with open("bans.txt", "r") as file:
-        for line in file:
-            bans.add(int(line))
-
 
 @command_tree.command(description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
@@ -260,11 +244,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
     # Get global variable
     global episode_generating
-
-    # Check if the user is banned
-    if interaction.user.id in bans:
-        await interaction.response.send_message(embed=embed_banned, file=File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
-        return
 
     # Check if the user is on cooldown
     current_time = int(time())
@@ -290,9 +269,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Show generating message
         await interaction.response.send_message(embed=embed_generating_episode_start)
         await client.change_presence(activity=activity_generating, status=Status.dnd)
-
-        # Log the interaction
-        await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{utils.escape_markdown(topic)}", color=embed_color))
 
         # Generate the script
         completion = await openai.completions.create(
@@ -600,11 +576,6 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     :return: None
     """
 
-    # Check if the user is banned
-    if interaction.user.id in bans:
-        await interaction.response.send_message(embed=embed_banned, file=File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
-        return
-
     # Check if the user is on cooldown
     current_time = int(time())
     if interaction.user.id in chat_cooldowns.keys() and current_time - chat_cooldowns[interaction.user.id] <= chat_cooldown:
@@ -624,9 +595,6 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
         # Show the generating message
         await interaction.response.send_message(embed=embed_generating_chat)
-
-        # Log the interaction
-        await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
 
         # Generate the chat response using OpenAI
         character_title = character.title().replace("bob", "Bob")
@@ -675,11 +643,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     :return: None
     """
 
-    # Check if the user is banned
-    if interaction.user.id in bans:
-        await interaction.response.send_message(embed=embed_banned, file=File("img/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
-        return
-
     # Check if the user is on cooldown
     current_time = int(time())
     if interaction.user.id in tts_cooldowns.keys() and current_time - tts_cooldowns[interaction.user.id] <= tts_cooldown:
@@ -704,9 +667,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
         # Show the generating message
         await interaction.response.send_message(embed=embed_generating_tts)
-
-        # Log the interaction
-        await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{utils.escape_markdown(text)}", color=embed_color))
 
         # Loop to run FakeYou requests in
         loop = get_running_loop()
@@ -844,101 +804,6 @@ async def help(interaction: Interaction):
     await interaction.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=ui.View().add_item(button_help))
 
 
-@command_tree.command(description="Ban a user.", guild=moderation_guild)
-@app_commands.describe(id="ID of user.")
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-@app_commands.default_permissions(ban_members=True)
-async def ban(interaction: Interaction, id: app_commands.Range[str, 17, 19]):
-    """
-    Ban a user by their ID.
-    :param interaction: Interaction created by the command
-    :param id: ID of the user to ban
-    :return: None
-    """
-
-    # Check that the user ID is valid
-    try:
-        id = int(id)
-        await client.fetch_user(id)
-    except NotFound as e:
-        print(e)
-        await interaction.response.send_message(embed=embed_unknown_user, ephemeral=True, delete_after=embed_delete_after)
-        return
-
-    # Check that the user is not already banned
-    if id in bans:
-        await interaction.response.send_message(embed=embed_already_banned, ephemeral=True, delete_after=embed_delete_after)
-        return
-
-    # Add the user to the bans list and file
-    bans.add(id)
-    with open("bans.txt", "a") as file:
-        file.write(f"{id}\n")
-
-    # Show the ban message
-    await interaction.response.send_message(embed=Embed(title="Banned user.", description=f"{id}", color=embed_color))
-
-
-@command_tree.command(description="Unban a user.", guild=moderation_guild)
-@app_commands.describe(id="ID of user.")
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-@app_commands.default_permissions(ban_members=True)
-async def unban(interaction: Interaction, id: app_commands.Range[str, 17, 19]):
-    """
-    Unban a user by their ID.
-    :param interaction: Interaction created by the command
-    :param id: ID of the user to unban
-    :return: None
-    """
-
-    # Check that the user ID is valid
-    try:
-        id = int(id)
-        await client.fetch_user(id)
-    except NotFound as e:
-        print(e)
-        await interaction.response.send_message(embed=embed_unknown_user, ephemeral=True, delete_after=embed_delete_after)
-        return
-
-    # Check that the user is banned
-    if id not in bans:
-        await interaction.response.send_message(embed=embed_not_banned, ephemeral=True, delete_after=embed_delete_after)
-        return
-
-    # Remove the user from the ban list and file
-    bans.discard(id)
-    with open("bans.txt", "w") as file:
-        for line in bans:
-            file.write(f"{line}\n")
-
-    # Show the unban message
-    await interaction.response.send_message(embed=Embed(title="Unbanned user.", description=f"{id}", color=embed_color))
-
-
-@command_tree.command(description="Clear recent logs.", guild=moderation_guild)
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-@app_commands.default_permissions(manage_messages=True)
-async def clear(interaction: Interaction):
-    """
-    Clear the 500 most recent logs from the logging channel.
-    :param interaction: Interaction created by the command
-    :return: None
-    """
-
-    # Show the clearing message
-    await interaction.response.send_message(embed=embed_clearing_logs)
-    response = await interaction.original_response()
-
-    # Purge messages from the logging channel
-    deleted = len(await logging_channel.purge(limit=500, check=lambda message: message.author == client.user and message != response))
-
-    # Show how many messages were deleted
-    await interaction.edit_original_response(embed=Embed(title="Cleared recent logs.", description=f"Deleted `{deleted}` message{('s' if deleted == 0 or deleted > 1 else '')}.", color=embed_color))
-
-
 @client.event
 async def on_ready():
     """
@@ -948,16 +813,14 @@ async def on_ready():
 
     try:
 
-        # Fetch logging channel and all emojis
-        global logging_channel, emojis
-        logging_channel = await client.fetch_channel(int(getenv("LOGGING_CHANNEL_ID")))
+        # Fetch all emojis
+        global emojis
         emojis = {e.name: e for e in await client.fetch_application_emojis()}
         for alt in characters["all"][2]:
             emojis[alt] = emojis["all"]
 
-        # Sync command trees
+        # Sync command tree
         await command_tree.sync()
-        await command_tree.sync(guild=moderation_guild)
 
         # Set status to ready
         await client.change_presence(activity=activity_ready, status=Status.online)
