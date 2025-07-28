@@ -2,8 +2,6 @@
 
 # AI Sponge Lite
 
-[![Discord](https://img.shields.io/discord/1289760166891225088?style=for-the-badge&logo=discord&logoColor=ffffff&label=Support&color=5865F2)](https://discord.gg/4qXZXZF3Vs)
-
 ## About
 
 AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by
@@ -23,32 +21,18 @@ News Studio, Rock Bottom, and Bikini Bottom.
 
 ## Usage
 
-### Slash Commands
+Only one of the following commands can be used at a time globally.
 
-- `/episode`: Generate an episode. Only one episode can be generated at a time globally. There is a 10-minute cooldown
-  upon successful generation.
-- `/chat`: Chat with a character. You can only generate one chat at a time. There is a 10-second cooldown upon 
-  successful generation.
-- `/tts`: Synthesize character speech. You can only generate one TTS at a time. There is a 30-second cooldown upon 
-  successful generation.
-- `/stats`: Show bot statistics. See how many generations have been completed in the last 24 hours and for all
-  time, as well as the number of servers the bot is in, API latency, and uptime.
-- `/help`: Show bot help. This will show a link to the Discord App Directory.
-
-### Context Menu Commands
-
-- `Convert OGG to MP3`: Convert episode or TTS output in OGG format to MP3. Useful for devices that do not support OGG
-  format.
+- `/episode`: Generate an audio-only episode.
+- `/chat`: Chat with a character.
+- `/tts`: Synthesize character speech.
 
 ## Installation
 
-Click the link in the repository description, then click "Add App" on the next page. After that, follow the instructions
-in the popup.
+Coming soon!
 
 ## Demonstration
 
 ![Episode](img/episode.png)
 ![Chat](img/chat.png)
 ![TTS](img/tts.png)
-![Convert](img/convert.png)
-![Stats](img/stats.png)
