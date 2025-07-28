@@ -49,8 +49,8 @@ logging_channel = None
 # Embed settings and static embeds
 embed_color = Color.dark_embed()
 embed_delete_after = 10
-embed_help = Embed(title="See App Directory for help.", description="You will find links to the support server, source code, donations, terms of service, and privacy policy there as well.", color=embed_color)
-button_help = ui.Button(style=ButtonStyle.link, label="App Directory", url="https://discord.com/application-directory/1254296070599610469")
+embed_help = Embed(title="See the GitHub repository for help.", description="You will find the source code and instructions to set up your own instance there as well.", color=embed_color)
+button_help = ui.Button(style=ButtonStyle.link, label="GitHub", url="https://github.com/jeremynoesen/AISpongeLite")
 embed_in_use_episode = Embed(title="Currently in use.", description="Only one episode can be generated at a time globally.", color=embed_color)
 embed_in_use_chat = Embed(title="Currently in use.", description="You can only generate one chat at a time.", color=embed_color)
 embed_in_use_tts = Embed(title="Currently in use.", description="You can only generate one TTS at a time.", color=embed_color)
