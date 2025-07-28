@@ -4,7 +4,7 @@
 
 ## About
 
-AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by
+AI Sponge Lite is a self-hosted Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
 ### Characters
@@ -16,8 +16,8 @@ Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator.
 
 ### Locations
 
-SpongeBob's House, Patrick's House, Squidward's House, Sandy's Treedome, Krusty Krab, Chum Bucket, Boating School,
-News Studio, Rock Bottom, and Bikini Bottom.
+SpongeBob's House, Patrick's House, Squidward's House, Sandy's Treedome, Krusty Krab, Chum Bucket, Boating School, News 
+Studio, Rock Bottom, and Bikini Bottom.
 
 ## Usage
 
@@ -27,12 +27,12 @@ Only one of the following commands can be used at a time globally.
 - `/chat`: Chat with a character.
 - `/tts`: Synthesize character speech.
 
-## Installation
-
-Coming soon!
-
 ## Demonstration
 
 ![Episode](img/episode.png)
 ![Chat](img/chat.png)
 ![TTS](img/tts.png)
+
+## Installation
+
+Coming soon!
