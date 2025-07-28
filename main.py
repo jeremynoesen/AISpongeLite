@@ -8,7 +8,7 @@ Written by Jeremy Noesen
 from asyncio import sleep, wait_for, get_running_loop
 from io import BytesIO
 from math import ceil
-from os import path, getenv
+from os import getenv
 from random import randint, randrange, choice, choices
 from time import time
 from typing import Literal
@@ -225,9 +225,6 @@ chat_cooldown = 10
 chat_cooldowns = {}
 tts_cooldown = 30
 tts_cooldowns = {}
-
-# Bot start time for uptime calculation
-start_time = int(time())
 
 
 @command_tree.command(description="Generate an episode.")
@@ -716,92 +713,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     # Unblock generation for this user
     finally:
         tts_generating.discard(interaction.user.id)
-
-
-@command_tree.command(description="Show bot statistics.")
-@app_commands.allowed_installs(True, True)
-@app_commands.allowed_contexts(True, True, True)
-async def stats(interaction: Interaction):
-    """
-    Show bot statistics including episode, chat, and TTS counts, guilds, latency, and uptime.
-    :param interaction: Interaction created by the command
-    :return: None
-    """
-
-    # Initialize count variables
-    episodes_24h = 0
-    episodes_all = 0
-    chats_24h = 0
-    chats_all = 0
-    tts_24h = 0
-    tts_all = 0
-
-    # Get current time for stat parsing and uptime calculation
-    current_time = int(time())
-
-    # Read the stats file and calculate counts
-    if path.exists("statistics.txt"):
-        with open("statistics.txt", "r") as file:
-            for line in file:
-                line_parts = line.strip().split(" ")
-
-                # Episodes
-                if line_parts[0] == "E":
-                    episodes_all += 1
-                    if current_time - int(line_parts[1]) < 86400:
-                        episodes_24h += 1
-
-                # Chats
-                elif line_parts[0] == "C":
-                    chats_all += 1
-                    if current_time - int(line_parts[1]) < 86400:
-                        chats_24h += 1
-
-                # TTS
-                elif line_parts[0] == "T":
-                    tts_all += 1
-                    if current_time - int(line_parts[1]) < 86400:
-                        tts_24h += 1
-
-    # Calculate uptime
-    uptime = int(current_time - start_time)
-
-    # Format uptime
-    uptime_formatted = ""
-    days = uptime // 86400
-    if days > 0:
-        uptime_formatted += f"{days}d "
-    hours = (uptime % 86400) // 3600
-    if hours > 0:
-        uptime_formatted += f"{hours}h "
-    minutes = (uptime % 3600) // 60
-    if minutes > 0:
-        uptime_formatted += f"{minutes}m "
-    seconds = uptime % 60
-    if seconds > 0:
-        uptime_formatted += f"{seconds}s"
-
-    # Send the statistics message
-    await interaction.response.send_message(embed=Embed(color=embed_color)
-                                      .add_field(name="Episodes", value=f"24h: `{episodes_24h}`\nAll: `{episodes_all}`", inline=False)
-                                      .add_field(name="Chats", value=f"24h: `{chats_24h}`\nAll: `{chats_all}`", inline=False)
-                                      .add_field(name="TTS", value=f"24h: `{tts_24h}`\nAll: `{tts_all}`", inline=False)
-                                      .add_field(name="Bot", value=f"Guilds: `{len(client.guilds)}`\nLatency: `{int(1000 * client.latency)}ms`\nUptime: `{uptime_formatted}`", inline=False),
-                                      ephemeral=True, delete_after=embed_delete_after)
-
-
-@command_tree.command(description="Show bot help.")
-@app_commands.allowed_installs(True, True)
-@app_commands.allowed_contexts(True, True, True)
-async def help(interaction: Interaction):
-    """
-    Show the bot help message.
-    :param interaction: Interaction created by the command
-    :return: None
-    """
-
-    # Show the help message
-    await interaction.response.send_message(embed=embed_help, ephemeral=True, delete_after=embed_delete_after, view=ui.View().add_item(button_help))
 
 
 @client.event
