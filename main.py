@@ -34,11 +34,11 @@ char_limit_min = 3
 char_limit_max = 256
 
 # Discord activity settings
-activity_ready = Game("Ready to generate.")
-activity_generating = Game("Generating episode...")
+activity_idle = Game("Ready.")
+activity_generating = Game("Generating...")
 
 # Initialize Discord client
-client = Client(intents=Intents.default(), activity=Game("Starting bot..."), status=Status.idle)
+client = Client(intents=Intents.default(), activity=Game("Initializing..."), status=Status.idle)
 command_tree = app_commands.CommandTree(client)
 
 # Embed settings and static embeds
@@ -46,10 +46,7 @@ embed_color = Color.dark_embed()
 embed_delete_after = 10
 embed_help = Embed(title="See the GitHub repository for help.", description="You will find the source code and instructions to set up your own instance there as well.", color=embed_color)
 button_help = ui.Button(style=ButtonStyle.link, label="GitHub", url="https://github.com/jeremynoesen/AISpongeLite")
-embed_in_use_episode = Embed(title="Currently in use.", description="Only one episode can be generated at a time globally.", color=embed_color)
-embed_in_use_chat = Embed(title="Currently in use.", description="You can only generate one chat at a time.", color=embed_color)
-embed_in_use_tts = Embed(title="Currently in use.", description="You can only generate one TTS at a time.", color=embed_color)
-embed_in_use_tts_episode = Embed(title="Currently in use.", description="TTS generation is unavailable while an episode is generating.", color=embed_color)
+embed_in_use = Embed(title="Currently in use.", description="Please wait for the current generation to finish.", color=embed_color)
 embed_generating_episode_start = Embed(title="Generating episode...", description="Generating script...", color=embed_color)
 embed_generating_episode_end = Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color)
 embed_generating_chat = Embed(title="Generating chat...", description="Generating response...", color=embed_color)
@@ -212,10 +209,8 @@ silence_line = AudioSegment.silent(200)
 silence_transition = AudioSegment.silent(600)
 silence_music = AudioSegment.silent(3000)
 
-# Generation states
-episode_generating = False
-chat_generating = set()
-tts_generating = set()
+# Generation state
+generating = False
 
 
 @command_tree.command(description="Generate an episode.")
@@ -231,18 +226,18 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
     """
 
     # Get global variable
-    global episode_generating
+    global generating
 
-    # Check if an episode is generating
-    if episode_generating:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use_episode)
+    # Check if something is generating
+    if generating:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
         return
 
     # Start generation
     try:
 
-        # Block generation for all users
-        episode_generating = True
+        # Block generation
+        generating = True
 
         # Show generating message
         await interaction.response.send_message(embed=embed_generating_episode_start)
@@ -527,10 +522,10 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         print(e)
         await interaction.edit_original_response(embed=embed_generation_failed)
 
-    # Unblock generation for all users
+    # Unblock generation
     finally:
-        episode_generating = False
-        await client.change_presence(activity=activity_ready, status=Status.online)
+        generating = False
+        await client.change_presence(activity=activity_idle, status=Status.online)
 
 
 @command_tree.command(description="Chat with a character.")
@@ -546,19 +541,23 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     :return: None
     """
 
-    # Check if the user is using already generating a chat
-    if interaction.user.id in chat_generating:
-        await interaction.response.send_message(embed=embed_in_use_chat, ephemeral=True, delete_after=embed_delete_after)
+    # Get global variable
+    global generating
+
+    # Check if something is generating
+    if generating:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
         return
 
     # Start generation
     try:
 
-        # Block generation for this user
-        chat_generating.add(interaction.user.id)
+        # Block generation
+        generating = True
 
-        # Show the generating message
+        # Show generating message
         await interaction.response.send_message(embed=embed_generating_chat)
+        await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Generate the chat response using OpenAI
         character_title = character.title().replace("bob", "Bob")
@@ -581,9 +580,10 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         print(e)
         await interaction.edit_original_response(embed=embed_generation_failed)
 
-    # Unblock generation for this user
+    # Unblock generation
     finally:
-        chat_generating.discard(interaction.user.id)
+        generating = False
+        await client.change_presence(activity=activity_idle, status=Status.online)
 
 
 @command_tree.command(description="Synthesize character speech.")
@@ -599,24 +599,23 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     :return: None
     """
 
-    # Check if the user is using already generating TTS
-    if interaction.user.id in tts_generating:
-        await interaction.response.send_message(embed=embed_in_use_tts, ephemeral=True, delete_after=embed_delete_after)
-        return
+    # Get global variable
+    global generating
 
-    # Check if an episode is generating
-    if episode_generating:
-        await interaction.response.send_message(embed=embed_in_use_tts_episode, ephemeral=True, delete_after=embed_delete_after)
+    # Check if something is generating
+    if generating:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
         return
 
     # Start generation
     try:
 
-        # Block generation for this user
-        tts_generating.add(interaction.user.id)
+        # Block generation
+        generating = True
 
-        # Show the generating message
+        # Show generating message
         await interaction.response.send_message(embed=embed_generating_tts)
+        await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Loop to run FakeYou requests in
         loop = get_running_loop()
@@ -655,9 +654,10 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         print(e)
         await interaction.edit_original_response(embed=embed_generation_failed)
 
-    # Unblock generation for this user
+    # Unblock generation
     finally:
-        tts_generating.discard(interaction.user.id)
+        generating = False
+        await client.change_presence(activity=activity_idle, status=Status.online)
 
 
 @client.event
@@ -679,7 +679,7 @@ async def on_ready():
         await command_tree.sync()
 
         # Set status to ready
-        await client.change_presence(activity=activity_ready, status=Status.online)
+        await client.change_presence(activity=activity_idle, status=Status.online)
 
     # Stop bot if any of the above fails
     except Exception as e:
