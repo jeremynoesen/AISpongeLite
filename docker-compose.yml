@@ -5,5 +5,3 @@ services:
       context: .
     restart: unless-stopped
     network_mode: host
-    volumes:
-      - ./:/usr/src/app
