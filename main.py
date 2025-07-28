@@ -10,7 +10,6 @@ from io import BytesIO
 from math import ceil
 from os import getenv
 from random import randint, randrange, choice, choices
-from time import time
 from typing import Literal
 from discord import Status, Embed, Interaction, Color, Game, ui, utils, Intents, Client, ButtonStyle, File, app_commands
 from dotenv import load_dotenv
@@ -218,14 +217,6 @@ episode_generating = False
 chat_generating = set()
 tts_generating = set()
 
-# Cooldowns
-episode_cooldown = 600
-episode_cooldowns = {}
-chat_cooldown = 10
-chat_cooldowns = {}
-tts_cooldown = 30
-tts_cooldowns = {}
-
 
 @command_tree.command(description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
@@ -241,16 +232,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
     # Get global variable
     global episode_generating
-
-    # Check if the user is on cooldown
-    current_time = int(time())
-    if interaction.user.id in episode_cooldowns.keys() and current_time - episode_cooldowns[interaction.user.id] <= episode_cooldown:
-        remaining = episode_cooldown - (current_time - episode_cooldowns[interaction.user.id])
-        remaining_formatted = f"{remaining % 60}s"
-        if remaining >= 60:
-            remaining_formatted = f"{remaining // 60}m {remaining_formatted}"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another episode in `{remaining_formatted}`.", color=embed_color))
-        return
 
     # Check if an episode is generating
     if episode_generating:
@@ -541,14 +522,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             await interaction.edit_original_response(embed=output_embed, attachments=[
                 File(output, f"{file_title}.mp3")])
 
-        # Set cooldown for user
-        end_time = int(time())
-        episode_cooldowns[interaction.user.id] = end_time
-
-        # Record successful episode generation in statistics
-        with open("statistics.txt", "a") as file:
-            file.write(f"E {end_time}\n")
-
     # Generation failed
     except Exception as e:
         print(e)
@@ -572,12 +545,6 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     :param message: Message to send to the character
     :return: None
     """
-
-    # Check if the user is on cooldown
-    current_time = int(time())
-    if interaction.user.id in chat_cooldowns.keys() and current_time - chat_cooldowns[interaction.user.id] <= chat_cooldown:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another chat in `{chat_cooldown - (current_time - chat_cooldowns[interaction.user.id])}s`.", color=embed_color))
-        return
 
     # Check if the user is using already generating a chat
     if interaction.user.id in chat_generating:
@@ -609,14 +576,6 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character][1]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
-        # Set cooldown for user
-        end_time = int(time())
-        chat_cooldowns[interaction.user.id] = end_time
-
-        # Record successful chat generation in statistics
-        with open("statistics.txt", "a") as file:
-            file.write(f"C {end_time}\n")
-
     # Generation failed
     except Exception as e:
         print(e)
@@ -639,12 +598,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     :param text: Text to speak
     :return: None
     """
-
-    # Check if the user is on cooldown
-    current_time = int(time())
-    if interaction.user.id in tts_cooldowns.keys() and current_time - tts_cooldowns[interaction.user.id] <= tts_cooldown:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another TTS in `{tts_cooldown - (current_time - tts_cooldowns[interaction.user.id])}s`.", color=embed_color))
-        return
 
     # Check if the user is using already generating TTS
     if interaction.user.id in tts_generating:
@@ -696,14 +649,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             character_title = character.title().replace('bob', 'Bob')
             await interaction.edit_original_response(embed=Embed(color=characters[character][1]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.mp3")])
-
-        # Set cooldown for user
-        end_time = int(time())
-        tts_cooldowns[interaction.user.id] = end_time
-
-        # Record successful TTS generation in statistics
-        with open("statistics.txt", "a") as file:
-            file.write(f"T {end_time}\n")
 
     # Generation failed
     except Exception as e:
