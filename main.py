@@ -55,7 +55,8 @@ embed_generating_tts = Embed(title="Generating TTS...", description="Synthesizin
 embed_generation_failed = Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
 
 # Regex patterns for actions in script
-regex_actions = r"(^)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+)"
+regex_actions = r"(:\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)([^\S\r\n]+)"
+regex_replacement = r"\1"
 
 # Emojis for the characters
 emojis = {}
@@ -255,7 +256,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         )
 
         # Clean the script
-        lines = sub(regex_actions, "", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
+        lines = sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
@@ -572,7 +573,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         )
 
         # Clean the response text
-        output = utils.escape_markdown(sub(regex_actions, "", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
+        output = utils.escape_markdown(sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
         if len(output) > char_limit_max:
             output = output[:char_limit_max - 3] + "..."
 
