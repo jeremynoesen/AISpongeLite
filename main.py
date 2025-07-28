@@ -69,8 +69,6 @@ embed_unknown_user = Embed(title="Unknown user.", description="That user does no
 embed_already_banned = Embed(title="User already banned.", description="That user is already banned.", color=embed_color)
 embed_not_banned = Embed(title="User not banned.", description="That user is not banned.", color=embed_color)
 embed_clearing_logs = Embed(title="Clearing recent logs...", description="Deleting messages...", color=embed_color)
-embed_no_file = Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color)
-embed_converting_file = Embed(title="Converting file...", description="Converting file from OGG to MP3...", color=embed_color)
 
 # Emojis for the characters
 emojis = {}
@@ -570,9 +568,9 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Export the episode and send it
         with BytesIO() as output:
-            combined.export(output, "ogg")
+            combined.export(output, "mp3", bitrate="384k")
             await interaction.edit_original_response(embed=output_embed, attachments=[
-                File(output, f"{file_title}.ogg")])
+                File(output, f"{file_title}.mp3")])
 
         # Set cooldown for user
         end_time = int(time())
@@ -741,10 +739,10 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
         # Export and send the file
         with BytesIO() as output:
-            seg.export(output, "ogg")
+            seg.export(output, "mp3", bitrate="384k")
             character_title = character.title().replace('bob', 'Bob')
             await interaction.edit_original_response(embed=Embed(color=characters[character][1]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
-                File(output, f"{character_title} — {text}.ogg")])
+                File(output, f"{character_title} — {text}.mp3")])
 
         # Set cooldown for user
         end_time = int(time())
@@ -943,37 +941,6 @@ async def clear(interaction: Interaction):
 
     # Show how many messages were deleted
     await interaction.edit_original_response(embed=Embed(title="Cleared recent logs.", description=f"Deleted `{deleted}` message{('s' if deleted == 0 or deleted > 1 else '')}.", color=embed_color))
-
-
-@command_tree.context_menu(name="Convert OGG to MP3")
-@app_commands.allowed_installs(True, True)
-@app_commands.allowed_contexts(True, True, True)
-async def convert(interaction: Interaction, message: Message):
-    """
-    Convert an OGG file sent by the bot to MP3 format.
-    :param interaction: Interaction created by the context menu command
-    :param message: Message the command was run on
-    :return: None
-    """
-
-    # Check if the message is from the bot and has an OGG attachment
-    if message.author != client.user or not message.attachments or message.attachments[0].filename[-3:].lower() != "ogg":
-        await interaction.response.send_message(embed=embed_no_file, ephemeral=True, delete_after=embed_delete_after)
-        return
-
-    # Show the converting message
-    await interaction.response.send_message(embed=embed_converting_file)
-
-    # Download the OGG file
-    with BytesIO() as input:
-        await message.attachments[0].save(input)
-        seg = AudioSegment.from_ogg(input)
-
-    # Convert to MP3 and send the file
-    with BytesIO() as output:
-        seg.export(output, "mp3")
-        await interaction.edit_original_response(embed=None, attachments=[
-            File(output, f"{message.attachments[0].filename[:-3]}mp3")])
 
 
 @client.event
