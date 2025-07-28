@@ -26,10 +26,6 @@ openai = AsyncOpenAI(api_key=getenv("OPENAI_API_KEY"))
 
 # Log in to FakeYou
 fakeyou = FakeYou()
-fakeyou_username = getenv("FAKEYOU_USERNAME")
-fakeyou_password = getenv("FAKEYOU_PASSWORD")
-if fakeyou_username and fakeyou_password:
-    fakeyou.login(fakeyou_username, fakeyou_password)
 
 # Set the FakeYou timeout before a line fails
 fakeyou_timeout = 90
