@@ -71,8 +71,6 @@ embed_not_banned = Embed(title="User not banned.", description="That user is not
 embed_clearing_logs = Embed(title="Clearing recent logs...", description="Deleting messages...", color=embed_color)
 embed_no_file = Embed(title="No episode or TTS found.", description="This can only be used on OGG files sent by this bot.", color=embed_color)
 embed_converting_file = Embed(title="Converting file...", description="Converting file from OGG to MP3...", color=embed_color)
-remove_cooldowns_sku = int(getenv("REMOVE_COOLDOWNS_SKU"))
-remove_cooldowns_button = ui.Button(style=ButtonStyle.premium, sku_id=remove_cooldowns_sku)
 
 # Emojis for the characters
 emojis = {}
@@ -281,7 +279,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         remaining_formatted = f"{remaining % 60}s"
         if remaining >= 60:
             remaining_formatted = f"{remaining // 60}m {remaining_formatted}"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another episode in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another episode in `{remaining_formatted}`.", color=embed_color))
         return
 
     # Check if an episode is generating
@@ -576,15 +574,9 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             await interaction.edit_original_response(embed=output_embed, attachments=[
                 File(output, f"{file_title}.ogg")])
 
-        # Set cooldown for user if they do not have the remove cooldowns entitlement
+        # Set cooldown for user
         end_time = int(time())
-        remove_cooldown = False
-        for entitlement in interaction.entitlements:
-            if entitlement.sku_id == remove_cooldowns_sku and not entitlement.is_expired():
-                remove_cooldown = True
-                break
-        if not remove_cooldown:
-            episode_cooldowns[interaction.user.id] = end_time
+        episode_cooldowns[interaction.user.id] = end_time
 
         # Record successful episode generation in statistics
         with open("statistics.txt", "a") as file:
@@ -622,7 +614,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     # Check if the user is on cooldown
     current_time = int(time())
     if interaction.user.id in chat_cooldowns.keys() and current_time - chat_cooldowns[interaction.user.id] <= chat_cooldown:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another chat in `{chat_cooldown - (current_time - chat_cooldowns[interaction.user.id])}s`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another chat in `{chat_cooldown - (current_time - chat_cooldowns[interaction.user.id])}s`.", color=embed_color))
         return
 
     # Check if the user is using already generating a chat
@@ -658,15 +650,9 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character][1]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
-        # Set cooldown for user if they do not have the remove cooldowns entitlement
+        # Set cooldown for user
         end_time = int(time())
-        remove_cooldown = False
-        for entitlement in interaction.entitlements:
-            if entitlement.sku_id == remove_cooldowns_sku and not entitlement.is_expired():
-                remove_cooldown = True
-                break
-        if not remove_cooldown:
-            chat_cooldowns[interaction.user.id] = end_time
+        chat_cooldowns[interaction.user.id] = end_time
 
         # Record successful chat generation in statistics
         with open("statistics.txt", "a") as file:
@@ -703,7 +689,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     # Check if the user is on cooldown
     current_time = int(time())
     if interaction.user.id in tts_cooldowns.keys() and current_time - tts_cooldowns[interaction.user.id] <= tts_cooldown:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another TTS in `{tts_cooldown - (current_time - tts_cooldowns[interaction.user.id])}s`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another TTS in `{tts_cooldown - (current_time - tts_cooldowns[interaction.user.id])}s`.", color=embed_color))
         return
 
     # Check if the user is using already generating TTS
@@ -760,15 +746,9 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             await interaction.edit_original_response(embed=Embed(color=characters[character][1]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.ogg")])
 
-        # Set cooldown for user if they do not have the remove cooldowns entitlement
+        # Set cooldown for user
         end_time = int(time())
-        remove_cooldown = False
-        for entitlement in interaction.entitlements:
-            if entitlement.sku_id == remove_cooldowns_sku and not entitlement.is_expired():
-                remove_cooldown = True
-                break
-        if not remove_cooldown:
-            tts_cooldowns[interaction.user.id] = end_time
+        tts_cooldowns[interaction.user.id] = end_time
 
         # Record successful TTS generation in statistics
         with open("statistics.txt", "a") as file:
