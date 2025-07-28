@@ -215,8 +215,8 @@ generating = False
 
 @command_tree.command(description="Generate an episode.")
 @app_commands.describe(topic="Topic of episode.")
-@app_commands.allowed_installs(True, True)
-@app_commands.allowed_contexts(True, True, True)
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
 async def episode(interaction: Interaction, topic: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
     Generate an audio episode where characters discuss a topic.
@@ -530,8 +530,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
 @command_tree.command(description="Chat with a character.")
 @app_commands.describe(character="Character to chat with.", message="Message to send.")
-@app_commands.allowed_installs(True, True)
-@app_commands.allowed_contexts(True, True, True)
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
 async def chat(interaction: Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
     Chat with one of the characters, excluding alts and "all".
@@ -588,8 +588,8 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
 @command_tree.command(description="Synthesize character speech.")
 @app_commands.describe(character="Voice to use.", text="Text to speak.")
-@app_commands.allowed_installs(True, True)
-@app_commands.allowed_contexts(True, True, True)
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
 async def tts(interaction: Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
     Synthesize text-to-speech for a character, excluding alts and "all".
