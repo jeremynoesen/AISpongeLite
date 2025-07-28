@@ -279,15 +279,12 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         return
 
     # Check if the user is on cooldown
-    if interaction.user.id in episode_cooldowns.keys() and int(time()) - episode_cooldowns[interaction.user.id] <= episode_cooldown:
-        remaining = episode_cooldown - (int(time()) - episode_cooldowns[interaction.user.id])
-        remaining_formatted = ""
-        minutes = remaining // 60
-        if minutes > 0:
-            remaining_formatted += f"{minutes}m "
-        seconds = remaining % 60
-        if seconds > 0:
-            remaining_formatted += f"{seconds}s"
+    current_time = int(time())
+    if interaction.user.id in episode_cooldowns.keys() and current_time - episode_cooldowns[interaction.user.id] <= episode_cooldown:
+        remaining = episode_cooldown - (current_time - episode_cooldowns[interaction.user.id])
+        remaining_formatted = f"{remaining % 60}s"
+        if remaining >= 60:
+            remaining_formatted = f"{remaining // 60}m {remaining_formatted}"
         await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another episode in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
         return
 
@@ -629,16 +626,9 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         return
 
     # Check if the user is on cooldown
-    if interaction.user.id in chat_cooldowns.keys() and int(time()) - chat_cooldowns[interaction.user.id] <= chat_cooldown:
-        remaining = chat_cooldown - (int(time()) - chat_cooldowns[interaction.user.id])
-        remaining_formatted = ""
-        minutes = remaining // 60
-        if minutes > 0:
-            remaining_formatted += f"{minutes}m "
-        seconds = remaining % 60
-        if seconds > 0:
-            remaining_formatted += f"{seconds}s"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another chat in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+    current_time = int(time())
+    if interaction.user.id in chat_cooldowns.keys() and current_time - chat_cooldowns[interaction.user.id] <= chat_cooldown:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another chat in `{chat_cooldown - (current_time - chat_cooldowns[interaction.user.id])}s`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
         return
 
     # Check if the user is using already generating a chat
@@ -686,7 +676,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
         # Record successful chat generation in statistics
         with open("statistics.txt", "a") as file:
-            file.write(f"C {int(time())}\n")
+            file.write(f"C {end_time}\n")
 
     # Generation failed
     except Exception as e:
@@ -717,16 +707,9 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         return
 
     # Check if the user is on cooldown
-    if interaction.user.id in tts_cooldowns.keys() and int(time()) - tts_cooldowns[interaction.user.id] <= tts_cooldown:
-        remaining = tts_cooldown - (int(time()) - tts_cooldowns[interaction.user.id])
-        remaining_formatted = ""
-        minutes = remaining // 60
-        if minutes > 0:
-            remaining_formatted += f"{minutes}m "
-        seconds = remaining % 60
-        if seconds > 0:
-            remaining_formatted += f"{seconds}s"
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another TTS in `{remaining_formatted}`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
+    current_time = int(time())
+    if interaction.user.id in tts_cooldowns.keys() and current_time - tts_cooldowns[interaction.user.id] <= tts_cooldown:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=Embed(title=f"Command on cooldown.", description=f"You can generate another TTS in `{tts_cooldown - (current_time - tts_cooldowns[interaction.user.id])}s`.", color=embed_color), view=ui.View().add_item(remove_cooldowns_button))
         return
 
     # Check if the user is using already generating TTS
@@ -794,7 +777,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
         # Record successful TTS generation in statistics
         with open("statistics.txt", "a") as file:
-            file.write(f"T {int(time())}\n")
+            file.write(f"T {end_time}\n")
 
     # Generation failed
     except Exception as e:
