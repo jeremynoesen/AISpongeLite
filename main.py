@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from fakeyou import FakeYou
 from openai import AsyncOpenAI
 from pydub import AudioSegment
+from re import sub
 
 # Load .env
 load_dotenv()
@@ -52,6 +53,9 @@ embed_generating_episode_end = Embed(title="Generating episode...", description=
 embed_generating_chat = Embed(title="Generating chat...", description="Generating response...", color=embed_color)
 embed_generating_tts = Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color)
 embed_generation_failed = Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
+
+# Regex patterns for actions in script
+regex_actions = r"(^)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)(\s+)"
 
 # Emojis for the characters
 emojis = {}
@@ -251,7 +255,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         )
 
         # Clean the script
-        lines = completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
+        lines = sub(regex_actions, "", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
@@ -568,7 +572,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         )
 
         # Clean the response text
-        output = utils.escape_markdown(completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip())
+        output = utils.escape_markdown(sub(regex_actions, "", completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
         if len(output) > char_limit_max:
             output = output[:char_limit_max - 3] + "..."
 
