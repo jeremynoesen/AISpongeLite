@@ -8,7 +8,7 @@ Written by Jeremy Noesen
 from asyncio import sleep, wait_for, get_running_loop
 from io import BytesIO
 from math import ceil
-from os import getenv
+from os import getenv, listdir
 from random import randint, randrange, choice, choices
 from typing import Literal
 from discord import Status, Embed, Interaction, Color, Game, ui, utils, Intents, Client, ButtonStyle, File, app_commands
@@ -674,9 +674,18 @@ async def on_ready():
 
     try:
 
-        # Fetch all emojis
+        # Fetch all application emojis
         global emojis
         emojis = {e.name: e for e in await client.fetch_application_emojis()}
+
+        # Create missing application emojis
+        for emoji_file in listdir("emoji"):
+            emoji_name = emoji_file.split(".")[0]
+            if emoji_name not in emojis.keys():
+                with open(f"emoji/{emoji_file}", "rb") as file:
+                    emojis[emoji_name] = await client.create_application_emoji(name=emoji_name, image=file.read())
+
+        # Add "all" emoji aliases
         for alt in characters["all"][2]:
             emojis[alt] = emojis["all"]
 
