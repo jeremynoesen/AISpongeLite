@@ -744,6 +744,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
             with BytesIO(fy_tts.content) as wav:
                 seg = AudioSegment.from_wav(wav)
+            await sleep(10)
 
         # Apply gain, forcing a loud event if the text is uppercase
         if text.isupper():
