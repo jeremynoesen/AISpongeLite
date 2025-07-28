@@ -35,7 +35,7 @@ char_limit_min = 3
 char_limit_max = 256
 
 # Discord activity settings
-activity_ready = Game(getenv("MOTD", "Ready to generate."))
+activity_ready = Game("Ready to generate.")
 activity_generating = Game("Generating episode...")
 
 # Initialize Discord client
