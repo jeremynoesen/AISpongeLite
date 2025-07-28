@@ -10,7 +10,6 @@ from io import BytesIO
 from math import ceil
 from os import path, getenv
 from random import randint, randrange, choice, choices
-from re import fullmatch, IGNORECASE
 from time import time
 from typing import Literal
 from discord import Status, Message, Embed, Interaction, Color, Game, ui, utils, Intents, Object, Client, ButtonStyle, File, app_commands, NotFound
@@ -75,9 +74,6 @@ embed_converting_file = Embed(title="Converting file...", description="Convertin
 remove_cooldowns_sku = int(getenv("REMOVE_COOLDOWNS_SKU"))
 remove_cooldowns_button = ui.Button(style=ButtonStyle.premium, sku_id=remove_cooldowns_sku)
 
-# Regex patterns
-regex_meow = r"(\W*m+e+o+w+s*\W*)+"
-
 # Emojis for the characters
 emojis = {}
 
@@ -89,7 +85,7 @@ characters = {
     "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", 0xda1503, ["shadow krabs", "sus krabs", "spin krabs", "ketamine krabs", "annoyed krabs"]),
     "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", 0x044a07, ["loudton", "dickton", "deathton", "suston", "freakton", "wideton", "pickleton", "dr. jr."]),
     "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", 0x7891b8, ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
-    "gary": ("weight_ak3kb7kvye39r6c63tydsveyy", 0xca8e93, ["weird gary"]),
+    "gary": ("", 0xca8e93, ["weird gary"]),
     "sandy": ("TM:214sp1nxxd63", 0xede0db, []),
     "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", 0xd8ab72, []),
     "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", 0xe46704, []),
@@ -418,10 +414,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 seg = choice(voice_doodlebob)
 
             # Synthesize speech using voice files for Gary
-            elif (character == "gary" or character in characters["gary"][2]) and fullmatch(regex_meow, output_line,
-                                                                                           IGNORECASE):
+            elif character == "gary" or character in characters["gary"][2]:
                 seg = choice(voice_gary)
-                used_model_tokens.add(model_token)
 
             # Synthesize speech using FakeYou for all other characters
             else:
@@ -742,7 +736,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             seg = choice(voice_doodlebob)
 
         # Synthesize speech using voice files for Gary
-        elif character == "gary" and fullmatch(regex_meow, text, IGNORECASE):
+        elif character == "gary":
             seg = choice(voice_gary)
 
         # Synthesize speech using FakeYou for all other characters
