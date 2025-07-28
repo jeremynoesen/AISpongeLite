@@ -517,7 +517,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Export the episode and send it
         with BytesIO() as output:
-            combined.export(output, "mp3", bitrate="384k")
+            combined.export(output, "mp3", bitrate="256k")
             await interaction.edit_original_response(embed=output_embed, attachments=[
                 File(output, f"{file_title}.mp3")])
 
@@ -648,7 +648,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
         # Export and send the file
         with BytesIO() as output:
-            seg.export(output, "mp3", bitrate="384k")
+            seg.export(output, "mp3", bitrate="256k")
             character_title = character.title().replace('bob', 'Bob')
             await interaction.edit_original_response(embed=Embed(color=characters[character][1]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.mp3")])
