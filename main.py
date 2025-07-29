@@ -35,7 +35,7 @@ char_limit_min = 3
 char_limit_max = 256
 
 # Discord activity settings
-activity_idle = Game("Ready.")
+activity_ready = Game("Ready.")
 activity_generating = Game("Generating...")
 
 # Initialize Discord client
@@ -530,7 +530,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
     # Unblock generation
     finally:
         generating = False
-        await client.change_presence(activity=activity_idle, status=Status.online)
+        await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @command_tree.command(description="Chat with a character.")
@@ -588,7 +588,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     # Unblock generation
     finally:
         generating = False
-        await client.change_presence(activity=activity_idle, status=Status.online)
+        await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @command_tree.command(description="Synthesize character speech.")
@@ -662,7 +662,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     # Unblock generation
     finally:
         generating = False
-        await client.change_presence(activity=activity_idle, status=Status.online)
+        await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @client.event
@@ -673,6 +673,16 @@ async def on_ready():
     """
 
     try:
+
+        # Set bot avatar if it is missing
+        if client.user.avatar is None:
+            with open("img/Logo.gif", "rb") as file:
+                await client.user.edit(avatar=file.read())
+
+        # Set bot banner if it is missing
+        if client.user.banner is None:
+            with open("img/Banner.png", "rb") as file:
+                await client.user.edit(banner=file.read())
 
         # Fetch all application emojis
         global emojis
@@ -693,7 +703,7 @@ async def on_ready():
         await command_tree.sync()
 
         # Set status to ready
-        await client.change_presence(activity=activity_idle, status=Status.online)
+        await client.change_presence(activity=activity_ready, status=Status.online)
 
     # Stop bot if any of the above fails
     except Exception as e:
