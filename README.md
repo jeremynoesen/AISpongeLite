@@ -47,7 +47,7 @@ Only one of the following commands can be used at a time globally.
 Do not worry about uploading an avatar, a banner, or any emojis. When running the bot for the first time, they will
 upload automatically.
 
-### OpenAI API Key
+### OpenAI API Key and Billing
 
 1. Log in to the [OpenAI Platform](https://platform.openai.com/).
 2. In the top right corner, click the settings icon.
@@ -55,6 +55,11 @@ upload automatically.
 4. In the top right, click on "Create new secret key".
 5. Name the key (e.g., "AI Sponge Lite"), select a project, and click "Create secret key".
 6. Copy the key. You will need it later.
+7. In the left sidebar, click on "Billing".
+8. On the top of this page, click "Payment methods".
+9. Click "Add payment method" and enter your payment information.
+10. On the top of this page, click "Overview".
+11. Click "Add to credit balance". $5 will keep the bot running for about six months.
 
 ### Install Script
 
