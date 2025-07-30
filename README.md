@@ -73,5 +73,5 @@ then follow these instructions. MacOS is not supported by the install script at 
 4. When prompted, enter the Discord bot token and OpenAI API key you copied earlier.
 5. Once the script is finished, you can delete the `install.sh` script.
 
-After all of these steps, the bot should be installed in a folder called `AISpongeLite` in the directory where you ran
-the script. The bot will automatically start on boot and run in the background.
+The bot will be ready to use once its status changes to "Ready.". You may need to restart your Discord client for the 
+bot's avatar, banner, and commands to appear.
