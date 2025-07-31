@@ -12,6 +12,8 @@ AI Sponge Lite is a self-hosted Discord bot that generates parody AI Sponge audi
 SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Gary*, Sandy, Mrs. Puff, Larry*, Squilliam*, Bubble Bass*,
 Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator.
 
+Character names must be written exactly as shown above, excluding capitalization.
+
 *voice differs from current Rehydrated voice.
 
 ### Locations
@@ -19,13 +21,18 @@ Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator.
 SpongeBob's House, Patrick's House, Squidward's House, Sandy's Treedome, Krusty Krab, Chum Bucket, Boating School, News
 Studio, Rock Bottom, and Bikini Bottom.
 
+Locations must be written exactly as shown above, excluding capitalization.
+
 ## Usage
 
-Only one of the following commands can be used at a time globally.
+Only one of the following commands can be used at a time globally:
 
-- `/episode`: Generate an audio-only episode.
-- `/chat`: Chat with a character.
-- `/tts`: Synthesize character speech.
+- `/episode`: Generate an audio-only episode. If an episode takes longer than 15 minutes to generate, it will be
+  automatically cancelled due to Discord's interaction timeout limit.
+- `/chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is sent
+  so the character can address you.
+- `/tts`: Synthesize character speech. This is a shortcut to FakeYou's service. It is also the only way to access
+  Squidward's and Sandy's Rehydrated voice models.
 
 ## Demonstration
 
@@ -66,14 +73,14 @@ upload automatically.
 The following instructions are for Linux (Ubuntu, Debian, Fedora, Red Hat, and CentOS). For Windows, please install WSL,
 then follow these instructions. MacOS is not supported by the install script at the moment.
 
-1. From this repository, download the `install.sh` script. Save it where you would like to install the bot. Do not 
+1. From this repository, download the `install.sh` script. Save it where you would like to install the bot. Do not
    download the entire repository.
 2. Open a terminal and navigate to the directory where you saved the script.
 3. Run the script with the command `sudo bash install.sh`.
 4. When prompted, enter the Discord bot token and OpenAI API key you copied earlier.
 5. Once the script is finished, you can delete the `install.sh` script.
 
-The bot will be ready to use once its status changes to "Ready.". You may need to restart your Discord client for the 
+The bot will be ready to use once its status changes to "Ready.". You may need to restart your Discord client for the
 bot's avatar, banner, and commands to appear.
 
 ## Updating
