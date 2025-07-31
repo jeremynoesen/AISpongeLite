@@ -207,7 +207,7 @@ sfx_lightning = AudioSegment.from_wav("sfx/lightning.wav")
 
 # Voice audio segments
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
-voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 9)]
+voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 19)]
 
 # Silence audio segments
 silence_line = AudioSegment.silent(200)
