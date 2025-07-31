@@ -7,6 +7,9 @@
 AI Sponge Lite is a self-hosted Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
+There used to be a public instance of this bot with a little over 1,800 installations; however, it was shut down due to
+several FakeYou device and account bans.
+
 ### Characters
 
 SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Gary*, Sandy, Mrs. Puff, Larry*, Squilliam*, Bubble Bass*,
@@ -41,6 +44,8 @@ Only one of the following commands can be used at a time globally:
 ![TTS](img/tts.png)
 
 ## Installation
+
+Installing AI Sponge Lite is only recommended for users who are comfortable with Linux and the command line.
 
 ### Discord Bot Token
 
