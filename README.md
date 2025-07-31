@@ -41,14 +41,19 @@ Only one of the following commands can be used at a time globally:
 
 Installing AI Sponge Lite is only recommended for users who are comfortable with Linux and the command line.
 
-### Discord Bot Token
+### Discord Application and Token
 
 1. Log in to the [Discord Developer Portal](https://discord.com/developers/applications).
 2. In the top right corner, click on "New Application".
 3. Name your application (e.g., "AI Sponge Lite"), click the checkbox at the bottom of the popup, and click "Create".
 4. In the left sidebar, click on "Bot".
 5. Scroll down slightly and click on "Reset Token". Then click "Yes, do it!" to confirm.
-6. Copy the token. You will need it later.
+6. Copy the token to your clipboard or a text file. You will need it later.
+7. In the left sidebar, click on "General Information".
+8. Scroll down slightly and click "Copy" under "Application ID".
+9. In your web browser, enter this URL, replacing `APP_ID` with your application ID:
+   https://discord.com/api/oauth2/authorize?client_id=APP_ID&permissions=0&scope=bot%20applications.commands
+10. Select a server to add the bot to, then click "Authorize".
 
 Do not worry about uploading an avatar, a banner, or any emojis. When running the bot for the first time, they will
 upload automatically.
@@ -60,17 +65,17 @@ upload automatically.
 3. In the left sidebar, click on "API Keys".
 4. In the top right, click on "Create new secret key".
 5. Name the key (e.g., "AI Sponge Lite"), select a project, and click "Create secret key".
-6. Copy the key. You will need it later.
+6. Copy the key to your clipboard or a text file. You will need it later.
 7. In the left sidebar, click on "Billing".
 8. On the top of this page, click "Payment methods".
 9. Click "Add payment method" and enter your payment information.
 10. On the top of this page, click "Overview".
 11. Click "Add to credit balance". $5 will keep the bot running for about six months.
 
-### Install Script
+### Installation Script
 
 The following instructions are for Linux (Ubuntu, Debian, Fedora, Red Hat, and CentOS). For Windows, please install WSL,
-then follow these instructions. MacOS is not supported by the install script at the moment.
+then follow these instructions. MacOS is not supported by the installation script at the moment.
 
 1. From this repository, download the `install.sh` script. Save it where you would like to install the bot. Do not
    download the entire repository.
