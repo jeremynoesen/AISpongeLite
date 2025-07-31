@@ -78,5 +78,9 @@ bot's avatar, banner, and commands to appear.
 
 ## Updating
 
-1. Navigate to the `AISpongeLite` directory the bot was installed to.
+If you have modified the bot's files in any way, you will need to revert those changes before updating.
+
+1. In a terminal, navigate to the `AISpongeLite` directory the bot was installed to.
 2. Run the command `sudo bash install.sh`.
+
+The bot will be ready to use once its status changes to "Ready.". 
