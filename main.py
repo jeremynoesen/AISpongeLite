@@ -78,8 +78,7 @@ characters = {
     "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", 0x79919b, []),
     "doodlebob": ("", 0x9a96a1, []),
     "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", 0x988f6e, []),
-    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", 0xa8865f, []),
-    "all": ("", 0, ["every", "unison", "together", "both"])
+    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", 0xa8865f, [])
 }
 
 # Characters literal type for command arguments
@@ -279,7 +278,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
-        used_model_tokens = set()
         combined = AudioSegment.empty()
         script_lower = ""
 
@@ -324,39 +322,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             if len(output_line) > char_limit_max:
                 output_line = output_line[:char_limit_max - 3] + "..."
 
-            # Synthesize speech using FakeYou for all characters that have spoken
-            if character == "all" or character in characters["all"][2]:
-                segs = []
-                for used_model_token in used_model_tokens:
-
-                    # Attempt to synthesize speech
-                    try:
-                        fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, output_line, used_model_token), fakeyou_timeout)
-                        with BytesIO(fy_tts.content) as wav:
-                            segs.append(AudioSegment.from_wav(wav))
-
-                    # Skip line part on failure
-                    except Exception as e:
-                        print(e)
-                        continue
-
-                    # Avoid rate limiting
-                    finally:
-                        await sleep(10)
-
-                # Skip line on failure
-                if len(segs) == 0:
-                    total_lines -= 1
-                    continue
-
-                # Combine all voice lines
-                segs.sort(key=lambda seg: -len(seg))
-                seg = segs[0]
-                for i in range(1, len(segs)):
-                    seg = seg.overlay(segs[i], 0)
-
             # Synthesize speech using voice files for DoodleBob
-            elif character == "doodlebob" or character in characters["doodlebob"][2]:
+            if character == "doodlebob" or character in characters["doodlebob"][2]:
                 seg = choice(voice_doodlebob)
 
             # Synthesize speech using voice files for Gary
@@ -371,7 +338,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                     fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, output_line, model_token), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
-                    used_model_tokens.add(model_token)
 
                 # Skip line on failure
                 except Exception as e:
@@ -539,7 +505,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 @app_commands.allowed_contexts(True, False, True)
 async def chat(interaction: Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
-    Chat with one of the characters, excluding alts and "all".
+    Chat with one of the characters, excluding alts.
     :param interaction: Interaction created by the command
     :param character: Character to chat with
     :param message: Message to send to the character
@@ -597,7 +563,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 @app_commands.allowed_contexts(True, False, True)
 async def tts(interaction: Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
-    Synthesize text-to-speech for a character, excluding alts and "all".
+    Synthesize text-to-speech for a character, excluding alts.
     :param interaction: Interaction created by the command
     :param character: Character voice to use for TTS
     :param text: Text to speak
@@ -696,10 +662,6 @@ async def on_ready():
             if emoji_name not in emojis.keys():
                 with open(f"emoji/{emoji_file}", "rb") as file:
                     emojis[emoji_name] = await client.create_application_emoji(name=emoji_name, image=file.read())
-
-        # Add "all" emoji aliases
-        for alt in characters["all"][2]:
-            emojis[alt] = emojis["all"]
 
         # Sync command tree
         await command_tree.sync()
