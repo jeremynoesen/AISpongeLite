@@ -75,3 +75,8 @@ then follow these instructions. MacOS is not supported by the install script at 
 
 The bot will be ready to use once its status changes to "Ready.". You may need to restart your Discord client for the 
 bot's avatar, banner, and commands to appear.
+
+## Updating
+
+1. Navigate to the `AISpongeLite` directory the bot was installed to.
+2. Run the command `sudo bash install.sh`.
