@@ -37,12 +37,6 @@ Only one of the following commands can be used at a time globally:
 - `/tts`: Synthesize character speech. This is a shortcut to FakeYou's service. It is also the only way to access
   Squidward's and Sandy's Rehydrated voice models.
 
-## Demonstration
-
-![Episode](img/episode.png)
-![Chat](img/chat.png)
-![TTS](img/tts.png)
-
 ## Installation
 
 Installing AI Sponge Lite is only recommended for users who are comfortable with Linux and the command line.
@@ -95,4 +89,10 @@ If you have modified the bot's files in any way, you will need to revert those c
 1. In a terminal, navigate to the `AISpongeLite` directory the bot was installed to.
 2. Run the command `sudo bash install.sh`.
 
-The bot will be ready to use once its status changes to "Ready.". 
+The bot will be ready to use once its status changes to "Ready.".
+
+## Demonstration
+
+![Episode](img/episode.png)
+![Chat](img/chat.png)
+![TTS](img/tts.png)
