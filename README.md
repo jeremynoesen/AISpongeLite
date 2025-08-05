@@ -84,7 +84,7 @@ then follow these instructions. MacOS is not supported by the installation scrip
 4. When prompted, enter the Discord bot token and OpenAI API key you copied earlier.
 5. Once the script is finished, you can delete the `install.sh` script.
 
-The bot will be ready to use once its status changes to "Ready.". You may need to restart your Discord client for the
+The bot will be ready to use once its status changes to "Ready!". You may need to restart your Discord client for the
 bot's avatar, banner, and commands to appear.
 
 ## Updating
@@ -94,7 +94,7 @@ If you have modified the bot's files in any way, you will need to revert those c
 1. In a terminal, navigate to the `AISpongeLite` directory the bot was installed to.
 2. Run the command `sudo bash install.sh`.
 
-The bot will be ready to use once its status changes to "Ready.".
+The bot will be ready to use once its status changes to "Ready!".
 
 ## Demonstration
 
