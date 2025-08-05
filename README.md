@@ -34,7 +34,7 @@ Only one of the following commands can be used at a time globally:
   automatically cancelled due to Discord's interaction timeout limit.
 - `/chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is sent
   so the character can address you.
-- `/tts`: Synthesize character speech. This is a shortcut to FakeYou's service. It is also the only way to access
+- `/tts`: Make a character speak text. This is a shortcut to FakeYou's service. It is also the only way to access
   Squidward's and Sandy's Rehydrated voice models.
 
 ## Installation
