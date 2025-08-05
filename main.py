@@ -543,7 +543,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
 
 @command_tree.command(description="Make a character speak text.")
-@app_commands.describe(character="Character's voice to use.", text="Text to speak.")
+@app_commands.describe(character="Character to speak text.", text="Text to speak.")
 @app_commands.allowed_installs(True, False)
 @app_commands.allowed_contexts(True, False, True)
 async def tts(interaction: Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
