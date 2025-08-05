@@ -11,7 +11,7 @@ from math import ceil
 from os import getenv, listdir
 from random import randint, randrange, choice, choices
 from typing import Literal
-from discord import Status, Embed, Interaction, Color, Game, ui, utils, Intents, Client, ButtonStyle, File, app_commands
+from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
 from dotenv import load_dotenv
 from fakeyou import FakeYou
 from openai import AsyncOpenAI
@@ -35,7 +35,7 @@ char_limit_min = 3
 char_limit_max = 256
 
 # Discord activity settings
-activity_ready = Game("Ready.")
+activity_ready = Game("Ready!")
 activity_generating = Game("Generating...")
 
 # Initialize Discord client
@@ -45,14 +45,12 @@ command_tree = app_commands.CommandTree(client)
 # Embed settings and static embeds
 embed_color = Color.dark_embed()
 embed_delete_after = 10
-embed_help = Embed(title="See the GitHub repository for help.", description="You will find the source code and instructions to set up your own instance there as well.", color=embed_color)
-button_help = ui.Button(style=ButtonStyle.link, label="GitHub", url="https://github.com/jeremynoesen/AISpongeLite")
-embed_in_use = Embed(title="Currently in use.", description="Please wait for the current generation to finish.", color=embed_color)
-embed_generating_episode_start = Embed(title="Generating episode...", description="Generating script...", color=embed_color)
-embed_generating_episode_end = Embed(title="Generating episode...", description="Adding music, ambiance, and SFX...", color=embed_color)
-embed_generating_chat = Embed(title="Generating chat...", description="Generating response...", color=embed_color)
-embed_generating_tts = Embed(title="Generating TTS...", description="Synthesizing line...", color=embed_color)
-embed_generation_failed = Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
+embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
+embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
+embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
+embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
+embed_failed = Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
+embed_in_use = Embed(title="Please wait.", description="The bot is currently in use.", color=embed_color)
 
 # Regex patterns for actions in script
 regex_actions = r"(:\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)([^\S\r\n]+)"
@@ -244,7 +242,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         generating = True
 
         # Show generating message
-        await interaction.response.send_message(embed=embed_generating_episode_start)
+        await interaction.response.send_message(embed=embed_episode_start)
         await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Generate the script
@@ -288,7 +286,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         for line in lines:
 
             # Update generation status
-            await interaction.edit_original_response(embed=Embed(title="Generating episode...", description=f"Synthesizing line `{current_line}/{min(total_lines, 25)}`...", color=embed_color))
+            await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{current_line}/{min(total_lines, 25)}`...", color=embed_color))
 
             # Skip line if it is too short or improperly formatted
             line_parts = line.split(":", 1)
@@ -308,23 +306,23 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 total_lines -= 1
                 continue
 
-            # Set the text to synthesize and to show
+            # Set the text to speak and to show
             output_line = line_parts[1].strip()
             if len(output_line) > char_limit_max:
                 output_line = output_line[:char_limit_max - 3] + "..."
 
-            # Synthesize speech using voice files for DoodleBob
+            # Speak line using voice files for DoodleBob
             if character == "doodlebob" or character in characters["doodlebob"][2]:
                 seg = choice(voice_doodlebob)
 
-            # Synthesize speech using voice files for Gary
+            # Speak line using voice files for Gary
             elif character == "gary" or character in characters["gary"][2]:
                 seg = choice(voice_gary)
 
-            # Synthesize speech using FakeYou for all other characters
+            # Speak line using FakeYou for all other characters
             else:
 
-                # Attempt to synthesize speech
+                # Attempt to speak line
                 try:
                     fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, output_line, characters[character][0]), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
@@ -377,7 +375,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 break
 
         # Show final generating message
-        await interaction.edit_original_response(embed=embed_generating_episode_end)
+        await interaction.edit_original_response(embed=embed_episode_end)
 
         # Add silence at the end of the episode
         combined = combined.append(silence_line, 0)
@@ -478,7 +476,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
     # Generation failed
     except Exception as e:
         print(e)
-        await interaction.edit_original_response(embed=embed_generation_failed)
+        await interaction.edit_original_response(embed=embed_failed)
 
     # Unblock generation
     finally:
@@ -514,7 +512,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         generating = True
 
         # Show generating message
-        await interaction.response.send_message(embed=embed_generating_chat)
+        await interaction.response.send_message(embed=embed_chat)
         await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Generate the chat response using OpenAI
@@ -536,7 +534,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     # Generation failed
     except Exception as e:
         print(e)
-        await interaction.edit_original_response(embed=embed_generation_failed)
+        await interaction.edit_original_response(embed=embed_failed)
 
     # Unblock generation
     finally:
@@ -544,13 +542,13 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         await client.change_presence(activity=activity_ready, status=Status.online)
 
 
-@command_tree.command(description="Synthesize character speech.")
-@app_commands.describe(character="Voice to use.", text="Text to speak.")
+@command_tree.command(description="Make a character speak text.")
+@app_commands.describe(character="Character's voice to use.", text="Text to speak.")
 @app_commands.allowed_installs(True, False)
 @app_commands.allowed_contexts(True, False, True)
 async def tts(interaction: Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
-    Synthesize text-to-speech for a character.
+    Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
     :param character: Character voice to use for TTS
     :param text: Text to speak
@@ -572,21 +570,21 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         generating = True
 
         # Show generating message
-        await interaction.response.send_message(embed=embed_generating_tts)
+        await interaction.response.send_message(embed=embed_tts)
         await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Loop to run FakeYou requests in
         loop = get_running_loop()
 
-        # Synthesize speech using voice files for DoodleBob
+        # Speak text using voice files for DoodleBob
         if character == "doodlebob":
             seg = choice(voice_doodlebob)
 
-        # Synthesize speech using voice files for Gary
+        # Speak text using voice files for Gary
         elif character == "gary":
             seg = choice(voice_gary)
 
-        # Synthesize speech using FakeYou for all other characters
+        # Speak text using FakeYou for all other characters
         else:
             fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
             with BytesIO(fy_tts.content) as wav:
@@ -612,7 +610,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     # Generation failed
     except Exception as e:
         print(e)
-        await interaction.edit_original_response(embed=embed_generation_failed)
+        await interaction.edit_original_response(embed=embed_failed)
 
     # Unblock generation
     finally:
