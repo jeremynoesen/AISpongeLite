@@ -61,24 +61,24 @@ regex_replacement = r"\1"
 # Emojis for the characters
 emojis = {}
 
-# Characters dictionary with their model tokens, embed colors, and alts
+# Characters dictionary with their model tokens and embed colors
 characters = {
-    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", 0xd4b937, ["loudbob", "freakbob", "sadbob", "nerdbob", "susbob", "gigglebob", "spongemeal"]),
-    "patrick": ("weight_154man2fzg19nrtc15drner7t", 0xf3a18a, ["loudrick", "shortrick", "widerick", "pinhead", "patback"]),
-    "squidward": ("TM:3psksme51515", 0x9fc3b9, ["loudward", "schizoward", "shadeward", "spinward", "gyattward", "skodwarde", "brokenward", "mikuward", "deadward"]),
-    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", 0xee4115, ["shadow krabs", "sus krabs", "spin krabs", "ketamine krabs", "annoyed krabs"]),
-    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", 0x26732b, ["loudton", "dickton", "deathton", "suston", "freakton", "wideton", "pickleton", "dr. jr."]),
-    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", 0x7891b8, ["evil karen", "snarky karen", "smart karen", "hydra karen"]),
-    "gary": ("", 0xca8e93, ["weird gary"]),
-    "sandy": ("TM:214sp1nxxd63", 0xede0db, []),
-    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", 0xd8ab72, []),
-    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", 0xe46704, []),
-    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", 0xd5f0d7, []),
-    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", 0xd9c481, ["bubble ass"]),
-    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", 0x79919b, []),
-    "doodlebob": ("", 0x9a96a1, []),
-    "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", 0x988f6e, []),
-    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", 0xa8865f, [])
+    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", 0xd4b937),
+    "patrick": ("weight_154man2fzg19nrtc15drner7t", 0xf3a18a),
+    "squidward": ("TM:3psksme51515", 0x9fc3b9),
+    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", 0xee4115),
+    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", 0x26732b),
+    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", 0x7891b8),
+    "gary": ("", 0xca8e93),
+    "sandy": ("TM:214sp1nxxd63", 0xede0db),
+    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", 0xd8ab72),
+    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", 0xe46704),
+    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", 0xd5f0d7),
+    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", 0xd9c481),
+    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", 0x79919b),
+    "doodlebob": ("", 0x9a96a1),
+    "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", 0x988f6e),
+    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", 0xa8865f)
 }
 
 # Characters literal type for command arguments
@@ -223,7 +223,7 @@ generating = False
 @app_commands.allowed_contexts(True, False, True)
 async def episode(interaction: Interaction, topic: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
-    Generate an audio episode where characters discuss a topic.
+    Generate an audio episode about a topic.
     :param interaction: Interaction created by the command
     :param topic: Topic of the episode
     :return: None
@@ -296,19 +296,10 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 total_lines -= 1
                 continue
 
-            # Get the character and model token
+            # Get the character
             character = ""
-            model_token = ""
             for key in characters.keys():
-                model_token = characters[key][0]
-                line_parts[0] = line_parts[0].lower()
-                for alt in characters[key][2]:
-                    if alt in line_parts[0]:
-                        character = alt
-                        break
-                if character:
-                    break
-                if key in line_parts[0]:
+                if key in line_parts[0].lower():
                     character = key
                     break
 
@@ -335,7 +326,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
                 # Attempt to synthesize speech
                 try:
-                    fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, output_line, model_token), fakeyou_timeout)
+                    fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, output_line, characters[character][0]), fakeyou_timeout)
                     with BytesIO(fy_tts.content) as wav:
                         seg = AudioSegment.from_wav(wav)
 
@@ -350,7 +341,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                     await sleep(10)
 
             # Apply gain, forcing a loud event sometimes
-            if "loud" in character or output_line.isupper() or randrange(20) == 0:
+            if output_line.isupper() or randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
                 output_line = output_line.upper()
@@ -478,10 +469,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Add the transition SFX to the beginning of the episode and fade out the end
         combined = silence_transition.append(combined, 0).overlay(sfx_transition).fade_out(len(silence_line))
 
-        # Check if the lag fish should appear
-        if "release the fish" in topic_lower or "release the fish" in script_lower:
-            output_embed.set_thumbnail(url=emojis["lagfish"].url)
-
         # Export the episode and send it
         with BytesIO() as output:
             combined.export(output, "mp3", bitrate="256k")
@@ -505,7 +492,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 @app_commands.allowed_contexts(True, False, True)
 async def chat(interaction: Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
-    Chat with one of the characters, excluding alts.
+    Chat with one of the characters.
     :param interaction: Interaction created by the command
     :param character: Character to chat with
     :param message: Message to send to the character
@@ -563,7 +550,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 @app_commands.allowed_contexts(True, False, True)
 async def tts(interaction: Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
     """
-    Synthesize text-to-speech for a character, excluding alts.
+    Synthesize text-to-speech for a character.
     :param interaction: Interaction created by the command
     :param character: Character voice to use for TTS
     :param text: Text to speak
