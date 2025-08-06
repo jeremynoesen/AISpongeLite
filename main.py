@@ -312,11 +312,11 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 output_line = output_line[:char_limit_max - 3] + "..."
 
             # Speak line using voice files for DoodleBob
-            if character == "doodlebob" or character in characters["doodlebob"][2]:
+            if character == "doodlebob":
                 seg = choice(voice_doodlebob)
 
             # Speak line using voice files for Gary
-            elif character == "gary" or character in characters["gary"][2]:
+            elif character == "gary":
                 seg = choice(voice_gary)
 
             # Speak line using FakeYou for all other characters
