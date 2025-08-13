@@ -49,8 +49,8 @@ embed_episode_start = Embed(title="Generating...", description="Writing script..
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
 embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
-embed_failed = Embed(title="Generation failed.", description="An error occurred.", color=embed_color)
-embed_in_use = Embed(title="Please wait.", description="The bot is currently in use.", color=embed_color)
+embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
+embed_in_use = Embed(title="Busy.", description="Currently in use.", color=embed_color)
 
 # Regex patterns for actions in script
 regex_actions = r"(:\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)([^\S\r\n]+)"
