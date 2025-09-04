@@ -43,7 +43,7 @@ client = Client(intents=Intents.default(), activity=Game("Initializing..."), sta
 command_tree = app_commands.CommandTree(client)
 
 # Embed settings and static embeds
-embed_color = Color.dark_embed()
+embed_color = Color.dark_theme()
 embed_delete_after = 10
 embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
