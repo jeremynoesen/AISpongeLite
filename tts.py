@@ -33,6 +33,7 @@ characters = {
     "french narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j"
 }
 
+
 async def speak(character: str, text: str):
     """
     Speak a line of text as a character using FakeYou TTS.
