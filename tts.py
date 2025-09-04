@@ -6,11 +6,20 @@ Written by Jeremy Noesen
 
 from asyncio import sleep, wait_for, get_running_loop
 from io import BytesIO
+from os import getenv
+from dotenv import load_dotenv
 from fakeyou import FakeYou
 from pydub import AudioSegment
 
+# Load .env
+load_dotenv()
+
 # Log in to FakeYou
 fakeyou = FakeYou()
+fakeyou_username = getenv("FAKEYOU_USERNAME")
+fakeyou_password = getenv("FAKEYOU_PASSWORD")
+if fakeyou_username and fakeyou_password:
+    fakeyou.login(fakeyou_username, fakeyou_password)
 
 # Set the FakeYou timeout before a line fails
 fakeyou_timeout = 90
