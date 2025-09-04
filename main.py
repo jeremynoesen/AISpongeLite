@@ -5,7 +5,6 @@ AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, 
 Written by Jeremy Noesen
 """
 
-from asyncio import sleep, wait_for, get_running_loop
 from io import BytesIO
 from math import ceil
 from os import getenv, listdir
@@ -13,10 +12,10 @@ from random import randint, randrange, choice, choices
 from typing import Literal
 from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
 from dotenv import load_dotenv
-from fakeyou import FakeYou
 from openai import AsyncOpenAI
 from pydub import AudioSegment
 from re import sub
+from tts import speak
 
 # Load .env
 load_dotenv()
@@ -24,13 +23,7 @@ load_dotenv()
 # Log in to OpenAI
 openai = AsyncOpenAI(api_key=getenv("OPENAI_API_KEY"))
 
-# Log in to FakeYou
-fakeyou = FakeYou()
-
-# Set the FakeYou timeout before a line fails
-fakeyou_timeout = 90
-
-# Set the input and output char limits, determined based on what FakeYou actually generates
+# Set the input and output char limits
 char_limit_min = 3
 char_limit_max = 256
 
@@ -59,24 +52,24 @@ regex_replacement = r"\1"
 # Emojis for the characters
 emojis = {}
 
-# Characters dictionary with their model tokens and embed colors
+# Characters dictionary with their embed colors
 characters = {
-    "spongebob": ("weight_5by9kjm8vr8xsp7abe8zvaxc8", 0xd4b937),
-    "patrick": ("weight_154man2fzg19nrtc15drner7t", 0xf3a18a),
-    "squidward": ("TM:3psksme51515", 0x9fc3b9),
-    "mr. krabs": ("weight_5bxbp9xqy61svfx03b25ezmwx", 0xee4115),
-    "plankton": ("weight_ahxbf2104ngsgyegncaefyy6j", 0x26732b),
-    "karen": ("weight_eckp92cd68r4yk68n6re3fwcb", 0x7891b8),
-    "gary": ("", 0xca8e93),
-    "sandy": ("TM:214sp1nxxd63", 0xede0db),
-    "mrs. puff": ("weight_129qhgze57zhndkkcq83e6b2a", 0xd8ab72),
-    "larry": ("weight_k7qvaffwsft6vxbcps4wbyj58", 0xe46704),
-    "squilliam": ("weight_zmjv8223ed6wx1fp234c79v9s", 0xd5f0d7),
-    "bubble bass": ("weight_h9g7rh6tj2hvfezrz8gjs4gwa", 0xd9c481),
-    "bubble buddy": ("weight_sbr0372ysxbdahcvej96axy1t", 0x79919b),
-    "doodlebob": ("", 0x9a96a1),
-    "realistic fish head": ("weight_m1a1yqf9f2v8s1evfzcffk4k0", 0x988f6e),
-    "french narrator": ("weight_edzcfmq6y0vj7pte9pzhq5b6j", 0xa8865f)
+    "spongebob": 0xd4b937,
+    "patrick": 0xf3a18a,
+    "squidward": 0x9fc3b9,
+    "mr. krabs": 0xee4115,
+    "plankton": 0x26732b,
+    "karen": 0x7891b8,
+    "gary": 0xca8e93,
+    "sandy": 0xede0db,
+    "mrs. puff": 0xd8ab72,
+    "larry": 0xe46704,
+    "squilliam": 0xd5f0d7,
+    "bubble bass": 0xd9c481,
+    "bubble buddy": 0x79919b,
+    "doodlebob": 0x9a96a1,
+    "realistic fish head": 0x988f6e,
+    "french narrator": 0xa8865f
 }
 
 # Characters literal type for command arguments
@@ -279,9 +272,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         combined = AudioSegment.empty()
         script_lower = ""
 
-        # Loop to run FakeYou requests in
-        loop = get_running_loop()
-
         # Process each line
         for line in lines:
 
@@ -319,24 +309,17 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             elif character == "gary":
                 seg = choice(voice_gary)
 
-            # Speak line using FakeYou for all other characters
+            # Speak line for all other characters
             else:
 
                 # Attempt to speak line
                 try:
-                    fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, output_line, characters[character][0]), fakeyou_timeout)
-                    with BytesIO(fy_tts.content) as wav:
-                        seg = AudioSegment.from_wav(wav)
+                    seg = await speak(character, output_line)
 
                 # Skip line on failure
-                except Exception as e:
-                    print(e)
+                except:
                     total_lines -= 1
                     continue
-
-                # Avoid rate limiting
-                finally:
-                    await sleep(10)
 
             # Apply gain, forcing a loud event sometimes
             if output_line.isupper() or randrange(20) == 0:
@@ -474,8 +457,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 File(output, f"{file_title}.mp3")])
 
     # Generation failed
-    except Exception as e:
-        print(e)
+    except:
         await interaction.edit_original_response(embed=embed_failed)
 
     # Unblock generation
@@ -529,11 +511,10 @@ async def chat(interaction: Interaction, character: characters_literal, message:
             output = output[:char_limit_max - 3] + "..."
 
         # Send the response
-        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character][1]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
+        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
     # Generation failed
-    except Exception as e:
-        print(e)
+    except:
         await interaction.edit_original_response(embed=embed_failed)
 
     # Unblock generation
@@ -573,9 +554,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         await interaction.response.send_message(embed=embed_tts)
         await client.change_presence(activity=activity_generating, status=Status.dnd)
 
-        # Loop to run FakeYou requests in
-        loop = get_running_loop()
-
         # Speak text using voice files for DoodleBob
         if character == "doodlebob":
             seg = choice(voice_doodlebob)
@@ -584,14 +562,9 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         elif character == "gary":
             seg = choice(voice_gary)
 
-        # Speak text using FakeYou for all other characters
+        # Speak text using TTS for all other characters
         else:
-            fy_tts = await wait_for(loop.run_in_executor(None, fakeyou.say, text, characters[character][0]), fakeyou_timeout)
-            with BytesIO(fy_tts.content) as wav:
-                seg = AudioSegment.from_wav(wav)
-
-            # Avoid rate limiting
-            await sleep(10)
+            seg = await speak(character, text)
 
         # Apply gain, forcing a loud event if the text is uppercase
         if text.isupper():
@@ -604,12 +577,11 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         with BytesIO() as output:
             seg.export(output, "mp3", bitrate="256k")
             character_title = character.title().replace('bob', 'Bob')
-            await interaction.edit_original_response(embed=Embed(color=characters[character][1]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+            await interaction.edit_original_response(embed=Embed(color=characters[character]).set_footer(text=text, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.mp3")])
 
     # Generation failed
-    except Exception as e:
-        print(e)
+    except:
         await interaction.edit_original_response(embed=embed_failed)
 
     # Unblock generation
@@ -655,8 +627,7 @@ async def on_ready():
         await client.change_presence(activity=activity_ready, status=Status.online)
 
     # Stop bot if any of the above fails
-    except Exception as e:
-        print(e)
+    except:
         exit(1)
 
 
