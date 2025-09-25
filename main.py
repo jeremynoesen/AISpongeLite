@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from openai import AsyncOpenAI
 from pydub import AudioSegment
 from re import sub
-from tts import speak
+from tts import speak, allow_parallel
 
 # Load .env
 load_dotenv()
@@ -233,11 +233,12 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
     try:
 
         # Block generation
-        generating = True
+        if not allow_parallel:
+            generating = True
+            await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Show generating message
         await interaction.response.send_message(embed=embed_episode_start)
-        await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Generate the script
         completion = await openai.completions.create(
@@ -462,8 +463,9 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
     # Unblock generation
     finally:
-        generating = False
-        await client.change_presence(activity=activity_ready, status=Status.online)
+        if not allow_parallel:
+            generating = False
+            await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @command_tree.command(description="Chat with a character.")
@@ -491,11 +493,12 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     try:
 
         # Block generation
-        generating = True
+        if not allow_parallel:
+            generating = True
+            await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Show generating message
         await interaction.response.send_message(embed=embed_chat)
-        await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Generate the chat response using OpenAI
         character_title = character.title().replace("bob", "Bob")
@@ -519,8 +522,9 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
     # Unblock generation
     finally:
-        generating = False
-        await client.change_presence(activity=activity_ready, status=Status.online)
+        if not allow_parallel:
+            generating = False
+            await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @command_tree.command(description="Make a character speak text.")
@@ -548,11 +552,12 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     try:
 
         # Block generation
-        generating = True
+        if not allow_parallel:
+            generating = True
+            await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Show generating message
         await interaction.response.send_message(embed=embed_tts)
-        await client.change_presence(activity=activity_generating, status=Status.dnd)
 
         # Speak text using voice files for DoodleBob
         if character == "doodlebob":
@@ -586,8 +591,9 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
     # Unblock generation
     finally:
-        generating = False
-        await client.change_presence(activity=activity_ready, status=Status.online)
+        if not allow_parallel:
+            generating = False
+            await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @client.event

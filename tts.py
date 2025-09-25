@@ -42,6 +42,9 @@ characters = {
     "french narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j"
 }
 
+# Whether to allow parallel requests
+allow_parallel = False
+
 
 async def speak(character: str, text: str):
     """
