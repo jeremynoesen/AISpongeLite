@@ -198,6 +198,7 @@ sfx_lightning = AudioSegment.from_wav("sfx/lightning.wav")
 # Voice audio segments
 voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
 voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 19)]
+voice_failed = AudioSegment.from_wav("voice/failed.wav")
 
 # Silence audio segments
 silence_line = AudioSegment.silent(200)
@@ -316,10 +317,9 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 try:
                     seg = await speak(character, output_line)
 
-                # Skip line on failure
+                # Failed sound effect on failure
                 except:
-                    total_lines -= 1
-                    continue
+                    seg = voice_failed
 
             # Apply gain, forcing a loud event sometimes
             if output_line.isupper() or randrange(20) == 0:
@@ -562,7 +562,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         elif character == "gary":
             seg = choice(voice_gary)
 
-        # Speak text using TTS for all other characters
+        # Speak line for all other characters
         else:
             seg = await speak(character, text)
 
