@@ -33,6 +33,8 @@ else
     # Prompt user tokens
     read -p "Enter your Discord bot token: " DISCORD_BOT_TOKEN
     read -p "Enter your OpenAI API key: " OPENAI_API_KEY
+    read -p "Enter your FakeYou username or press enter to skip: " FAKEYOU_USERNAME
+    read -p "Enter your FakeYou password or press enter to skip: " FAKEYOU_PASSWORD
 
     # Install Git if not already installed
     if ! command -v git &> /dev/null; then
@@ -67,6 +69,8 @@ else
     # Create .env file
     echo "DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN" >> .env
     echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+    echo "FAKEYOU_USERNAME=$FAKEYOU_USERNAME" >> .env
+    echo "FAKEYOU_PASSWORD=$FAKEYOU_PASSWORD" >> .env
 
     # Build the Docker image and start the container
     docker compose up -d
