@@ -1,5 +1,6 @@
 """
-TTS module using FakeYou for text-to-speech synthesis. This is separate to allow for easy swapping of TTS providers.
+TTS module using FakeYou for text-to-speech synthesis.
+This is separate to allow for easy swapping of TTS providers.
 
 Written by Jeremy Noesen
 """
