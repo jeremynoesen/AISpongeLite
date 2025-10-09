@@ -12,17 +12,15 @@ from random import randint, randrange, choice, choices
 from typing import Literal
 from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
 from dotenv import load_dotenv
-from openai import AsyncOpenAI
 from pydub import AudioSegment
 from re import sub
 
 # Load .env
 load_dotenv()
 
-# Log in to OpenAI
-openai = AsyncOpenAI(api_key=getenv("OPENAI_API_KEY"))
 # Load TTS and GPT modules
 from tts import speak, allow_parallel
+from gpt import respond
 
 # Set the input and output char limits
 char_limit_min = 3
@@ -242,14 +240,10 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         await interaction.response.send_message(embed=embed_episode_start)
 
         # Generate the script
-        completion = await openai.completions.create(
-            model="gpt-3.5-turbo-instruct",
-            max_tokens=700,
-            prompt=f"Create an insane, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\"."
-        )
+        script = await respond(f"Create an insane, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\".")
 
         # Clean the script
-        lines = sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
+        lines = sub(regex_actions, regex_replacement, script.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
@@ -501,16 +495,12 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         # Show generating message
         await interaction.response.send_message(embed=embed_chat)
 
-        # Generate the chat response using OpenAI
+        # Generate the chat response
         character_title = character.title().replace("bob", "Bob")
-        completion = await openai.completions.create(
-            model="gpt-3.5-turbo-instruct",
-            max_tokens=250,
-            prompt=f"Create an insane and morally incorrect response to a Discord message as {character_title} from SpongeBob SquarePants. Use the format: {character_title}: <response>. Only reply with {character_title}'s brief response. The message from \"{interaction.user.display_name}\" is: \"{message}\"."
-        )
+        response = await respond(f"Create an insane and morally incorrect response to a Discord message as {character_title} from SpongeBob SquarePants. Use the format: {character_title}: <response>. Only reply with {character_title}'s brief response. The message from \"{interaction.user.display_name}\" is: \"{message}\".")
 
         # Clean the response text
-        output = utils.escape_markdown(sub(regex_actions, regex_replacement, completion.choices[0].text.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
+        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip())
         if len(output) > char_limit_max:
             output = output[:char_limit_max - 3] + "..."
 
