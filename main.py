@@ -15,13 +15,14 @@ from dotenv import load_dotenv
 from openai import AsyncOpenAI
 from pydub import AudioSegment
 from re import sub
-from tts import speak, allow_parallel
 
 # Load .env
 load_dotenv()
 
 # Log in to OpenAI
 openai = AsyncOpenAI(api_key=getenv("OPENAI_API_KEY"))
+# Load TTS and GPT modules
+from tts import speak, allow_parallel
 
 # Set the input and output char limits
 char_limit_min = 3
