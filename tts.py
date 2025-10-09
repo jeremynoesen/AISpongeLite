@@ -53,7 +53,8 @@ async def speak(character: str, text: str):
 
     # Attempt to speak line
     try:
-        with BytesIO((await wait_for(get_running_loop().run_in_executor(None, fakeyou.say, text, characters[character]), fakeyou_timeout)).content) as wav:
+        output = await wait_for(get_running_loop().run_in_executor(None, fakeyou.say, text, characters[character]), fakeyou_timeout)
+        with BytesIO(output.content) as wav:
             return AudioSegment.from_wav(wav)
 
     # Line failed to generate
