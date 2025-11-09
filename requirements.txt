@@ -1,5 +1,5 @@
-discord.py~=2.6.3
-python-dotenv~=1.1.1
-openai~=2.2.0
+discord.py~=2.6.4
+python-dotenv~=1.2.1
+openai~=2.7.1
 pydub~=0.25.1
 fakeyou~=1.2.6
