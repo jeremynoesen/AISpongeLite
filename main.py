@@ -247,8 +247,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
-        file_title = "UNTiTLED EPiSODE"
-        embed_title = "**U**NTiTLED **E**PiSODE"
+        file_title = "NO TiTLE"
+        embed_title = "**N**O **T**iTLE"
         if len(line_parts) == 2 and "title" in line_parts[0].lower():
             title = line_parts[1].strip()
             if title:
