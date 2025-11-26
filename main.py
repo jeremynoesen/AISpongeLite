@@ -379,8 +379,12 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         output_embed.colour = locations[location][1]
 
         # Apply random gain, fade in, and loop the music
-        music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
-        music_loop = silence_music.append(music.fade_in(10000), 0)
+        if music == music_just_breaking_softer or music == music_grass_skirt_chase:
+            music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
+            music_loop = music
+        else:
+            music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
+            music_loop = silence_music.append(music.fade_in(10000), 0)
         while len(music_loop) < len(combined):
             music_loop = music_loop.append(music, 0)
         combined = combined.overlay(music_loop)
