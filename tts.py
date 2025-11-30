@@ -35,6 +35,7 @@ characters = {
     "squilliam": "weight_zmjv8223ed6wx1fp234c79v9s",
     "bubble bass": "weight_h9g7rh6tj2hvfezrz8gjs4gwa",
     "bubble buddy": "weight_sbr0372ysxbdahcvej96axy1t",
+    "king neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm",
     "realistic fish head": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
     "french narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j"
 }

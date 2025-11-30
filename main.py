@@ -67,12 +67,13 @@ characters = {
     "bubble bass": 0xd9c481,
     "bubble buddy": 0x79919b,
     "doodlebob": 0x9a96a1,
+    "king neptune": 0x6ff57c,
     "realistic fish head": 0x988f6e,
     "french narrator": 0xa8865f
 }
 
 # Characters literal type for command arguments
-characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "plankton", "karen", "gary", "sandy", "mrs. puff", "larry", "squilliam", "bubble bass", "bubble buddy", "doodlebob", "realistic fish head", "french narrator"]
+characters_literal = Literal["spongebob", "patrick", "squidward", "mr. krabs", "plankton", "karen", "gary", "sandy", "mrs. puff", "larry", "squilliam", "bubble bass", "bubble buddy", "doodlebob", "king neptune", "realistic fish head", "french narrator"]
 
 # Gain settings for audio segments
 gain_ambiance = -45
@@ -240,7 +241,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         await interaction.response.send_message(embed=embed_episode_start)
 
         # Generate the script
-        script = await respond(f"Create an insane, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, Realistic Fish Head, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\".")
+        script = await respond(f"Create an insane, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, King Neptune, Realistic Fish Head, and French Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\".")
 
         # Clean the script
         lines = sub(regex_actions, regex_replacement, script.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
