@@ -34,6 +34,9 @@ activity_generating = Game("Generating...")
 client = Client(intents=Intents.default(), activity=Game("Initializing..."), status=Status.idle)
 command_tree = app_commands.CommandTree(client)
 
+# Logging channel
+logging_channel = None
+
 # Embed settings and static embeds
 embed_color = Color.dark_theme()
 embed_delete_after = 10
@@ -236,6 +239,10 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         if not allow_parallel:
             generating = True
             await client.change_presence(activity=activity_generating, status=Status.dnd)
+
+        # Log the interaction
+        if logging_channel:
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{utils.escape_markdown(topic)}", color=embed_color))
 
         # Show generating message
         await interaction.response.send_message(embed=embed_episode_start)
@@ -497,6 +504,10 @@ async def chat(interaction: Interaction, character: characters_literal, message:
             generating = True
             await client.change_presence(activity=activity_generating, status=Status.dnd)
 
+        # Log the interaction
+        if logging_channel:
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
+
         # Show generating message
         await interaction.response.send_message(embed=embed_chat)
 
@@ -551,6 +562,10 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         if not allow_parallel:
             generating = True
             await client.change_presence(activity=activity_generating, status=Status.dnd)
+
+        # Log the interaction
+        if logging_channel:
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{utils.escape_markdown(text)}", color=embed_color))
 
         # Show generating message
         await interaction.response.send_message(embed=embed_tts)
@@ -607,7 +622,7 @@ async def on_ready():
                 await client.user.edit(avatar=file.read())
 
         # Set bot banner if it is missing
-        if client.user.banner is None:
+        if (await client.fetch_user(client.user.id)).banner is None:
             with open("img/Banner.png", "rb") as file:
                 await client.user.edit(banner=file.read())
 
@@ -621,6 +636,12 @@ async def on_ready():
             if emoji_name not in emojis.keys():
                 with open(f"emoji/{emoji_file}", "rb") as file:
                     emojis[emoji_name] = await client.create_application_emoji(name=emoji_name, image=file.read())
+
+        # Set logging channel if specified
+        global logging_channel
+        logging_channel_id = getenv("LOGGING_CHANNEL_ID")
+        if logging_channel_id:
+            logging_channel = await client.fetch_channel(int(logging_channel_id))
 
         # Sync command tree
         await command_tree.sync()
