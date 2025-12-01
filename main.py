@@ -10,8 +10,6 @@ from math import ceil
 from os import getenv, listdir
 from random import randint, randrange, choice, choices
 from typing import Literal
-
-import discord.utils
 from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
 from dotenv import load_dotenv
 from pydub import AudioSegment
@@ -512,7 +510,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
             output = output[:char_limit_max - 3] + "..."
 
         # Send the response
-        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
+        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
     # Generation failed
     except:
@@ -580,7 +578,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         with BytesIO() as output:
             seg.export(output, "mp3", bitrate="256k")
             character_title = character.title().replace('bob', 'Bob')
-            await interaction.edit_original_response(embed=Embed(color=characters[character], description=discord.utils.escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+            await interaction.edit_original_response(embed=Embed(color=characters[character], description=utils.escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.mp3")])
 
     # Generation failed
