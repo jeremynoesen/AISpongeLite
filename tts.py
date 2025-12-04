@@ -43,6 +43,10 @@ characters = {
 # Whether to allow parallel requests
 allow_parallel = False
 
+# Character limits for input and output
+char_limit_min = 3
+char_limit_max = 256
+
 
 async def speak(character: str, text: str):
     """

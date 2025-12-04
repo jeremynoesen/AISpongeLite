@@ -19,12 +19,8 @@ from re import sub
 load_dotenv()
 
 # Load TTS and GPT modules
-from tts import speak, allow_parallel
+from tts import speak, allow_parallel, char_limit_min, char_limit_max
 from gpt import respond
-
-# Set the input and output char limits
-char_limit_min = 3
-char_limit_max = 256
 
 # Discord activity settings
 activity_ready = Game("Ready!")
