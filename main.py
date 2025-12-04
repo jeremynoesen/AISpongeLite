@@ -69,7 +69,7 @@ characters = {
     "perch": 0x9f80bd,
     "pearl": 0x9fa9a5,
     "doodlebob": 0x9a96a1,
-    "fish head": 0x988f6e,
+    "mr. fish": 0x988f6e,
     "dutchman": 0x08b00e,
     "king neptune": 0x6ff57c,
     "manray": 0x094b82,
@@ -77,7 +77,7 @@ characters = {
 }
 
 # Characters literal type for command arguments
-characters_literal = Literal["spongebob", "patrick", "squidward", "sandy", "mr. krabs", "plankton", "gary", "mrs. puff", "larry", "squilliam", "karen", "narrator", "bubble buddy", "bubble bass", "perch", "pearl", "doodlebob", "fish head", "dutchman", "king neptune", "manray", "dirty bubble"]
+characters_literal = Literal["spongebob", "patrick", "squidward", "sandy", "mr. krabs", "plankton", "gary", "mrs. puff", "larry", "squilliam", "karen", "narrator", "bubble buddy", "bubble bass", "perch", "pearl", "doodlebob", "mr. fish", "dutchman", "king neptune", "manray", "dirty bubble"]
 
 # Gain settings for audio segments
 gain_ambiance = -45
@@ -151,7 +151,7 @@ locations = {
     }, 0xc7b208, "spongebob, patrick, mrs. puff"),
     "news studio": ({
         music_just_breaking_softer: 1
-    }, 0x4385d2, "perch, fish head"),
+    }, 0x4385d2, "perch, mr. fish"),
     "rock bottom": ({
         music_rock_bottom: 1
     }, 0x0b091c, "spongebob, patrick, squidward"),

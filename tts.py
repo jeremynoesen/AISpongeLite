@@ -36,7 +36,7 @@ characters = {
     "narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j",
     "bubble buddy": "weight_sbr0372ysxbdahcvej96axy1t",
     "bubble bass": "weight_h9g7rh6tj2hvfezrz8gjs4gwa",
-    "fish head": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
+    "mr. fish": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
     "king neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm"
 }
 
