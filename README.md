@@ -12,10 +12,12 @@ several FakeYou device and account bans.
 
 ### Characters
 
-SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, Gary, Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass,
-Bubble Buddy, DoodleBob, King Neptune, Realistic Fish Head, and French Narrator.
+SpongeBob, Patrick, Squidward, Sandy, Mr. Krabs, Plankton, Gary, Mrs. Puff, Larry, Squilliam, Karen, Narrator, 
+Bubble Buddy, Bubble Bass, Perch*, Pearl*, DoodleBob, Fish Head, Dutchman*, King Neptune, Manray*, and Dirty Bubble*.
 
 Character names must be written exactly as shown above, excluding capitalization.
+
+*Only works in the AI Sponge Rehydrated instance.
 
 ### Locations
 
