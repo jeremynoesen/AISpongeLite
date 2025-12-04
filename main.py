@@ -118,48 +118,48 @@ locations = {
         music_stars_and_games: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0xd97d00),
+    }, 0xd97d00, "spongebob, patrick, gary"),
     "patrick's house": ({
         music_gator: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x521b1d),
+    }, 0x521b1d, "spongebob, patrick"),
     "squidward's house": ({
         music_comic_walk: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x285663),
+    }, 0x285663, "spongebob, patrick, squidward"),
     "sandy's treedome": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x387c00),
+    }, 0x387c00, "spongebob, patrick, sandy"),
     "krusty krab": ({
         music_tip_top_polka: 5,
         music_rake_hornpipe: 5,
         music_drunken_sailor: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x6b3c0f),
+    }, 0x6b3c0f, "spongebob, patrick, squidward, mr. krabs"),
     "chum bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x001848),
+    }, 0x001848, "plankton, karen"),
     "boating school": ({
         music_hello_sailor_b: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0xc7b208),
+    }, 0xc7b208, "spongebob, patrick, mrs. puff"),
     "news studio": ({
         music_just_breaking_softer: 1
-    }, 0x4385d2),
+    }, 0x4385d2, "perch, fish head"),
     "rock bottom": ({
         music_rock_bottom: 1
-    }, 0x0b091c),
+    }, 0x0b091c, "spongebob, patrick, squidward"),
     "bikini bottom": ({
         music_closing_theme: 5,
         music_grass_skirt_chase: 1,
         music_gator: 1
-    }, 0xc2a36b)
+    }, 0xc2a36b, "spongebob, patrick, squidward, mr. krabs, plankton, squilliam")
 }
 
 # SFX audio segments
@@ -248,8 +248,42 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Show generating message
         await interaction.response.send_message(embed=embed_episode_start)
 
+        # Lowercase version of topic for processing
+        topic_lower = topic.lower()
+
+        # Get location from topic or choose a random one
+        location = choice(list(locations.keys()))
+        for key in locations.keys():
+            if key in topic_lower:
+                location = key
+                break
+
+        # Get ambiance from topic or choose a random one
+        ambiance = choice(list(ambiance_time.keys()))
+        for key in ambiance_time.keys():
+            if any(word in topic_lower for word in ambiance_time[key]):
+                ambiance = key
+                break
+
+        # Determine rain intensity from topic or randomly
+        if any(word in topic_lower for word in storm_keywords):
+            rain_intensity = randint(1, 5)
+            weather = "stormy"
+        elif any(word in topic_lower for word in rain_keywords):
+            rain_intensity = randint(-5, 0)
+            weather = "rainy"
+        elif any(word in topic_lower for word in clear_keywords):
+            rain_intensity = None
+            weather = "clear"
+        elif randrange(5) == 0:
+            rain_intensity = randint(-5, 5)
+            weather = "rainy" if rain_intensity <= 0 else "stormy"
+        else:
+            rain_intensity = None
+            weather = "clear"
+
         # Generate the script
-        script = await respond(f"Create an insane, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Common characters to include are SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Karen, and Gary. Rare characters to include are Sandy, Mrs. Puff, Larry, Squilliam, Bubble Bass, Bubble Buddy, DoodleBob, King Neptune, Fish Head, and Narrator. Include 3 - 5 characters maximum. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word title with format: Title: <title>. The topic is: \"{topic}\".")
+        script = await respond(f"Create an insane, profanity-filled, and morally incorrect script for an episode of SpongeBob SquarePants about a topic. Characters in this episode are {locations[location][2]}, and any characters mentioned in the topic. This episode takes place on a {weather} {choice(ambiance_time[ambiance])[0]} in {location}. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word episode title with format: Title: <title>. The topic is: \"{topic}\".")
 
         # Clean the script
         lines = sub(regex_actions, regex_replacement, script.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
@@ -271,7 +305,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         total_lines = len(lines)
 
         # Create the embed for the output
-        output_embed = Embed(title=embed_title)
+        output_embed = Embed(title=embed_title, color=locations[location][1])
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -368,26 +402,8 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Add silence at the end of the episode
         combined = combined.append(silence_line, 0)
 
-        # Lowercase version of topic for processing
-        topic_lower = topic.lower()
-
-        # Add music to the episode based on location or randomly
-        location = None
-        for text in (topic_lower, script_lower):
-            for key in locations.keys():
-                if key in text:
-                    location = key
-                    break
-            if location:
-                break
-        if not location:
-            location = choice(list(locations.keys()))
+        # Add music to the episode based on location
         music = choices(list(locations[location][0].keys()), list(locations[location][0].values()))[0]
-
-        # Set the embed color based on the location
-        output_embed.colour = locations[location][1]
-
-        # Apply random gain, fade in, and loop the music
         if music == music_just_breaking_softer or music == music_grass_skirt_chase:
             music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
             music_loop = music
@@ -398,42 +414,15 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             music_loop = music_loop.append(music, 0)
         combined = combined.overlay(music_loop)
 
-        # Add day or night ambiance to the episode if topic or script contains keywords or randomly
-        ambiance = None
-        for text in (topic_lower, script_lower):
-            for key in ambiance_time.keys():
-                if any(word in text for word in ambiance_time[key]):
-                    ambiance = key
-                    break
-            if ambiance:
-                break
-        if not ambiance:
-            ambiance = choice(list(ambiance_time.keys()))
-
-        # Apply random gain, fade in, and loop the ambiance sound
+        # Add day or night ambiance to the episode
         ambiance = ambiance.apply_gain((gain_ambiance + randint(-5, 5)) - ambiance.dBFS)
         ambiance_loop = ambiance.fade_in(fade_ambiance)
         while len(ambiance_loop) < len(combined):
             ambiance_loop = ambiance_loop.append(ambiance, 0)
         combined = combined.overlay(ambiance_loop)
 
-        # Add rain sounds to the episode if topic contains keywords or randomly
-        rain_intensity = None
-        if randrange(5) == 0:
-            rain_intensity = randint(-5, 5)
-        for text in (topic_lower, script_lower):
-            if any(word in text for word in storm_keywords):
-                rain_intensity = randint(1, 5)
-                break
-            elif any(word in text for word in rain_keywords):
-                rain_intensity = randint(-5, 0)
-                break
-            elif any(word in text for word in clear_keywords):
-                rain_intensity = None
-                break
+        # Add rain sounds to the episode
         if rain_intensity is not None:
-
-            # Apply random gain, fade in, and loop the rain sound
             rain_randomized = ambiance_rain.apply_gain((gain_ambiance + rain_intensity) - ambiance_rain.dBFS)
             rain_loop = rain_randomized.fade_in(fade_ambiance)
             while len(rain_loop) < len(combined):
