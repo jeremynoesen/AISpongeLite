@@ -47,6 +47,9 @@ allow_parallel = False
 char_limit_min = 3
 char_limit_max = 256
 
+# Bitrate for output audio
+bitrate = "256k"
+
 
 async def speak(character: str, text: str):
     """

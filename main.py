@@ -19,7 +19,7 @@ from re import sub
 load_dotenv()
 
 # Load TTS and GPT modules
-from tts import speak, allow_parallel, char_limit_min, char_limit_max
+from tts import speak, allow_parallel, char_limit_min, char_limit_max, bitrate
 from gpt import respond
 
 # Discord activity settings
@@ -444,7 +444,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Export the episode and send it
         with BytesIO() as output:
-            combined.export(output, "mp3", bitrate="256k")
+            combined.export(output, "mp3", bitrate=bitrate)
             await interaction.edit_original_response(embed=output_embed, attachments=[
                 File(output, f"{title_formatted}.mp3")])
 
@@ -573,7 +573,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
         # Export and send the file
         with BytesIO() as output:
-            seg.export(output, "mp3", bitrate="256k")
+            seg.export(output, "mp3", bitrate=bitrate)
             character_title = character.title().replace('bob', 'Bob')
             await interaction.edit_original_response(embed=Embed(color=characters[character], description=utils.escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.mp3")])
