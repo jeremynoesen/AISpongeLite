@@ -32,10 +32,10 @@ Only one of the following commands can be used at a time globally:
 
 - `/episode`: Generate an audio-only episode. If an episode takes longer than 15 minutes to generate, it will be
   automatically cancelled due to Discord's interaction timeout limit.
-- `/chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is sent
-  so the character can address you.
 - `/tts`: Make a character speak text. This is a shortcut to FakeYou's service. It is also the only way to access
   Squidward's and Sandy's Rehydrated voice models.
+- `/chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is sent
+  so the character can address you.
 
 ## Installation
 
@@ -100,5 +100,5 @@ The bot will be ready to use once its status changes to "Ready!".
 ## Demonstration
 
 ![Episode](img/episode.png)
-![Chat](img/chat.png)
 ![TTS](img/tts.png)
+![Chat](img/chat.png)

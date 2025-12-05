@@ -5,12 +5,12 @@ This is separate to allow for easy swapping of TTS providers.
 Written by Jeremy Noesen
 """
 
-from io import BytesIO
-from aiohttp import ClientSession
-from pydub import AudioSegment
-from websockets import connect, ConnectionClosed
 from uuid import uuid4
 from json import loads
+from io import BytesIO
+from aiohttp import ClientSession
+from websockets import connect, ConnectionClosed
+from pydub import AudioSegment
 
 # Characters dictionary with TTS system name and arpabet status
 characters = {

@@ -5,15 +5,15 @@ AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, 
 Written by Jeremy Noesen
 """
 
-from io import BytesIO
-from math import ceil
-from os import getenv, listdir
-from random import randint, randrange, choice, choices
 from typing import Literal
-from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
-from dotenv import load_dotenv
-from pydub import AudioSegment
+from random import randint, randrange, choice, choices
 from re import sub
+from math import ceil
+from io import BytesIO
+from os import getenv, listdir
+from dotenv import load_dotenv
+from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
+from pydub import AudioSegment
 
 # Load .env
 load_dotenv()
@@ -38,8 +38,8 @@ embed_color = Color.dark_theme()
 embed_delete_after = 10
 embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
-embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
+embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
 embed_in_use = Embed(title="Busy.", description="Currently in use.", color=embed_color)
 
@@ -459,63 +459,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             await client.change_presence(activity=activity_ready, status=Status.online)
 
 
-@command_tree.command(description="Chat with a character.")
-@app_commands.describe(character="Character to chat with.", message="Message to send.")
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-async def chat(interaction: Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
-    """
-    Chat with one of the characters.
-    :param interaction: Interaction created by the command
-    :param character: Character to chat with
-    :param message: Message to send to the character
-    :return: None
-    """
-
-    # Get global variable
-    global generating
-
-    # Check if something is generating
-    if generating:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
-        return
-
-    # Start generation
-    try:
-
-        # Block generation
-        if not allow_parallel:
-            generating = True
-            await client.change_presence(activity=activity_generating, status=Status.dnd)
-
-        # Log the interaction
-        if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
-
-        # Show generating message
-        await interaction.response.send_message(embed=embed_chat)
-
-        # Generate the chat response
-        character_title = character.title().replace("bob", "Bob")
-        response = await respond(f"Create an insane and morally incorrect response to a Discord message as {character_title} from SpongeBob SquarePants. Use the format: {character_title}: <response>. Only reply with {character_title}'s brief response. The message from \"{interaction.user.display_name}\" is: \"{message}\".")
-
-        # Clean the response text
-        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max])
-
-        # Send the response
-        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
-
-    # Generation failed
-    except:
-        await interaction.edit_original_response(embed=embed_failed)
-
-    # Unblock generation
-    finally:
-        if not allow_parallel:
-            generating = False
-            await client.change_presence(activity=activity_ready, status=Status.online)
-
-
 @command_tree.command(description="Make a character speak text.")
 @app_commands.describe(character="Character to speak text.", text="Text to speak.")
 @app_commands.allowed_installs(True, False)
@@ -577,6 +520,63 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             character_title = character.title().replace('bob', 'Bob')
             await interaction.edit_original_response(embed=Embed(color=characters[character], description=utils.escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, f"{character_title} — {text}.mp3")])
+
+    # Generation failed
+    except:
+        await interaction.edit_original_response(embed=embed_failed)
+
+    # Unblock generation
+    finally:
+        if not allow_parallel:
+            generating = False
+            await client.change_presence(activity=activity_ready, status=Status.online)
+
+
+@command_tree.command(description="Chat with a character.")
+@app_commands.describe(character="Character to chat with.", message="Message to send.")
+@app_commands.allowed_installs(True, False)
+@app_commands.allowed_contexts(True, False, True)
+async def chat(interaction: Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
+    """
+    Chat with one of the characters.
+    :param interaction: Interaction created by the command
+    :param character: Character to chat with
+    :param message: Message to send to the character
+    :return: None
+    """
+
+    # Get global variable
+    global generating
+
+    # Check if something is generating
+    if generating:
+        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
+        return
+
+    # Start generation
+    try:
+
+        # Block generation
+        if not allow_parallel:
+            generating = True
+            await client.change_presence(activity=activity_generating, status=Status.dnd)
+
+        # Log the interaction
+        if logging_channel:
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
+
+        # Show generating message
+        await interaction.response.send_message(embed=embed_chat)
+
+        # Generate the chat response
+        character_title = character.title().replace("bob", "Bob")
+        response = await respond(f"Create an insane and morally incorrect response to a Discord message as {character_title} from SpongeBob SquarePants. Use the format: {character_title}: <response>. Only reply with {character_title}'s brief response. The message from \"{interaction.user.display_name}\" is: \"{message}\".")
+
+        # Clean the response text
+        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max])
+
+        # Send the response
+        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
     # Generation failed
     except:
