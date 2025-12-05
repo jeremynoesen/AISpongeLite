@@ -290,22 +290,18 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
-        file_title = "NO TiTLE"
-        embed_title = "**N**O **T**iTLE"
+        title_formatted = "NO TiTLE"
         if len(line_parts) == 2 and "title" in line_parts[0].lower():
-            title = line_parts[1].strip()
+            title = line_parts[1].strip()[:char_limit_max]
             if title:
-                if len(title) > char_limit_max:
-                    title = title[:char_limit_max]
-                file_title = title.upper().replace("I", "i")
-                embed_title = "".join(f"**{char}**​" if char.isupper() or char.isnumeric() or char in ".,!?" else char for char in utils.escape_markdown(title)).upper().replace("I", "i")
+                title_formatted = title.upper().replace("I", "i")
 
         # Keep track of current line and the total number of lines
         current_line = 1
         total_lines = len(lines)
 
         # Create the embed for the output
-        output_embed = Embed(title=embed_title, color=locations[location][1])
+        output_embed = Embed(title=utils.escape_markdown(title_formatted), color=locations[location][1])
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -452,7 +448,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         with BytesIO() as output:
             combined.export(output, "mp3", bitrate="256k")
             await interaction.edit_original_response(embed=output_embed, attachments=[
-                File(output, f"{file_title}.mp3")])
+                File(output, f"{title_formatted}.mp3")])
 
     # Generation failed
     except:
