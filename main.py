@@ -333,9 +333,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 continue
 
             # Set the text to speak and to show
-            output_line = line_parts[1].strip()
-            if len(output_line) > char_limit_max:
-                output_line = output_line[:char_limit_max]
+            output_line = line_parts[1].strip()[:char_limit_max]
 
             # Speak line using voice files for DoodleBob
             if character == "doodlebob":
@@ -502,10 +500,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         response = await respond(f"Create an insane and morally incorrect response to a Discord message as {character_title} from SpongeBob SquarePants. Use the format: {character_title}: <response>. Only reply with {character_title}'s brief response. The message from \"{interaction.user.display_name}\" is: \"{message}\".")
 
         # Clean the response text
-        output = sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()
-        if len(output) > char_limit_max:
-            output = output[:char_limit_max]
-        output = utils.escape_markdown(output)
+        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max])
 
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
