@@ -236,6 +236,9 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
     # Start generation
     try:
 
+        # Show generating message
+        await interaction.response.send_message(embed=embed_episode_start)
+
         # Block generation
         if not allow_parallel:
             generating = True
@@ -244,9 +247,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Log the interaction
         if logging_channel:
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{utils.escape_markdown(topic)}", color=embed_color))
-
-        # Show generating message
-        await interaction.response.send_message(embed=embed_episode_start)
 
         # Lowercase version of topic for processing
         topic_lower = topic.lower()
@@ -483,6 +483,9 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
     # Start generation
     try:
 
+        # Show generating message
+        await interaction.response.send_message(embed=embed_tts)
+
         # Block generation
         if not allow_parallel:
             generating = True
@@ -491,9 +494,6 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         # Log the interaction
         if logging_channel:
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{utils.escape_markdown(text)}", color=embed_color))
-
-        # Show generating message
-        await interaction.response.send_message(embed=embed_tts)
 
         # Speak text using voice files for DoodleBob
         if character == "doodlebob":
@@ -556,6 +556,9 @@ async def chat(interaction: Interaction, character: characters_literal, message:
     # Start generation
     try:
 
+        # Show generating message
+        await interaction.response.send_message(embed=embed_chat)
+
         # Block generation
         if not allow_parallel:
             generating = True
@@ -564,9 +567,6 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         # Log the interaction
         if logging_channel:
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
-
-        # Show generating message
-        await interaction.response.send_message(embed=embed_chat)
 
         # Generate the chat response
         character_title = character.title().replace("bob", "Bob")
