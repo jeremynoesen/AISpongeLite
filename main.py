@@ -139,7 +139,7 @@ locations = {
         music_drunken_sailor: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x6b3c0f, "spongebob, patrick, squidward, mr. krabs"),
+    }, 0x6b3c0f, "spongebob, patrick, squidward, mr. krabs, plankton"),
     "chum bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
