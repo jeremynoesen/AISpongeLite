@@ -20,7 +20,7 @@ load_dotenv()
 
 # Load TTS and GPT modules
 from tts import speak, allow_parallel, char_limit_min, char_limit_max, bitrate
-from gpt import respond
+from llm import respond
 
 # Discord activity settings
 activity_ready = Game("Ready!")

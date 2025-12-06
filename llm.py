@@ -1,6 +1,6 @@
 """
-GPT module using OpenAI for text generation.
-This is separate to allow for easy swapping of GPT providers.
+LLM module using OpenAI for text generation.
+This is separate to allow for easy swapping of LLM providers.
 
 Written by Jeremy Noesen
 """
