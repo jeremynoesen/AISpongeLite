@@ -290,11 +290,11 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
-        title_formatted = "NO TiTLE"
+        title_formatted = "No Title"
         if len(line_parts) == 2 and "title" in line_parts[0].lower():
             title = line_parts[1].strip()[:char_limit_max]
             if title:
-                title_formatted = title.upper().replace("I", "i")
+                title_formatted = title
 
         # Keep track of current line and the total number of lines
         current_line = 1
