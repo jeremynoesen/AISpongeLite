@@ -12,7 +12,7 @@ from openai import AsyncOpenAI
 openai = AsyncOpenAI(api_key=getenv("OPENAI_API_KEY"))
 
 
-async def respond(prompt: str):
+async def write(prompt: str):
     """
     Respond to a prompt using OpenAI gpt-3.5-turbo-instruct.
     :param prompt: Input text prompt
