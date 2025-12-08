@@ -283,7 +283,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             weather = "clear"
 
         # Generate the script
-        script = await write(f"Create an insane, profanity-filled, and morally incorrect script for an episode of spongebob about a topic. Characters in this episode are {locations[location][2]}, and any characters mentioned in the topic. This episode takes place on a {weather} {ambiance_time[ambiance][0]} in {location}. Use the format: Character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word episode title with format: Title: <title>. The topic is: \"{topic}\".")
+        script = await write(f"Write an insane, profanity-filled, and morally incorrect script for an episode of spongebob about a topic. Characters in this episode are {locations[location][2]}, and any characters mentioned in the topic. This episode takes place on a {weather} {ambiance_time[ambiance][0]} in {location}. Use the format: character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word episode title with format: title: <title>. The topic is: \"{topic}\".")
 
         # Clean the script
         lines = sub(regex_actions, regex_replacement, script.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
@@ -569,7 +569,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
 
         # Generate the chat response
-        response = await write(f"Create an insane and morally incorrect response to a discord message as {character} from spongebob. Use the format: {character}: <response>. Only reply with {character}'s brief response. The message from \"{interaction.user.display_name}\" is: \"{message}\".")
+        response = await write(f"Write an insane and morally incorrect response to a discord message as {character} from spongebob. Use the format: {character}: <response>. Only reply with {character}'s brief response. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
 
         # Clean the response text
         output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max])
