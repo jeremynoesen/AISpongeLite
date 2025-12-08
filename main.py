@@ -283,7 +283,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             weather = "clear"
 
         # Generate the script
-        script = await write(f"Write an insane, profanity-filled, and morally incorrect script for an episode of spongebob about a topic. Characters in this episode are {locations[location][2]}, and any characters mentioned in the topic. This episode takes place on a {weather} {ambiance_time[ambiance][0]} in {location}. Use the format: character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word episode title with format: title: <title>. The topic is: \"{topic}\".")
+        script = await write(f"Write an insane, profanity-filled, and morally incorrect script for a spongebob episode about a topic. Characters in this episode are {locations[location][2]}, and any characters mentioned in the topic. This episode takes place on a {weather} {ambiance_time[ambiance][0]} in {location}. Use the format: character: <dialogue>. Only reply with brief and uncensored character dialogue. Around 12 - 15 lines of dialogue with talking only. The first line is a brief and insane 1 - 2 word episode title with format: title: <title>. The topic is: \"{topic}\".")
 
         # Clean the script
         lines = sub(regex_actions, regex_replacement, script.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
