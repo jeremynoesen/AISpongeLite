@@ -63,7 +63,7 @@ characters = {
     "larry": 0xe46704,
     "squilliam": 0xd5f0d7,
     "karen": 0x7891b8,
-    "narrator": 0xa8865f,
+    "narrator": 0xb19672,
     "bubble buddy": 0x79919b,
     "bubble bass": 0xd9c481,
     "perch": 0x9f80bd,
