@@ -72,12 +72,12 @@ characters = {
     "mr. fish": 0x988f6e,
     "dutchman": 0x08b00e,
     "king neptune": 0x6ff57c,
-    "manray": 0x094b82,
+    "man ray": 0x094b82,
     "dirty bubble": 0x985d21
 }
 
 # Characters literal type for command arguments
-characters_literal = Literal["spongebob", "patrick", "squidward", "sandy", "mr. krabs", "plankton", "gary", "mrs. puff", "larry", "squilliam", "karen", "narrator", "bubble buddy", "bubble bass", "perch", "pearl", "doodlebob", "mr. fish", "dutchman", "king neptune", "manray", "dirty bubble"]
+characters_literal = Literal["spongebob", "patrick", "squidward", "sandy", "mr. krabs", "plankton", "gary", "mrs. puff", "larry", "squilliam", "karen", "narrator", "bubble buddy", "bubble bass", "perch", "pearl", "doodlebob", "mr. fish", "dutchman", "king neptune", "man ray", "dirty bubble"]
 
 # Gain settings for audio segments
 gain_ambiance = -45
