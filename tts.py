@@ -37,7 +37,8 @@ characters = {
     "bubble buddy": "weight_sbr0372ysxbdahcvej96axy1t",
     "bubble bass": "weight_h9g7rh6tj2hvfezrz8gjs4gwa",
     "mr. fish": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
-    "king neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm"
+    "king neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm",
+    "dirty bubble": "weight_f7nm9e4sx49gjjknc2mgb9ggs"
 }
 
 # Whether to allow parallel requests
