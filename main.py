@@ -446,7 +446,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         with BytesIO() as output:
             combined.export(output, "mp3", bitrate=bitrate)
             await interaction.edit_original_response(embed=output_embed, attachments=[
-                File(output, f"{title_formatted}.mp3")])
+                File(output, f"{title_formatted.replace('/', '').strip()}.mp3")])
 
     # Generation failed
     except:
@@ -519,7 +519,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
             seg.export(output, "mp3", bitrate=bitrate)
             character_title = character.title().replace('bob', 'Bob')
             await interaction.edit_original_response(embed=Embed(color=characters[character], description=utils.escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
-                File(output, f"{character_title} — {text}.mp3")])
+                File(output, f"{character_title} — {text.replace('/', '').strip()}.mp3")])
 
     # Generation failed
     except:
