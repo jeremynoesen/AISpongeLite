@@ -4,7 +4,7 @@
 
 ## About
 
-AI Sponge Lite is a self-hosted Discord bot that generates parody AI Sponge audio episodes, chats, and TTS inspired by
+AI Sponge Lite is a self-hosted Discord bot that generates parody AI Sponge audio episodes, TTS, and chats inspired by
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
 There used to be a public instance of this bot with a little over 1,800 installations; however, it was shut down due to
