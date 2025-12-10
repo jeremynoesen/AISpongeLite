@@ -292,7 +292,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         line_parts = lines.pop(0).split(":", 1)
         title_formatted = "No Title"
         if len(line_parts) == 2 and "title" in line_parts[0].lower():
-            title = line_parts[1].strip()[:char_limit_max]
+            title = line_parts[1].strip()[:char_limit_max].strip()
             if title:
                 title_formatted = title
 
@@ -314,9 +314,15 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             # Update generation status
             await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{current_line}/{min(total_lines, 25)}`...", color=embed_color))
 
-            # Skip line if it is too short or improperly formatted
+            # Skip line if it is improperly formatted
             line_parts = line.split(":", 1)
-            if len(line_parts) != 2 or len(line_parts[1].strip()) < char_limit_min:
+            if len(line_parts) != 2:
+                total_lines -= 1
+                continue
+
+            # Skip line if it is too short
+            output_line = line_parts[1].strip()[:char_limit_max].strip()
+            if len(output_line) < char_limit_min:
                 total_lines -= 1
                 continue
 
@@ -331,9 +337,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             if not character:
                 total_lines -= 1
                 continue
-
-            # Set the text to speak and to show
-            output_line = line_parts[1].strip()[:char_limit_max]
 
             # Speak line using voice files for DoodleBob
             if character == "doodlebob":
@@ -572,7 +575,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         response = await write(f"Write an insane and morally incorrect response to a discord message as {character} from spongebob. Use the format: {character}: <response>. Only reply with {character}'s brief response. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
 
         # Clean the response text
-        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max])
+        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max].strip())
 
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character.title().replace("bob", "Bob"), icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
