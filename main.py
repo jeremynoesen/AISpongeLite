@@ -56,10 +56,10 @@ characters = {
     "patrick": 0xeea68b,
     "squidward": 0x9abab2,
     "sandy": 0xc6b4ab,
-    "mr. krabs": 0xe24924,
+    "mr. krabs": 0xde280d,
     "plankton": 0x0f4708,
-    "gary": 0xd4a8ab,
-    "mrs. puff": 0xd0a777,
+    "gary": 0xc18d86,
+    "mrs. puff": 0xcc9c64,
     "larry": 0xd55b06,
     "squilliam": 0xd4ecd7,
     "karen": 0x778bb0,
@@ -73,7 +73,7 @@ characters = {
     "dutchman": 0x11c304,
     "king neptune": 0x82f386,
     "man ray": 0x0b4881,
-    "dirty bubble": 0xbf8854
+    "dirty bubble": 0x7c522d
 }
 
 # Characters literal type for command arguments
