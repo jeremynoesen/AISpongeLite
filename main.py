@@ -89,11 +89,11 @@ gain_voice_distort = 20
 
 # Ambiance audio segments
 ambiance_time = {
-    AudioSegment.from_wav("ambiance/day.wav"): ["day", "bright", "morning", "noon", "dawn"],
-    AudioSegment.from_wav("ambiance/night.wav"): ["night", "dark", "evening", "dusk"]
+    AudioSegment.from_wav("ambiance/day.wav"): ["day", "bright", "morning", "noon", "dawn", "sunrise", "early"],
+    AudioSegment.from_wav("ambiance/night.wav"): ["night", "dark", "evening", "dusk", "sunset", "late"]
 }
 ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
-storm_keywords = ["storm", "thunder", "lightning", "tornado", "hurricane"]
+storm_keywords = ["storm", "thunder", "lightning", "downpour"]
 rain_keywords = ["rain", "drizzle", "shower", "sprinkle", "wet"]
 clear_keywords = ["clear", "dry"]
 fade_ambiance = 500
