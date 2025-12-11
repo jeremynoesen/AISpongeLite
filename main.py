@@ -52,28 +52,28 @@ emojis = {}
 
 # Characters dictionary with their embed colors
 characters = {
-    "spongebob": 0xd4b937,
-    "patrick": 0xf3a18a,
-    "squidward": 0x9fc3b9,
-    "sandy": 0xede0db,
-    "mr. krabs": 0xee4115,
-    "plankton": 0x26732b,
-    "gary": 0xca8e93,
-    "mrs. puff": 0xd8ab72,
-    "larry": 0xe46704,
-    "squilliam": 0xd5f0d7,
-    "karen": 0x7891b8,
-    "narrator": 0xb19672,
-    "bubble buddy": 0x79919b,
-    "bubble bass": 0xd9c481,
-    "perch": 0x9f80bd,
-    "pearl": 0x9fa9a5,
-    "doodlebob": 0x9a96a1,
-    "mr. fish": 0x988f6e,
-    "dutchman": 0x08b00e,
-    "king neptune": 0x6ff57c,
-    "man ray": 0x094b82,
-    "dirty bubble": 0x985d21
+    "spongebob": 0xc3ac30,
+    "patrick": 0xeea68b,
+    "squidward": 0x9abab2,
+    "sandy": 0xc6b4ab,
+    "mr. krabs": 0xe24924,
+    "plankton": 0x0f4708,
+    "gary": 0xd4a8ab,
+    "mrs. puff": 0xd0a777,
+    "larry": 0xd55b06,
+    "squilliam": 0xd4ecd7,
+    "karen": 0x778bb0,
+    "narrator": 0x8f7c69,
+    "bubble buddy": 0x788b94,
+    "bubble bass": 0xc0ae6b,
+    "perch": 0x987cb4,
+    "pearl": 0xa7b2b3,
+    "doodlebob": 0x9a94a0,
+    "mr. fish": 0x999072,
+    "dutchman": 0x11c304,
+    "king neptune": 0x82f386,
+    "man ray": 0x0b4881,
+    "dirty bubble": 0xbf8854
 }
 
 # Characters literal type for command arguments
@@ -118,48 +118,48 @@ locations = {
         music_stars_and_games: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0xd97d00, "spongebob, patrick, gary"),
+    }, 0xd87c02, "spongebob, patrick, gary"),
     "patrick's house": ({
         music_gator: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x521b1d, "spongebob, patrick"),
+    }, 0x561e1f, "spongebob, patrick"),
     "squidward's house": ({
         music_comic_walk: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x285663, "spongebob, patrick, squidward"),
+    }, 0x193f51, "spongebob, patrick, squidward"),
     "sandy's treedome": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x387c00, "spongebob, patrick, sandy"),
+    }, 0x2b6f00, "spongebob, patrick, sandy"),
     "krusty krab": ({
         music_tip_top_polka: 5,
         music_rake_hornpipe: 5,
         music_drunken_sailor: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x6b3c0f, "spongebob, patrick, squidward, mr. krabs, plankton"),
+    }, 0x62390f, "spongebob, patrick, squidward, mr. krabs, plankton"),
     "chum bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x001848, "plankton, karen"),
+    }, 0x071942, "plankton, karen"),
     "boating school": ({
         music_hello_sailor_b: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0xc7b208, "spongebob, patrick, mrs. puff"),
+    }, 0xcab307, "spongebob, patrick, mrs. puff"),
     "news studio": ({
         music_just_breaking_softer: 1
-    }, 0x4385d2, "perch, mr. fish"),
+    }, 0x316ec3, "perch, mr. fish"),
     "rock bottom": ({
         music_rock_bottom: 1
-    }, 0x0b091c, "spongebob, patrick, squidward"),
+    }, 0x101027, "spongebob, patrick, squidward"),
     "bikini bottom": ({
         music_closing_theme: 5,
         music_grass_skirt_chase: 1,
         music_gator: 1
-    }, 0xc2a36b, "spongebob, patrick, squidward, mr. krabs, plankton, squilliam")
+    }, 0xccba8b, "spongebob, patrick, squidward, mr. krabs, plankton, squilliam")
 }
 
 # SFX audio segments
