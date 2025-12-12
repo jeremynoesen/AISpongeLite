@@ -143,7 +143,7 @@ locations = {
     "chum bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x071942, "plankton, karen"),
+    }, 0x2a3644, "plankton, karen"),
     "boating school": ({
         music_hello_sailor_b: 5,
         music_seaweed: 1,
@@ -159,7 +159,7 @@ locations = {
         music_closing_theme: 5,
         music_grass_skirt_chase: 1,
         music_gator: 1
-    }, 0xccba8b, "spongebob, patrick, squidward, mr. krabs, plankton, squilliam")
+    }, 0xddba8b, "spongebob, patrick, squidward, mr. krabs, plankton, squilliam")
 }
 
 # SFX audio segments
