@@ -189,11 +189,11 @@ sfx_random = {
     AudioSegment.from_wav("sfx/phone_call.wav"): 1
 }
 sfx_triggered = {
-    "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack"]),
-    "ball": ([AudioSegment.from_wav("sfx/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
+    "bomb": ([AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "exploding", "fire in the hole", "blow", "blew", "blast", "firework"]),
     "gun": ([AudioSegment.from_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)], ["shoot", "shot", "kill", "murder", "gun", "firing", "firearm", "bullet", "pistol", "rifle"]),
     "molotov": ([AudioSegment.from_wav("sfx/molotov.wav")], ["fire", "molotov", "burn", "flame", "flaming", "ignite", "igniting", "arson", "light", "lit", "hot", "blaze", "blazing", "combust"]),
-    "bomb": ([AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "exploding", "fire in the hole", "blow", "blew", "blast"])
+    "ball": ([AudioSegment.from_wav("sfx/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
+    "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp"])
 }
 sfx_transition = AudioSegment.from_wav("sfx/transition.wav")
 sfx_transition = sfx_transition.apply_gain(gain_sfx - sfx_transition.dBFS)
@@ -306,7 +306,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
         combined = AudioSegment.empty()
-        script_lower = ""
 
         # Process each line
         for line in lines:
@@ -357,6 +356,12 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 except:
                     seg = voice_failed
 
+            # Check if any of the word-activated SFX should happen
+            for sfx in sfx_triggered.keys():
+                if any(keyword in output_line.lower() for keyword in sfx_triggered[sfx][1]):
+                    sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
+                    break
+
             # Apply gain, forcing a loud event sometimes
             if output_line.isupper() or randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
@@ -364,14 +369,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 output_line = output_line.upper()
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
-
-            # Check if any of the word-activated SFX should happen
-            output_line_lower = output_line.lower()
-            for sfx in sfx_triggered.keys():
-                keywords = sfx_triggered[sfx][1]
-                collection = sfx_positions[sfx]
-                if any(keyword in output_line_lower for keyword in keywords):
-                    collection.append(len(combined) + randrange(len(seg)))
 
             # Add the line to the combined audio segment
             combined = combined.append(seg, 0)
@@ -384,7 +381,6 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
             # Add the line to the output script
             output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {utils.escape_markdown(output_line)}", inline=False)
-            script_lower += output_line_lower + "\n"
 
             # Line completed
             current_line += 1
