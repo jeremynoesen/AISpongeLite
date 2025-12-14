@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN apt update
+RUN apt upgrade -y
 RUN apt install ffmpeg -y
 RUN pip install --no-cache-dir -r requirements.txt
 
