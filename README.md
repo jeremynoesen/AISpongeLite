@@ -12,7 +12,7 @@ several FakeYou device and account bans.
 
 ### Characters
 
-SpongeBob, Patrick, Squidward, Sandy, Mr. Krabs, Plankton, Gary, Mrs. Puff, Larry, Squilliam, Karen, Narrator, 
+SpongeBob, Patrick, Squidward, Sandy, Mr. Krabs, Plankton, Gary, Mrs. Puff, Larry, Squilliam, Karen, Narrator,
 Bubble Buddy, Bubble Bass, Perch*, Pearl*, DoodleBob, Mr. Fish, Dutchman*, King Neptune, Man Ray*, and Dirty Bubble.
 
 Character names must be written exactly as shown above, excluding capitalization.
@@ -81,7 +81,7 @@ then follow these instructions. MacOS is not supported by the installation scrip
    download the entire repository.
 2. Open a terminal and navigate to the directory where you saved the script.
 3. Run the script with the command `sudo bash install.sh`.
-4. When prompted, enter the Discord bot token and OpenAI API key you copied earlier. Optionally, you can enter FakeYou 
+4. When prompted, enter the Discord bot token and OpenAI API key you copied earlier. Optionally, you can enter FakeYou
    credentials, as well as a Discord channel ID for logging.
 5. Once the script is finished, you can delete the `install.sh` script.
 
@@ -102,3 +102,13 @@ The bot will be ready to use once its status changes to "Ready!".
 ![Episode](img/episode.png)
 ![TTS](img/tts.png)
 ![Chat](img/chat.png)
+
+## Wall of Fame
+
+The following Patreon supporters are subscribed to the "Wall of Fame" tier, pledging the highest tier of support to
+this project:
+
+- Explode
+
+Thank you to all my supporters for helping to keep this project alive, and thank you especially to everyone listed
+above for your generous support!
