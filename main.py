@@ -186,7 +186,10 @@ sfx_random = {
     AudioSegment.from_wav("sfx/dramatic_cue_a.wav"): 1,
     AudioSegment.from_wav("sfx/dramatic_cue_d.wav"): 1,
     AudioSegment.from_wav("sfx/alarm.wav"): 1,
-    AudioSegment.from_wav("sfx/phone_call.wav"): 1
+    AudioSegment.from_wav("sfx/phone_call.wav"): 1,
+    AudioSegment.from_wav("sfx/explosion.wav"): 1,
+    AudioSegment.from_wav("sfx/anchor.wav"): 1,
+    AudioSegment.from_wav("sfx/train.wav"): 1
 }
 sfx_triggered = {
     "bomb": ([AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "exploding", "fire in the hole", "blow", "blew", "blast", "firework"]),
