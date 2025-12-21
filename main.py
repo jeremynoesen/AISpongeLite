@@ -252,7 +252,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{utils.escape_markdown(topic)}", color=embed_color))
 
         # Lowercase version of topic for processing
-        topic_lower = topic.lower()
+        topic_lower = topic.lower().replace("’", "'")
 
         # Get location from topic or choose a random one
         location = choice(list(locations.keys()))
