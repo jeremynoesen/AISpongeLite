@@ -109,6 +109,7 @@ The following Patreon supporters are subscribed to the "Wall of Fame" tier, pled
 this project:
 
 - Explode
+- lulu ♡
 
 Thank you to all my supporters for helping to keep this project alive, and thank you especially to everyone listed
 above for your generous support!
