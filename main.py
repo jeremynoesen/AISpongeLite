@@ -378,7 +378,10 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
             # Add line spacing unless a cutoff event occurs
             if output_line[-1] in "-–—" or randrange(10) == 0:
-                output_line = output_line[:-1] + "—"
+                if output_line[-1] == ">":
+                    output_line = output_line + "—"
+                else:
+                    output_line = output_line[:-1] + "—"
             else:
                 combined = combined.append(silence_line, 0)
 
