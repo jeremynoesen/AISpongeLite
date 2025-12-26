@@ -252,7 +252,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{utils.escape_markdown(topic)}", color=embed_color))
 
         # Lowercase version of topic for processing
-        topic_lower = topic.lower().replace("’", "'")
+        topic_lower = topic.casefold().replace("’", "'")
 
         # Get location from topic or choose a random one
         location = choice(list(locations.keys()))
@@ -294,7 +294,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
         title_formatted = "No Title"
-        if len(line_parts) == 2 and "title" in line_parts[0].lower():
+        if len(line_parts) == 2 and "title" in line_parts[0].casefold():
             title = line_parts[1].strip()[:char_limit_max].strip()
             if title:
                 title_formatted = title
@@ -331,7 +331,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             # Get the character
             character = ""
             for key in characters.keys():
-                if key in line_parts[0].lower():
+                if key in line_parts[0].casefold():
                     character = key
                     break
 
@@ -361,7 +361,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
             # Check if any of the word-activated SFX should happen
             for sfx in sfx_triggered.keys():
-                if any(keyword in output_line.lower() for keyword in sfx_triggered[sfx][1]):
+                if any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
                     sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
                     break
 
