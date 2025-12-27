@@ -369,7 +369,13 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             if output_line.isupper() or randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
-                output_line = output_line.upper()
+                words = []
+                for word in output_line.split(" "):
+                    if all(char in word for char in "<:>"):
+                        words.append(word)
+                    else:
+                        words.append(word.upper())
+                output_line = " ".join(words)
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
 
