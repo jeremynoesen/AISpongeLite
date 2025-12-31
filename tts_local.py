@@ -47,7 +47,7 @@ allow_parallel = True
 char_limit_min = 1
 char_limit_max = 512
 
-# Bitrate for output audio
+# Bitrate for compressed output audio
 bitrate = "320k"
 
 
