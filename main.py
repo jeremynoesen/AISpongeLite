@@ -12,7 +12,9 @@ from math import ceil
 from io import BytesIO
 from os import getenv, listdir
 from dotenv import load_dotenv
-from discord import Status, Embed, Interaction, Color, Game, utils, Intents, Client, File, app_commands
+from discord import Status, Embed, Interaction, Color, Game, Intents, Client, File
+from discord.utils import escape_markdown
+from discord.app_commands import CommandTree, Range, describe, allowed_installs, allowed_contexts
 from pydub import AudioSegment
 
 # Load .env
@@ -28,7 +30,7 @@ activity_generating = Game("Generating...")
 
 # Initialize Discord client
 client = Client(intents=Intents.default(), activity=Game("Initializing..."), status=Status.idle)
-command_tree = app_commands.CommandTree(client)
+command_tree = CommandTree(client)
 
 # Logging channel
 logging_channel = None
@@ -217,10 +219,10 @@ generating = False
 
 
 @command_tree.command(description="Generate an episode.")
-@app_commands.describe(topic="Topic of episode.")
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-async def episode(interaction: Interaction, topic: app_commands.Range[str, char_limit_min, char_limit_max]):
+@describe(topic="Topic of episode.")
+@allowed_installs(True, False)
+@allowed_contexts(True, False, True)
+async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max]):
     """
     Generate an audio episode about a topic.
     :param interaction: Interaction created by the command
@@ -249,7 +251,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{utils.escape_markdown(topic)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic)}", color=embed_color))
 
         # Lowercase version of topic for processing
         topic_lower = topic.casefold().replace("’", "'")
@@ -304,7 +306,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         total_lines = len(lines)
 
         # Create the embed for the output
-        output_embed = Embed(title=utils.escape_markdown(title_formatted), color=locations[location][1])
+        output_embed = Embed(title=escape_markdown(title_formatted), color=locations[location][1])
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -386,7 +388,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 combined = combined.append(silence_line, 0)
 
             # Add the line to the output script
-            output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {utils.escape_markdown(output_line)}", inline=False)
+            output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line)}", inline=False)
 
             # Line completed
             current_line += 1
@@ -465,10 +467,10 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
 
 @command_tree.command(description="Make a character speak text.")
-@app_commands.describe(character="Character to speak text.", text="Text to speak.")
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: characters_literal, text: app_commands.Range[str, char_limit_min, char_limit_max]):
+@describe(character="Character to speak text.", text="Text to speak.")
+@allowed_installs(True, False)
+@allowed_contexts(True, False, True)
+async def tts(interaction: Interaction, character: characters_literal, text: Range[str, char_limit_min, char_limit_max]):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
@@ -498,7 +500,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{utils.escape_markdown(text)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text)}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "doodlebob":
@@ -523,7 +525,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
         with BytesIO() as output:
             seg.export(output, "wav")
             character_title = character.title().replace('bob', 'Bob')
-            await interaction.edit_original_response(embed=Embed(color=characters[character], description=utils.escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, character_title + ": " + text.replace("/", "\\") + ".wav")])
 
     # Generation failed
@@ -538,10 +540,10 @@ async def tts(interaction: Interaction, character: characters_literal, text: app
 
 
 @command_tree.command(description="Chat with a character.")
-@app_commands.describe(character="Character to chat with.", message="Message to send.")
-@app_commands.allowed_installs(True, False)
-@app_commands.allowed_contexts(True, False, True)
-async def chat(interaction: Interaction, character: characters_literal, message: app_commands.Range[str, char_limit_min, char_limit_max]):
+@describe(character="Character to chat with.", message="Message to send.")
+@allowed_installs(True, False)
+@allowed_contexts(True, False, True)
+async def chat(interaction: Interaction, character: characters_literal, message: Range[str, char_limit_min, char_limit_max]):
     """
     Chat with one of the characters.
     :param interaction: Interaction created by the command
@@ -571,13 +573,13 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{utils.escape_markdown(message)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{escape_markdown(message)}", color=embed_color))
 
         # Generate the chat response
         response = await write(f"Write a response to a discord message as {character} from spongebob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
 
         # Clean the response text
-        output = utils.escape_markdown(sub(regex_actions, "", response.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip()).strip()[:char_limit_max].strip())
+        output = escape_markdown(sub(regex_actions, "", response.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip()).strip()[:char_limit_max].strip())
 
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character.title().replace("bob", "Bob"), icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
