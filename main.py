@@ -7,7 +7,7 @@ Written by Jeremy Noesen
 
 from typing import Literal
 from random import randint, randrange, choice, choices
-from re import sub
+from re import sub, fullmatch, split
 from math import ceil
 from io import BytesIO
 from os import getenv, listdir
@@ -43,9 +43,9 @@ embed_chat = Embed(title="Generating...", description="Writing response...", col
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
 embed_in_use = Embed(title="Busy.", description="Currently in use.", color=embed_color)
 
-# Regex patterns for actions in script
-regex_actions = r"(:\s+)(\(+\S[^()]+\S\)+|\[+\S[^\[\]]+\S]+|\*+\S[^*]+\S\*+|<+\S[^<>:]+\S>+|\{+\S[^{}]+\S}+|-+\S[^-]+\S-+|\|+\S[^|]+\S\|+|/+\S[^/]+\S/+|\\+\S[^\\]+\S\\+)([^\S\r\n]+)"
-regex_replacement = r"\1"
+# Regex patterns for script modification
+regex_actions = r"^[\(*\[].+?[\)*\]]\s+"
+regex_emoji = r"(<[^<>]*[:@#][^<>]*>)"
 
 # Emojis for the characters
 emojis = {}
@@ -289,7 +289,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
         script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a spongebob episode about a topic that takes place on a {weather} {ambiance_time[ambiance][0]} in {location} and features {locations[location][2]}, and any characters mentioned in the topic. Only respond with a two-word, spongebob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
 
         # Clean the script
-        lines = sub(regex_actions, regex_replacement, script.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")
+        lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
 
         # Get the episode title
         line_parts = lines.pop(0).split(":", 1)
@@ -323,7 +323,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
                 continue
 
             # Skip line if it is too short
-            output_line = line_parts[1].strip()[:char_limit_max].strip()
+            output_line = sub(regex_actions, "", line_parts[1].strip()).strip()[:char_limit_max].strip()
             if len(output_line) < char_limit_min:
                 total_lines -= 1
                 continue
@@ -369,13 +369,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
             if output_line.isupper() or randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
-                words = []
-                for word in output_line.split(" "):
-                    if all(char in word for char in "<:>"):
-                        words.append(word)
-                    else:
-                        words.append(word.upper())
-                output_line = " ".join(words)
+                output_line = "".join(part if fullmatch(regex_emoji, part) else part.upper() for part in split(regex_emoji, output_line))
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
 
@@ -384,7 +378,7 @@ async def episode(interaction: Interaction, topic: app_commands.Range[str, char_
 
             # Add line spacing unless a cutoff event occurs
             if output_line[-1] in "-–—" or randrange(10) == 0:
-                if output_line[-1] == ">":
+                if fullmatch(r".*" + regex_emoji, output_line):
                     output_line = output_line + "—"
                 else:
                     output_line = output_line[:-1] + "—"
@@ -583,7 +577,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         response = await write(f"Write a response to a discord message as {character} from spongebob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
 
         # Clean the response text
-        output = utils.escape_markdown(sub(regex_actions, regex_replacement, response.replace("\n\n", "\n").replace(":\n", ": ")).strip().split("\n")[0].split(":", 1)[1].strip()[:char_limit_max].strip())
+        output = utils.escape_markdown(sub(regex_actions, "", response.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip()).strip()[:char_limit_max].strip())
 
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character.title().replace("bob", "Bob"), icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
