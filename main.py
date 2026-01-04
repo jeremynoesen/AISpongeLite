@@ -306,7 +306,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         total_lines = len(lines)
 
         # Create the embed for the output
-        output_embed = Embed(title=escape_markdown(title_formatted), color=locations[location][1])
+        embed_output = Embed(title=escape_markdown(title_formatted), color=locations[location][1])
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -388,7 +388,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                 combined = combined.append(silence_line, 0)
 
             # Add the line to the output script
-            output_embed.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line)}", inline=False)
+            embed_output.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line)}", inline=False)
 
             # Line completed
             current_line += 1
@@ -452,12 +452,14 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         # Export the episode and send it
         with BytesIO() as output:
             combined.export(output, "mp3", bitrate=bitrate)
-            await interaction.edit_original_response(embed=output_embed, attachments=[
+            await interaction.edit_original_response(embed=embed_output, attachments=[
                 File(output, title_formatted.replace("/", "\\") + ".mp3")])
 
     # Generation failed
     except:
-        await interaction.edit_original_response(embed=embed_failed)
+        with BytesIO() as output:
+            voice_failed.export(output, "wav")
+            await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
 
     # Unblock generation
     finally:
@@ -530,7 +532,9 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
 
     # Generation failed
     except:
-        await interaction.edit_original_response(embed=embed_failed)
+        with BytesIO() as output:
+            voice_failed.export(output, "wav")
+            await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
 
     # Unblock generation
     finally:
@@ -586,7 +590,9 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
     # Generation failed
     except:
-        await interaction.edit_original_response(embed=embed_failed)
+        with BytesIO() as output:
+            voice_failed.export(output, "wav")
+            await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
 
     # Unblock generation
     finally:
