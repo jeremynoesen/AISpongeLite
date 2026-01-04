@@ -46,7 +46,7 @@ embed_failed = Embed(title="Failed.", description="An error occurred.", color=em
 embed_in_use = Embed(title="Busy.", description="Currently in use.", color=embed_color)
 
 # Regex patterns for script modification
-regex_actions = r"^[\(*\[].+?[\)*\]]\s+"
+regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
 regex_emoji = r"(<[^<>]*[:@#][^<>]*>)"
 
 # Emojis for the characters
