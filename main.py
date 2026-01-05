@@ -583,7 +583,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         response = await write(f"Write a response to a discord message as {character} from spongebob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
 
         # Clean the response text
-        output = escape_markdown(sub(regex_actions, "", response.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")[0].split(":", 1)[1].strip())[:char_limit_max].strip())
+        output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character.title().replace("bob", "Bob"), icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
