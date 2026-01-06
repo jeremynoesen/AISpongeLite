@@ -37,7 +37,7 @@ logging_channel = None
 
 # Embed settings and static embeds
 embed_color = Color.dark_theme()
-embed_delete_after = 10
+embed_delete_after = 5
 embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
