@@ -113,6 +113,7 @@ music_gator = AudioSegment.from_wav("music/gator.wav")
 music_rock_bottom = AudioSegment.from_wav("music/rock_bottom.wav")
 music_just_breaking_softer = AudioSegment.from_mp3("music/just_breaking_softer.mp3")
 music_grass_skirt_chase = AudioSegment.from_wav("music/grass_skirt_chase.wav")
+fade_music = 5000
 
 # Locations with their assigned music segments and embed colors
 locations = {
@@ -410,7 +411,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             music_loop = music
         else:
             music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
-            music_loop = silence_music.append(music.fade_in(10000), 0)
+            music_loop = silence_music.append(music.fade_in(fade_music), 0)
         while len(music_loop) < len(combined):
             music_loop = music_loop.append(music, 0)
         combined = combined.overlay(music_loop)
