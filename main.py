@@ -468,15 +468,16 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Character to speak text.", text="Text to speak.")
+@describe(character="Character to speak text.", text="Text to speak.", loud="Whether to speak loud or not.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: characters_literal, text: Range[str, char_limit_min, char_limit_max]):
+async def tts(interaction: Interaction, character: characters_literal, text: Range[str, char_limit_min, char_limit_max], loud: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
     :param character: Character voice to use for TTS
     :param text: Text to speak
+    :param loud: Whether to make the audio loud and distorted
     :return: None
     """
 
@@ -501,7 +502,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text)} loud:{loud}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "doodlebob":
@@ -515,8 +516,8 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
         else:
             seg = await speak(character, text)
 
-        # Apply gain, forcing a loud event if the text is uppercase
-        if text.isupper():
+        # Apply gain, forcing a loud event if requested
+        if loud:
             seg = seg.apply_gain(gain_voice_distort)
             seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
         else:
