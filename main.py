@@ -258,7 +258,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic)} location:{location} weather:{weather} time:{time} chaos:{chaos}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic, as_needed=True)} location:{location} weather:{weather} time:{time} chaos:{chaos}", color=embed_color))
 
         # Get random location if none provided
         if location is None:
@@ -303,7 +303,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         total_lines = len(lines)
 
         # Create the embed for the output
-        embed_output = Embed(title=escape_markdown(title_formatted), color=locations[location][1])
+        embed_output = Embed(title=escape_markdown(title_formatted, as_needed=True), color=locations[location][1])
 
         # Variables used for generation data
         sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -379,7 +379,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                 combined = combined.append(silence_line, 0)
 
             # Add the line to the output script
-            embed_output.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line)}", inline=False)
+            embed_output.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line, as_needed=True)}", inline=False)
 
             # Line completed
             current_line += 1
@@ -494,7 +494,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text)} loud:{loud}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} loud:{loud}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "DoodleBob":
@@ -518,7 +518,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
         # Export and send the file
         with BytesIO() as output:
             seg.export(output, "wav")
-            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text, as_needed=True)).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                 File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
     # Generation failed
@@ -568,13 +568,13 @@ async def chat(interaction: Interaction, character: characters_literal, message:
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{escape_markdown(message)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
 
         # Generate the chat response
         response = await write(f"Write a response to a discord message as {character} from spongebob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
 
         # Clean the response text
-        output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
+        output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip(), as_needed=True)
 
         # Send the response
         await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
