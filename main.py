@@ -385,12 +385,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             combined = combined.append(seg, 0)
 
             # Add line spacing unless a cutoff event occurs
-            if output_line[-1] in "-–—" or randrange(10) == 0:
-                if fullmatch(r".*" + regex_emoji, output_line):
-                    output_line = output_line + "—"
-                else:
-                    output_line = output_line[:-1] + "—"
-            else:
+            if output_line[-1] not in "-–—":
                 combined = combined.append(silence_line, 0)
 
             # Add the line to the output script
