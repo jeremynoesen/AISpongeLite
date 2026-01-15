@@ -90,14 +90,14 @@ gain_voice_distort = 20
 
 # Ambiance audio segments
 ambiance_time = {
-    AudioSegment.from_wav("ambiance/day.wav"): ["day", "bright", "morning", "noon", "dawn", "sunrise", "early"],
-    AudioSegment.from_wav("ambiance/night.wav"): ["night", "dark", "evening", "dusk", "sunset", "late"]
+    "Day": AudioSegment.from_wav("ambiance/day.wav"),
+    "Night": AudioSegment.from_wav("ambiance/night.wav")
 }
 ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
-storm_keywords = ["storm", "thunder", "lightning", "downpour"]
-rain_keywords = ["rain", "drizzle", "shower", "sprinkle", "wet"]
-clear_keywords = ["clear", "dry"]
 fade_ambiance = 500
+time_literal = Literal["Day", "Night"]
+weather_literal = Literal["Stormy", "Rainy", "Clear"]
+
 
 # Music audio segments
 music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav")
@@ -116,53 +116,56 @@ fade_music = 5000
 
 # Locations with their assigned music segments and embed colors
 locations = {
-    "spongebob's house": ({
+    "SpongeBob's House": ({
         music_stars_and_games: 5,
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0xd87c02, "SpongeBob, Patrick, Gary"),
-    "patrick's house": ({
+    "Patrick's House": ({
         music_gator: 5,
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0x561e1f, "SpongeBob, Patrick"),
-    "squidward's house": ({
+    "Squidward's House": ({
         music_comic_walk: 5,
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0x193f51, "SpongeBob, Patrick, Squidward"),
-    "sandy's treedome": ({
+    "Sandy's Treedome": ({
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0x2b6f00, "SpongeBob, Patrick, Sandy"),
-    "krusty krab": ({
+    "Krusty Krab": ({
         music_tip_top_polka: 5,
         music_rake_hornpipe: 5,
         music_drunken_sailor: 5,
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0x62390f, "SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton"),
-    "chum bucket": ({
+    "Chum Bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0x2a3644, "Plankton, Karen"),
-    "boating school": ({
+    "Boating School": ({
         music_hello_sailor_b: 5,
         music_seaweed: 1,
         music_closing_theme: 1
     }, 0xcab307, "SpongeBob, Patrick, Mrs. Puff"),
-    "news studio": ({
+    "News Studio": ({
         music_just_breaking_softer: 1
     }, 0x316ec3, "Perch, Mr. Fish"),
-    "rock bottom": ({
+    "Rock Bottom": ({
         music_rock_bottom: 1
     }, 0x101027, "SpongeBob, Patrick, Squidward"),
-    "bikini bottom": ({
+    "Bikini Bottom": ({
         music_closing_theme: 5,
         music_grass_skirt_chase: 1,
         music_gator: 1
     }, 0xddba8b, "SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Squilliam")
 }
+
+# Locations literal type for command arguments
+locations_literal = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "News Studio", "Rock Bottom", "Bikini Bottom"]
 
 # SFX audio segments
 sfx_random = {
@@ -219,14 +222,18 @@ generating = False
 
 
 @command_tree.command(description="Generate an episode.")
-@describe(topic="Topic of episode.")
+@describe(topic="Topic of episode.", location="Location of episode.", weather="Weather of episode.", time="Time of episode.", chaos="Whether to simulate chaos hour or not.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max]):
+async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations_literal = None, weather: weather_literal = None, time: time_literal = None, chaos: bool = False):
     """
     Generate an audio episode about a topic.
     :param interaction: Interaction created by the command
     :param topic: Topic of the episode
+    :param location: Location of the episode
+    :param weather: Weather of the episode
+    :param time: Time of the episode
+    :param chaos: Whether to simulate chaos hour or not
     :return: None
     """
 
@@ -251,49 +258,34 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic)} location:{location} weather:{weather} time:{time} chaos:{chaos}", color=embed_color))
 
-        # Lowercase version of topic for processing
-        topic_lower = topic.casefold().replace("’", "'")
+        # Get random location if none provided
+        if location is None:
+            location = choice(list(locations.keys()))
 
-        # Determine if this topic is a chaos topic
-        chaos = False
-        if "chaos" in topic_lower or "chaotic" in topic_lower:
-            chaos = True
+        # Get random time if none provided
+        if time is None:
+            ambiance = choice(list(ambiance_time.values()))
+        else:
+            ambiance = ambiance_time[time]
 
-        # Get location from topic or choose a random one
-        location = choice(list(locations.keys()))
-        for key in locations.keys():
-            if key in topic_lower:
-                location = key
-                break
-
-        # Get ambiance from topic or choose a random one
-        ambiance = choice(list(ambiance_time.keys()))
-        for key in ambiance_time.keys():
-            if any(word in topic_lower for word in ambiance_time[key]):
-                ambiance = key
-                break
-
-        # Determine rain intensity from topic or randomly
-        if any(word in topic_lower for word in storm_keywords):
+        # Get rain intensity
+        if weather == "Stormy":
             rain_intensity = randint(1, 5)
-            weather = "stormy"
-        elif any(word in topic_lower for word in rain_keywords):
+        elif weather == "Rainy":
             rain_intensity = randint(-5, 0)
-            weather = "rainy"
-        elif any(word in topic_lower for word in clear_keywords):
+        elif weather == "Clear":
             rain_intensity = None
-            weather = "clear"
         elif randrange(5) == 0:
             rain_intensity = randint(-5, 5)
-            weather = "rainy" if rain_intensity <= 0 else "stormy"
+            weather = "Rainy" if rain_intensity <= 0 else "Stormy"
         else:
             rain_intensity = None
-            weather = "clear"
+            weather = "Clear"
 
         # Generate the script
-        script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a spongebob episode about a topic that takes place on a {weather} {ambiance_time[ambiance][0]} in {location} and features {locations[location][2]}, and any characters mentioned in the topic. Only respond with a two-word, spongebob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+        script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a spongebob episode about a topic that takes place on a {weather} {time} in {location} and features {locations[location][2]}, and any characters mentioned in the topic. Only respond with a two-word, spongebob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
 
         # Clean the script
         lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
