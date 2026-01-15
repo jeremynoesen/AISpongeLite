@@ -257,6 +257,11 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         # Lowercase version of topic for processing
         topic_lower = topic.casefold().replace("’", "'")
 
+        # Determine if this topic is a chaos topic
+        chaos = False
+        if "chaos" in topic_lower or "chaotic" in topic_lower:
+            chaos = True
+
         # Get location from topic or choose a random one
         location = choice(list(locations.keys()))
         for key in locations.keys():
@@ -433,7 +438,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
             # Add lightning if rain is intense
             if rain_intensity > 0:
-                for i in range(randint(1, ceil(min(total_lines, 25) / (10 - rain_intensity)))):
+                for i in range(ceil(len(combined) / 1000) if chaos else randint(1, ceil(min(total_lines, 25) / (10 - rain_intensity)))):
                     combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), randrange(len(combined)))
 
         # Add word-activated SFX to the episode
@@ -444,7 +449,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                     combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-10, 0)) - variant.dBFS), position)
 
         # Add random SFX to the episode
-        for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=randint(1, ceil(min(total_lines, 25) / 5))):
+        for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else randint(1, ceil(min(total_lines, 25) / 5)))):
             combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
 
         # Add the transition SFX to the beginning of the episode and fade out the end
