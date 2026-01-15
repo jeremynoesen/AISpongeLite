@@ -47,7 +47,6 @@ embed_in_use = Embed(title="Busy.", description="Currently in use.", color=embed
 
 # Regex patterns for script modification
 regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
-regex_emoji = r"(<[^<>]*[:@#][^<>]*>)"
 
 # Emojis for the characters
 emojis = {}
@@ -377,7 +376,6 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             if output_line.isupper() or randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
-                output_line = "".join(part if fullmatch(regex_emoji, part) else part.upper() for part in split(regex_emoji, output_line))
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
 
