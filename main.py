@@ -53,32 +53,32 @@ emojis = {}
 
 # Characters dictionary with their embed colors
 characters = {
-    "spongebob": 0xc3ac30,
-    "patrick": 0xeea68b,
-    "squidward": 0x9abab2,
-    "sandy": 0xc6b4ab,
-    "mr. krabs": 0xde280d,
-    "plankton": 0x0f4708,
-    "gary": 0xc18d86,
-    "mrs. puff": 0xcc9c64,
-    "larry": 0xd55b06,
-    "squilliam": 0xd4ecd7,
-    "karen": 0x778bb0,
-    "narrator": 0x8f7c69,
-    "bubble buddy": 0x788b94,
-    "bubble bass": 0xc0ae6b,
-    "perch": 0x987cb4,
-    "pearl": 0xa7b2b3,
-    "doodlebob": 0x9a94a0,
-    "mr. fish": 0x999072,
-    "dutchman": 0x11c304,
-    "king neptune": 0x82f386,
-    "man ray": 0x0b4881,
-    "dirty bubble": 0x7c522d
+    "SpongeBob": 0xc3ac30,
+    "Patrick": 0xeea68b,
+    "Squidward": 0x9abab2,
+    "Sandy": 0xc6b4ab,
+    "Mr. Krabs": 0xde280d,
+    "Plankton": 0x0f4708,
+    "Gary": 0xc18d86,
+    "Mrs. Puff": 0xcc9c64,
+    "Larry": 0xd55b06,
+    "Squilliam": 0xd4ecd7,
+    "Karen": 0x778bb0,
+    "Narrator": 0x8f7c69,
+    "Bubble Buddy": 0x788b94,
+    "Bubble Bass": 0xc0ae6b,
+    "Perch": 0x987cb4,
+    "Pearl": 0xa7b2b3,
+    "DoodleBob": 0x9a94a0,
+    "Mr. Fish": 0x999072,
+    "Dutchman": 0x11c304,
+    "King Neptune": 0x82f386,
+    "Man Ray": 0x0b4881,
+    "Dirty Bubble": 0x7c522d
 }
 
 # Characters literal type for command arguments
-characters_literal = Literal["spongebob", "patrick", "squidward", "sandy", "mr. krabs", "plankton", "gary", "mrs. puff", "larry", "squilliam", "karen", "narrator", "bubble buddy", "bubble bass", "perch", "pearl", "doodlebob", "mr. fish", "dutchman", "king neptune", "man ray", "dirty bubble"]
+characters_literal = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch", "Pearl", "DoodleBob", "Mr. Fish", "Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
 
 # Gain settings for audio segments
 gain_ambiance = -45
@@ -120,48 +120,48 @@ locations = {
         music_stars_and_games: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0xd87c02, "spongebob, patrick, gary"),
+    }, 0xd87c02, "SpongeBob, Patrick, Gary"),
     "patrick's house": ({
         music_gator: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x561e1f, "spongebob, patrick"),
+    }, 0x561e1f, "SpongeBob, Patrick"),
     "squidward's house": ({
         music_comic_walk: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x193f51, "spongebob, patrick, squidward"),
+    }, 0x193f51, "SpongeBob, Patrick, Squidward"),
     "sandy's treedome": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x2b6f00, "spongebob, patrick, sandy"),
+    }, 0x2b6f00, "SpongeBob, Patrick, Sandy"),
     "krusty krab": ({
         music_tip_top_polka: 5,
         music_rake_hornpipe: 5,
         music_drunken_sailor: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x62390f, "spongebob, patrick, squidward, mr. krabs, plankton"),
+    }, 0x62390f, "SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton"),
     "chum bucket": ({
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0x2a3644, "plankton, karen"),
+    }, 0x2a3644, "Plankton, Karen"),
     "boating school": ({
         music_hello_sailor_b: 5,
         music_seaweed: 1,
         music_closing_theme: 1
-    }, 0xcab307, "spongebob, patrick, mrs. puff"),
+    }, 0xcab307, "SpongeBob, Patrick, Mrs. Puff"),
     "news studio": ({
         music_just_breaking_softer: 1
-    }, 0x316ec3, "perch, mr. fish"),
+    }, 0x316ec3, "Perch, Mr. Fish"),
     "rock bottom": ({
         music_rock_bottom: 1
-    }, 0x101027, "spongebob, patrick, squidward"),
+    }, 0x101027, "SpongeBob, Patrick, Squidward"),
     "bikini bottom": ({
         music_closing_theme: 5,
         music_grass_skirt_chase: 1,
         music_gator: 1
-    }, 0xddba8b, "spongebob, patrick, squidward, mr. krabs, plankton, squilliam")
+    }, 0xddba8b, "SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Squilliam")
 }
 
 # SFX audio segments
@@ -338,7 +338,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             # Get the character
             character = ""
             for key in characters.keys():
-                if key in line_parts[0].casefold():
+                if key.casefold() in line_parts[0].casefold():
                     character = key
                     break
 
@@ -348,11 +348,11 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                 continue
 
             # Speak line using voice files for DoodleBob
-            if character == "doodlebob":
+            if character == "DoodleBob":
                 seg = choice(voice_doodlebob)
 
             # Speak line using voice files for Gary
-            elif character == "gary":
+            elif character == "Gary":
                 seg = choice(voice_gary)
 
             # Speak line for all other characters
@@ -505,11 +505,11 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text)} loud:{loud}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
-        if character == "doodlebob":
+        if character == "DoodleBob":
             seg = choice(voice_doodlebob)
 
         # Speak text using voice files for Gary
-        elif character == "gary":
+        elif character == "Gary":
             seg = choice(voice_gary)
 
         # Speak line for all other characters
@@ -526,9 +526,8 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
         # Export and send the file
         with BytesIO() as output:
             seg.export(output, "wav")
-            character_title = character.title().replace('bob', 'Bob')
-            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text)).set_author(name=character_title, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
-                File(output, character_title + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
+            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+                File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
     # Generation failed
     except:
@@ -586,7 +585,7 @@ async def chat(interaction: Interaction, character: characters_literal, message:
         output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
         # Send the response
-        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character.title().replace("bob", "Bob"), icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
+        await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
 
     # Generation failed
     except:

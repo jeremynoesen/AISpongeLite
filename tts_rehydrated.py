@@ -14,26 +14,26 @@ from pydub import AudioSegment
 
 # Characters dictionary with TTS system name and arpabet status
 characters = {
-    "spongebob": ("SpongeBob", True),
-    "patrick": ("Patrick", True),
-    "squidward": ("Loudward", True),
-    "sandy": ("Sandy", False),
-    "mr. krabs": ("Mr Krabs (Clancy Brown)", False),
-    "plankton": ("Plankton v2 (Doug Lawrence)", True),
-    "mrs. puff": ("Mrs Puff", False),
-    "larry": ("Larry", False),
-    "squilliam": ("Squilliam Fancyson", True),
-    "karen": ("Karen", True),
-    "narrator": ("The French Narrator (Tom Kenny)", True),
-    "bubble buddy": ("BubbleBuddy-30", True),
-    "bubble bass": ("Bubble Bass", True),
-    "perch": ("Perch Perkins", False),
-    "pearl": ("Pearl Krabs", False),
-    "mr. fish": ("MrFish-30", True),
-    "dutchman": ("Flying Dutchman", True),
-    "king neptune": ("KingNep", True),
-    "man ray": ("Manray2025", True),
-    "dirty bubble": ("DirtyBubble22", True)
+    "SpongeBob": ("SpongeBob", True),
+    "Patrick": ("Patrick", True),
+    "Squidward": ("Loudward", True),
+    "Sandy": ("Sandy", False),
+    "Mr. Krabs": ("Mr Krabs (Clancy Brown)", False),
+    "Plankton": ("Plankton v2 (Doug Lawrence)", True),
+    "Mrs. Puff": ("Mrs Puff", False),
+    "Larry": ("Larry", False),
+    "Squilliam": ("Squilliam Fancyson", True),
+    "Karen": ("Karen", True),
+    "Narrator": ("The French Narrator (Tom Kenny)", True),
+    "Bubble Buddy": ("BubbleBuddy-30", True),
+    "Bubble Bass": ("Bubble Bass", True),
+    "Perch": ("Perch Perkins", False),
+    "Pearl": ("Pearl Krabs", False),
+    "Mr. Fish": ("MrFish-30", True),
+    "Dutchman": ("Flying Dutchman", True),
+    "King Neptune": ("KingNep", True),
+    "Man Ray": ("Manray2025", True),
+    "Dirty Bubble": ("DirtyBubble22", True)
 }
 
 # Base URLs of local TTS server

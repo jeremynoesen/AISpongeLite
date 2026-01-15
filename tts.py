@@ -23,22 +23,22 @@ fakeyou_timeout = 90
 
 # Characters dictionary with their model tokens
 characters = {
-    "spongebob": "weight_5by9kjm8vr8xsp7abe8zvaxc8",
-    "patrick": "weight_154man2fzg19nrtc15drner7t",
-    "squidward": "TM:3psksme51515",
-    "sandy": "TM:214sp1nxxd63",
-    "mr. krabs": "weight_5bxbp9xqy61svfx03b25ezmwx",
-    "plankton": "weight_ahxbf2104ngsgyegncaefyy6j",
-    "mrs. puff": "weight_129qhgze57zhndkkcq83e6b2a",
-    "larry": "weight_k7qvaffwsft6vxbcps4wbyj58",
-    "squilliam": "weight_zmjv8223ed6wx1fp234c79v9s",
-    "karen": "weight_eckp92cd68r4yk68n6re3fwcb",
-    "narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j",
-    "bubble buddy": "weight_sbr0372ysxbdahcvej96axy1t",
-    "bubble bass": "weight_h9g7rh6tj2hvfezrz8gjs4gwa",
-    "mr. fish": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
-    "king neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm",
-    "dirty bubble": "weight_f7nm9e4sx49gjjknc2mgb9ggs"
+    "SpongeBob": "weight_5by9kjm8vr8xsp7abe8zvaxc8",
+    "Patrick": "weight_154man2fzg19nrtc15drner7t",
+    "Squidward": "TM:3psksme51515",
+    "Sandy": "TM:214sp1nxxd63",
+    "Mr. Krabs": "weight_5bxbp9xqy61svfx03b25ezmwx",
+    "Plankton": "weight_ahxbf2104ngsgyegncaefyy6j",
+    "Mrs. Puff": "weight_129qhgze57zhndkkcq83e6b2a",
+    "Larry": "weight_k7qvaffwsft6vxbcps4wbyj58",
+    "Squilliam": "weight_zmjv8223ed6wx1fp234c79v9s",
+    "Karen": "weight_eckp92cd68r4yk68n6re3fwcb",
+    "Narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j",
+    "Bubble Buddy": "weight_sbr0372ysxbdahcvej96axy1t",
+    "Bubble Bass": "weight_h9g7rh6tj2hvfezrz8gjs4gwa",
+    "Mr. Fish": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
+    "King Neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm",
+    "Dirty Bubble": "weight_f7nm9e4sx49gjjknc2mgb9ggs"
 }
 
 # Whether to allow parallel requests
