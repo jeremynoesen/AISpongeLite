@@ -365,7 +365,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                     break
 
             # Apply gain, forcing a loud event sometimes
-            if output_line.isupper() or randrange(20) == 0:
+            if randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
             else:
