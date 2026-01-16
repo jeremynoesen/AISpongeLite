@@ -7,7 +7,7 @@ Written by Jeremy Noesen
 
 from typing import Literal
 from random import randint, randrange, choice, choices
-from re import sub, fullmatch, split
+from re import sub
 from math import ceil
 from io import BytesIO
 from os import getenv, listdir
