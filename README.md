@@ -16,25 +16,16 @@ SpongeBob, Patrick, Squidward, Sandy, Mr. Krabs, Plankton, Gary, Mrs. Puff, Larr
 Bubble Buddy, Bubble Bass, Perch*, Pearl*, DoodleBob, Mr. Fish, Flying Dutchman*, King Neptune, Man Ray*, and 
 Dirty Bubble.
 
-Character names must be written exactly as shown above, excluding capitalization.
-
-*Only speaks in the AI Sponge Rehydrated instance.
-
-### Locations
-
-SpongeBob's House, Patrick's House, Squidward's House, Sandy's Treedome, Krusty Krab, Chum Bucket, Boating School, News
-Studio, Rock Bottom, and Bikini Bottom.
-
-Locations must be written exactly as shown above, excluding capitalization.
+*Only has TTS in the AI Sponge Rehydrated instance.
 
 ## Usage
 
-Only one of the following commands can be used at a time globally:
+Only one of the following commands can be used at a time per instance:
 
 - `/episode`: Generate an audio-only episode. If an episode takes longer than 15 minutes to generate, it will be
   automatically cancelled due to Discord's interaction timeout limit.
 - `/tts`: Make a character speak text. This is a shortcut to FakeYou's service. It is also the only way to access
-  Squidward's and Sandy's Rehydrated voice models.
+  Squidward's and Sandy's FakeYou Rehydrated voice models.
 - `/chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is sent
   so the character can address you.
 
