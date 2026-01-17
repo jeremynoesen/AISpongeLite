@@ -16,7 +16,7 @@ from discord import Status, Embed, Interaction, Color, Game, Intents, Client, Fi
 from discord.utils import escape_markdown
 from discord.app_commands import CommandTree, Range, describe, allowed_installs, allowed_contexts
 from pydub import AudioSegment
-from pydub.effects import high_pass_filter, low_pass_filter
+from pydub.effects import high_pass_filter
 
 # Load .env
 load_dotenv()
@@ -377,17 +377,17 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                     sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
                     break
 
+            # Apply phone filter in News Studio for callers
+            if location == "News Studio" and character not in ["Perch", "Mr. Fish"]:
+                seg = high_pass_filter(seg, 3000)
+                combined = combined.append(silence_phone, 0)
+
             # Apply gain, forcing a loud event sometimes
             if randrange(20) == 0:
                 seg = seg.apply_gain(gain_voice_distort)
                 seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
             else:
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
-
-            # Apply phone filter in News Studio for callers
-            if location == "News Studio" and character not in ["Perch", "Mr. Fish"]:
-                seg = low_pass_filter(high_pass_filter(seg, 1000), 3000)
-                combined = combined.append(silence_phone, 0)
 
             # Add the line to the combined audio segment
             combined = combined.append(seg, 0)
@@ -532,16 +532,16 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
         else:
             seg = await speak(character, text)
 
+        # Apply phone effect if requested
+        if phone:
+            seg = high_pass_filter(seg, 3000)
+
         # Apply gain, forcing a loud event if requested
         if loud:
             seg = seg.apply_gain(gain_voice_distort)
             seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
         else:
             seg = seg.apply_gain(gain_voice-seg.dBFS)
-
-        # Apply phone effect if requested
-        if phone:
-            seg = low_pass_filter(high_pass_filter(seg, 1000), 3000)
 
         # Export and send the file
         with BytesIO() as output:
