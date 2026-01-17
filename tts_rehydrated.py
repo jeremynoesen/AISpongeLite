@@ -30,7 +30,7 @@ characters = {
     "Perch": ("Perch Perkins", False),
     "Pearl": ("Pearl Krabs", False),
     "Mr. Fish": ("MrFish-30", True),
-    "Dutchman": ("Flying Dutchman", True),
+    "Flying Dutchman": ("Flying Dutchman", True),
     "King Neptune": ("KingNep", True),
     "Man Ray": ("Manray2025", True),
     "Dirty Bubble": ("DirtyBubble22", True)
