@@ -78,9 +78,6 @@ characters = {
     "Dirty Bubble": 0x7c522d
 }
 
-# Characters literal type for command arguments
-characters_literal = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch", "Pearl", "DoodleBob", "Mr. Fish", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
-
 # Gain settings for audio segments
 gain_ambiance = -45
 gain_music = -35
@@ -89,16 +86,16 @@ gain_voice = -15
 gain_voice_loud = -10
 gain_voice_distort = 20
 
+# Fade durations
+fade_ambiance = 500
+fade_music = 5000
+
 # Ambiance audio segments
 ambiance_time = {
     "Day": AudioSegment.from_wav("ambiance/day.wav"),
     "Night": AudioSegment.from_wav("ambiance/night.wav")
 }
 ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
-fade_ambiance = 500
-time_literal = Literal["Day", "Night"]
-weather_literal = Literal["Stormy", "Rainy", "Clear"]
-
 
 # Music audio segments
 music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav")
@@ -113,7 +110,6 @@ music_gator = AudioSegment.from_wav("music/gator.wav")
 music_rock_bottom = AudioSegment.from_wav("music/rock_bottom.wav")
 music_just_breaking_softer = AudioSegment.from_mp3("music/just_breaking_softer.mp3")
 music_grass_skirt_chase = AudioSegment.from_wav("music/grass_skirt_chase.wav")
-fade_music = 5000
 
 # Locations with their assigned music segments and embed colors
 locations = {
@@ -164,9 +160,6 @@ locations = {
         music_gator: 1
     }, 0xddba8b, "SpongeBob, Patrick, Squidward, Mr. Krabs, Plankton, Squilliam")
 }
-
-# Locations literal type for command arguments
-locations_literal = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "News Studio", "Rock Bottom", "Bikini Bottom"]
 
 # SFX audio segments
 sfx_random = {
@@ -221,10 +214,16 @@ voice_failed = AudioSegment.from_wav("voice/failed.wav")
 # Silence audio segments
 silence_line = AudioSegment.silent(200)
 silence_phone = AudioSegment.silent(500)
-silence_episode_intro = AudioSegment.silent(500)
-silence_news_intro = AudioSegment.silent(2000)
-silence_episode_music = AudioSegment.silent(3000)
-silence_news_music = AudioSegment.silent(7500)
+silence_intro_episode = AudioSegment.silent(500)
+silence_intro_news = AudioSegment.silent(2000)
+silence_music_episode = AudioSegment.silent(3000)
+silence_music_news = AudioSegment.silent(7500)
+
+# Literal types
+literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch", "Pearl", "DoodleBob", "Mr. Fish", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
+literal_locations = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "News Studio", "Rock Bottom", "Bikini Bottom"]
+literal_time = Literal["Day", "Night"]
+literal_weather = Literal["Stormy", "Rainy", "Clear"]
 
 # Generation state
 generating = False
@@ -234,7 +233,7 @@ generating = False
 @describe(topic="Topic of episode.", location="Location of episode.", weather="Weather of episode.", time="Time of episode.", chaos="Whether to simulate chaos hour or not.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations_literal = None, weather: weather_literal = None, time: time_literal = None, chaos: bool = False):
+async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: literal_locations = None, weather: literal_weather = None, time: literal_time = None, chaos: bool = False):
     """
     Generate an audio episode about a topic.
     :param interaction: Interaction created by the command
@@ -416,9 +415,9 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         music = choices(list(locations[location][0].keys()), list(locations[location][0].values()))[0]
         music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
         if location == "News Studio":
-            music_loop = silence_news_music.append(music, 0)
+            music_loop = silence_music_news.append(music, 0)
         else:
-            music_loop = silence_episode_music.append(music.fade_in(fade_music), 0)
+            music_loop = silence_music_episode.append(music.fade_in(fade_music), 0)
         while len(music_loop) < len(combined):
             music_loop = music_loop.append(music, 0)
         combined = combined.overlay(music_loop)
@@ -459,9 +458,9 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
         # Add the transition SFX to the beginning of the episode and fade out the end
         if location == "News Studio":
-            combined = silence_news_intro.append(combined, 0).overlay(transition_news).fade_out(len(silence_line))
+            combined = silence_intro_news.append(combined, 0).overlay(transition_news).fade_out(len(silence_line))
         else:
-            combined = silence_episode_intro.append(combined, 0).overlay(transition_episode).fade_out(len(silence_line))
+            combined = silence_intro_episode.append(combined, 0).overlay(transition_episode).fade_out(len(silence_line))
 
         # Export the episode and send it
         with BytesIO() as output:
@@ -486,7 +485,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 @describe(character="Character to speak text.", text="Text to speak.", loud="Whether to speak loud or not.", phone="Whether to speak over the phone or not.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: characters_literal, text: Range[str, char_limit_min, char_limit_max], loud: bool = False, phone: bool = False):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], loud: bool = False, phone: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
@@ -566,7 +565,7 @@ async def tts(interaction: Interaction, character: characters_literal, text: Ran
 @describe(character="Character to chat with.", message="Message to send.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def chat(interaction: Interaction, character: characters_literal, message: Range[str, char_limit_min, char_limit_max]):
+async def chat(interaction: Interaction, character: literal_characters, message: Range[str, char_limit_min, char_limit_max]):
     """
     Chat with one of the characters.
     :param interaction: Interaction created by the command
