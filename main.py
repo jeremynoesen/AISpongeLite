@@ -370,6 +370,9 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                 except:
                     seg = voice_failed
 
+            # Limit the audio length based on text length
+            seg = seg[:1000 + (len(output_line) * 100)]
+
             # Check if any of the word-activated SFX should happen
             for sfx in sfx_triggered.keys():
                 if any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
@@ -485,7 +488,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 @describe(character="Character to speak text.", text="Text to speak.", loud="Whether to speak loud or not.", phone="Whether to speak over the phone or not.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], loud: bool = False, phone: bool = False):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], loud: bool = False, phone: bool = False, limit: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
@@ -530,6 +533,10 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
         # Speak line for all other characters
         else:
             seg = await speak(character, text)
+
+        # Apply length limit if requested
+        if limit:
+            seg = seg[:1000 + (len(text) * 100)]
 
         # Apply phone effect if requested
         if phone:
