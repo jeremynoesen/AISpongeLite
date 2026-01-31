@@ -212,8 +212,8 @@ voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in ra
 voice_failed = AudioSegment.from_wav("voice/failed.wav")
 
 # Silence audio segments
-silence_line = AudioSegment.silent(200)
-silence_phone = AudioSegment.silent(500)
+silence_line_episode = AudioSegment.silent(200)
+silence_line_news = AudioSegment.silent(400)
 silence_intro_episode = AudioSegment.silent(500)
 silence_intro_news = AudioSegment.silent(2000)
 silence_music_episode = AudioSegment.silent(3000)
@@ -382,7 +382,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             # Apply phone filter in News Studio for callers
             if location == "News Studio" and character not in ["Perch", "Mr. Fish"]:
                 seg = high_pass_filter(seg, 3000)
-                combined = combined.append(silence_phone, 0)
+                combined = combined.append(silence_line_news, 0)
 
             # Apply gain, forcing a loud event sometimes
             if randrange(20) == 0:
@@ -396,7 +396,10 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
             # Add line spacing unless a cutoff event occurs
             if output_line[-1] not in "-–—":
-                combined = combined.append(silence_line, 0)
+                if location == "News Studio":
+                    combined = combined.append(silence_line_news, 0)
+                else:
+                    combined = combined.append(silence_line_episode, 0)
 
             # Add the line to the output script
             embed_output.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line, as_needed=True)}", inline=False)
@@ -412,7 +415,10 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         await interaction.edit_original_response(embed=embed_episode_end)
 
         # Add silence at the end of the episode
-        combined = combined.append(silence_line, 0)
+        if location == "News Studio":
+            combined = combined.append(silence_line_news, 0)
+        else:
+            combined = combined.append(silence_line_episode, 0)
 
         # Add music to the episode based on location
         music = choices(list(locations[location][0].keys()), list(locations[location][0].values()))[0]
@@ -461,9 +467,9 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
         # Add the transition SFX to the beginning of the episode and fade out the end
         if location == "News Studio":
-            combined = silence_intro_news.append(combined, 0).overlay(transition_news).fade_out(len(silence_line))
+            combined = silence_intro_news.append(combined, 0).overlay(transition_news).fade_out(len(silence_line_news))
         else:
-            combined = silence_intro_episode.append(combined, 0).overlay(transition_episode).fade_out(len(silence_line))
+            combined = silence_intro_episode.append(combined, 0).overlay(transition_episode).fade_out(len(silence_line_episode))
 
         # Export the episode and send it
         with BytesIO() as output:
