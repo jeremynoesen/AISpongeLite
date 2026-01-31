@@ -230,18 +230,18 @@ generating = False
 
 
 @command_tree.command(description="Generate an episode.")
-@describe(topic="Topic of episode.", location="Location of episode.", weather="Weather of episode.", time="Time of episode.", chaos="Whether to simulate chaos hour or not.")
+@describe(topic="What the episode is about.", location="Where the episode takes place.", time="When the episode takes place.", weather="What the weather is like.", chaos="Whether to simulate chaos hour.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: literal_locations = None, weather: literal_weather = None, time: literal_time = None, chaos: bool = False):
+async def episode(interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: literal_locations = None, time: literal_time = None, weather: literal_weather = None, chaos: bool = False):
     """
     Generate an audio episode about a topic.
     :param interaction: Interaction created by the command
-    :param topic: Topic of the episode
-    :param location: Location of the episode
-    :param weather: Weather of the episode
-    :param time: Time of the episode
-    :param chaos: Whether to simulate chaos hour or not
+    :param topic: What the episode is about
+    :param location: Where the episode takes place
+    :param time: When the episode takes place
+    :param weather: What the weather is like
+    :param chaos: Whether to simulate chaos hour
     :return: None
     """
 
@@ -485,17 +485,18 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Character to speak text.", text="Text to speak.", loud="Whether to speak loud or not.", phone="Whether to speak over the phone or not.")
+@describe(character="Who should speak.", text="What should be said.", loud="Whether to speak loud and distorted.", phone="Whether to speak over the phone.", limit="Whether to apply a text-based audio length limit.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
 async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], loud: bool = False, phone: bool = False, limit: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
-    :param character: Character voice to use for TTS
-    :param text: Text to speak
-    :param loud: Whether to make the audio loud and distorted
-    :param phone: Whether to apply a phone effect to the audio
+    :param character: Who should speak
+    :param text: What should be said
+    :param loud: Whether to speak loud and distorted
+    :param phone: Whether to speak over the phone
+    :param limit: Whether to apply a text-based audio length limit
     :return: None
     """
 
@@ -569,15 +570,15 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
 
 
 @command_tree.command(description="Chat with a character.")
-@describe(character="Character to chat with.", message="Message to send.")
+@describe(character="Who to chat with.", message="What to say to them.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
 async def chat(interaction: Interaction, character: literal_characters, message: Range[str, char_limit_min, char_limit_max]):
     """
     Chat with one of the characters.
     :param interaction: Interaction created by the command
-    :param character: Character to chat with
-    :param message: Message to send to the character
+    :param character: Who to chat with
+    :param message: What to say to them
     :return: None
     """
 
