@@ -492,18 +492,18 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Who should speak.", text="What should be said.", volume="How loud to speak.", phone="Whether to speak over the phone.", limit="Whether to limit speaking time.")
+@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", phone="Whether to speak over the phone.", volume="How loud to speak.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], volume: literal_volume = "Raw", phone: bool = False, limit: bool = False):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, phone: bool = False, volume: literal_volume = "Raw"):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
     :param character: Who should speak
     :param text: What should be said
-    :param volume: How loud to speak
-    :param phone: Whether to speak over the phone
     :param limit: Whether to limit speaking time
+    :param phone: Whether to speak over the phone
+    :param volume: How loud to speak
     :return: None
     """
 
@@ -528,7 +528,7 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} volume:{volume} phone:{phone} limit:{limit}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} limit:{limit} phone:{phone} volume:{volume}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "DoodleBob":
@@ -542,25 +542,32 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
         else:
             seg = await speak(character, text)
 
+        # Footer text to show selected options
+        footer = ""
+
         # Apply length limit if requested
         if limit:
             seg = seg[:1000 + (len(text) * 100)]
+            footer += "⏲️ "
 
         # Apply phone effect if requested
         if phone:
             seg = high_pass_filter(seg, 3000)
+            footer += "☎️ "
 
         # Apply gain
         if volume == "Loud":
             seg = seg.apply_gain(gain_voice_distort)
             seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
+            footer += "📢"
         elif volume == "Normal":
             seg = seg.apply_gain(gain_voice-seg.dBFS)
+            footer += "🗣️"
 
         # Export and send the file
         with BytesIO() as output:
             seg.export(output, "wav")
-            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text, as_needed=True)).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+            await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text, as_needed=True)).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url).set_footer(text=footer), attachments=[
                 File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
     # Generation failed
