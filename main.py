@@ -196,7 +196,8 @@ sfx_triggered = {
     "gun": ([AudioSegment.from_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)], ["shoot", "shot", "kill", "murder", "gun", "firing", "firearm", "bullet", "pistol", "rifle"]),
     "molotov": ([AudioSegment.from_wav("sfx/molotov.wav")], ["fire", "molotov", "burn", "flame", "flaming", "ignite", "igniting", "arson", "light", "hot", "blaze", "blazing", "combust"]),
     "ball": ([AudioSegment.from_wav("sfx/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
-    "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp", "sandwich"])
+    "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp", "sandwich"]),
+    "megaphone": ([AudioSegment.from_wav("sfx/megaphone.wav")], ["hey", "shut", "listen"])
 }
 sfx_lightning = AudioSegment.from_wav("sfx/lightning.wav")
 
@@ -218,6 +219,7 @@ silence_intro_episode = AudioSegment.silent(500)
 silence_intro_news = AudioSegment.silent(2000)
 silence_music_episode = AudioSegment.silent(3000)
 silence_music_news = AudioSegment.silent(7500)
+silence_megaphone = AudioSegment.silent(500)
 
 # Literal types
 literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch", "Pearl", "DoodleBob", "Mr. Fish", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
@@ -225,6 +227,7 @@ literal_locations = Literal["SpongeBob's House", "Patrick's House", "Squidward's
 literal_time = Literal["Day", "Night"]
 literal_weather = Literal["Stormy", "Rainy", "Clear"]
 literal_volume = Literal["Raw", "Normal", "Loud"]
+literal_filter = Literal["None", "Phone", "Megaphone"]
 
 # Generation state
 generating = False
@@ -376,7 +379,15 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             # Check if any of the word-activated SFX should happen
             for sfx in sfx_triggered.keys():
                 if any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
-                    sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
+                    if sfx == "megaphone":
+                        if randrange(2) > 0:
+                            sfx_positions[sfx].append(len(combined))
+                            if location != "News Studio":
+                                combined = combined.append(silence_megaphone, 0)
+                                seg = high_pass_filter(seg, 2000)
+                    else:
+                        if randrange(5) > 0:
+                            sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
                     break
 
             # Apply phone filter in News Studio for callers
@@ -457,9 +468,8 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             # Add word-activated SFX to the episode
             for sfx in sfx_triggered.keys():
                 for position in sfx_positions[sfx]:
-                    if randrange(5) > 0:
-                        variant = choice(sfx_triggered[sfx][0])
-                        combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-10, 0)) - variant.dBFS), position)
+                    variant = choice(sfx_triggered[sfx][0])
+                    combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-10, 0)) - variant.dBFS), position)
 
         # Add random SFX to the episode
         for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else randint(1, ceil(min(total_lines, 25) / 5)))):
@@ -491,17 +501,17 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", phone="Whether to speak over the phone.", volume="How loud to speak.")
+@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", filter="Filter to speak through.", volume="How loud to speak.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, phone: bool = False, volume: literal_volume = "Raw"):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, filter: literal_filter = "None", volume: literal_volume = "Raw"):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
     :param character: Who should speak
     :param text: What should be said
     :param limit: Whether to limit speaking time
-    :param phone: Whether to speak over the phone
+    :param filter: Filter to speak through
     :param volume: How loud to speak
     :return: None
     """
@@ -544,24 +554,33 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
         # Footer text to show selected options
         footer = ""
 
-        # Apply length limit if requested
+        # Apply length limit
         if limit:
             seg = seg[:1000 + (len(text) * 100)]
             footer += "⏲️ "
 
-        # Apply phone effect if requested
-        if phone:
+        # Apply filters
+        if filter == "Phone":
             seg = high_pass_filter(seg, 3000)
             footer += "☎️ "
+        elif filter == "Megaphone":
+            seg = high_pass_filter(seg, 2000)
+            footer += "📢 "
 
         # Apply gain
         if volume == "Loud":
             seg = seg.apply_gain(gain_voice_distort)
             seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
-            footer += "📢"
+            footer += "⚠️"
         elif volume == "Normal":
             seg = seg.apply_gain(gain_voice-seg.dBFS)
             footer += "🗣️"
+
+        # Megaphone start sound effect
+        if filter == "Megaphone":
+            seg = silence_megaphone.append(seg, 0)
+            sfx = sfx_triggered["megaphone"][0][0]
+            seg = seg.overlay(sfx.apply_gain((gain_sfx + randint(-10, 0)) - sfx.dBFS), 0)
 
         # Export and send the file
         with BytesIO() as output:
