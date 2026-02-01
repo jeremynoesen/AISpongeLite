@@ -380,7 +380,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
             for sfx in sfx_triggered.keys():
                 if any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
                     if sfx == "megaphone":
-                        if randrange(2) > 0:
+                        if randrange(5) == 0:
                             sfx_positions[sfx].append(len(combined))
                             if location != "News Studio":
                                 combined = combined.append(silence_megaphone, 0)
