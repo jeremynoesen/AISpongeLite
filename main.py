@@ -275,9 +275,8 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
         # Get random time if none provided
         if time is None:
-            ambiance = choice(list(ambiance_time.values()))
-        else:
-            ambiance = ambiance_time[time]
+            time = choice(list(ambiance_time.keys()))
+        ambiance = ambiance_time[time]
 
         # Get rain intensity
         if weather == "Stormy":
