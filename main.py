@@ -384,7 +384,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
                             sfx_positions[sfx].append(len(combined))
                             if location != "News Studio":
                                 combined = combined.append(silence_megaphone, 0)
-                                seg = high_pass_filter(seg, 2000)
+                                seg = high_pass_filter(seg, 3000)
                     else:
                         if randrange(5) > 0:
                             sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
@@ -564,7 +564,7 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
             seg = high_pass_filter(seg, 3000)
             footer += "☎️ "
         elif filter == "Megaphone":
-            seg = high_pass_filter(seg, 2000)
+            seg = high_pass_filter(seg, 3000)
             footer += "📢 "
 
         # Apply gain
