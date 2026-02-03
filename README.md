@@ -1,4 +1,4 @@
-<img src="img/Logo.gif" alt="Logo" title="Logo" align="right" width="72" height="72" />
+<img src="image/profile/avatar.gif" alt="Logo" title="Logo" align="right" width="72" height="72" />
 
 # AI Sponge Lite
 
@@ -23,9 +23,9 @@ Bubble Buddy, Bubble Bass, Perch, Pearl, DoodleBob, Mr. Fish, Flying Dutchman, K
 
 ## Demonstration
 
-![Episode](img/episode.png)
-![TTS](img/tts.png)
-![Chat](img/chat.png)
+![Episode](image/demo/episode.png)
+![TTS](image/demo/tts.png)
+![Chat](image/demo/chat.png)
 
 ## Wall of Fame
 

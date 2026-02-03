@@ -21,7 +21,7 @@ from pydub.effects import high_pass_filter
 # Load .env
 load_dotenv()
 
-# Load TTS and GPT modules
+# Load TTS and LLM modules
 from tts import speak
 from llm import write
 
@@ -86,24 +86,24 @@ fade_music = 5000
 
 # Ambiance audio segments
 ambiance_time = {
-    "Day": AudioSegment.from_wav("ambiance/day.wav"),
-    "Night": AudioSegment.from_wav("ambiance/night.wav")
+    "Day": AudioSegment.from_wav("audio/ambiance/day.wav"),
+    "Night": AudioSegment.from_wav("audio/ambiance/night.wav")
 }
-ambiance_rain = AudioSegment.from_wav("ambiance/rain.wav")
+ambiance_rain = AudioSegment.from_wav("audio/ambiance/rain.wav")
 
 # Music audio segments
-music_closing_theme = AudioSegment.from_wav("music/closing_theme.wav")
-music_tip_top_polka = AudioSegment.from_wav("music/tip_top_polka.wav")
-music_rake_hornpipe = AudioSegment.from_wav("music/rake_hornpipe.wav")
-music_seaweed = AudioSegment.from_wav("music/seaweed.wav")
-music_hello_sailor_b = AudioSegment.from_wav("music/hello_sailor_b.wav")
-music_drunken_sailor = AudioSegment.from_wav("music/drunken_sailor.wav")
-music_stars_and_games = AudioSegment.from_wav("music/stars_and_games.wav")
-music_comic_walk = AudioSegment.from_wav("music/comic_walk.wav")
-music_gator = AudioSegment.from_wav("music/gator.wav")
-music_rock_bottom = AudioSegment.from_wav("music/rock_bottom.wav")
-music_just_breaking_softer = AudioSegment.from_mp3("music/just_breaking_softer.mp3")
-music_grass_skirt_chase = AudioSegment.from_wav("music/grass_skirt_chase.wav")
+music_closing_theme = AudioSegment.from_wav("audio/music/closing_theme.wav")
+music_tip_top_polka = AudioSegment.from_wav("audio/music/tip_top_polka.wav")
+music_rake_hornpipe = AudioSegment.from_wav("audio/music/rake_hornpipe.wav")
+music_seaweed = AudioSegment.from_wav("audio/music/seaweed.wav")
+music_hello_sailor_b = AudioSegment.from_wav("audio/music/hello_sailor_b.wav")
+music_drunken_sailor = AudioSegment.from_wav("audio/music/drunken_sailor.wav")
+music_stars_and_games = AudioSegment.from_wav("audio/music/stars_and_games.wav")
+music_comic_walk = AudioSegment.from_wav("audio/music/comic_walk.wav")
+music_gator = AudioSegment.from_wav("audio/music/gator.wav")
+music_rock_bottom = AudioSegment.from_wav("audio/music/rock_bottom.wav")
+music_just_breaking_softer = AudioSegment.from_mp3("audio/music/just_breaking_softer.mp3")
+music_grass_skirt_chase = AudioSegment.from_wav("audio/music/grass_skirt_chase.wav")
 
 # Locations with their assigned music segments and embed colors
 locations = {
@@ -157,54 +157,54 @@ locations = {
 
 # SFX audio segments
 sfx_random = {
-    AudioSegment.from_wav("sfx/steel_sting.wav"): 5,
-    AudioSegment.from_wav("sfx/boowomp.wav"): 5,
-    AudioSegment.from_wav("sfx/kiss.wav"): 5,
-    AudioSegment.from_mp3("sfx/car.mp3"): 5,
-    AudioSegment.from_wav("sfx/my_leg_1.wav"): 5,
-    AudioSegment.from_wav("sfx/my_leg_2.wav"): 5,
-    AudioSegment.from_wav("sfx/glass_shatter.wav"): 5,
-    AudioSegment.from_wav("sfx/foghorn.wav"): 1,
-    AudioSegment.from_wav("sfx/vibe_link_b.wav"): 1,
-    AudioSegment.from_wav("sfx/this_guy_stinks.wav"): 1,
-    AudioSegment.from_wav("sfx/you_what.wav"): 1,
-    AudioSegment.from_wav("sfx/dolphin.wav"): 1,
-    AudioSegment.from_wav("sfx/boo_you_stink.wav"): 1,
-    AudioSegment.from_wav("sfx/bonk.wav"): 1,
-    AudioSegment.from_wav("sfx/fling_1.wav"): 1,
-    AudioSegment.from_wav("sfx/fling_2.wav"): 1,
-    AudioSegment.from_wav("sfx/kick.wav"): 1,
-    AudioSegment.from_wav("sfx/squish_1.wav"): 1,
-    AudioSegment.from_wav("sfx/squish_2.wav"): 1,
-    AudioSegment.from_wav("sfx/dramatic_cue_a.wav"): 1,
-    AudioSegment.from_wav("sfx/dramatic_cue_d.wav"): 1,
-    AudioSegment.from_wav("sfx/alarm.wav"): 1,
-    AudioSegment.from_wav("sfx/phone_call.wav"): 1,
-    AudioSegment.from_wav("sfx/explosion.wav"): 1,
-    AudioSegment.from_wav("sfx/anchor.wav"): 1,
-    AudioSegment.from_wav("sfx/train.wav"): 1,
-    AudioSegment.from_wav("sfx/ignite.wav"): 1
+    AudioSegment.from_wav("audio/sfx/random/steel_sting.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/boowomp.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/kiss.wav"): 5,
+    AudioSegment.from_mp3("audio/sfx/random/car.mp3"): 5,
+    AudioSegment.from_wav("audio/sfx/random/my_leg_1.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/my_leg_2.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/glass_shatter.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/foghorn.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/vibe_link_b.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/this_guy_stinks.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/you_what.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/dolphin.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/boo_you_stink.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/bonk.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/fling_1.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/fling_2.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/kick.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/squish_1.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/squish_2.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/dramatic_cue_a.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/dramatic_cue_d.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/alarm.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/phone_call.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/explosion.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/anchor.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/train.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/ignite.wav"): 1
 }
+sfx_lightning = AudioSegment.from_wav("audio/sfx/random/lightning.wav")
 sfx_triggered = {
-    "bomb": ([AudioSegment.from_wav("sfx/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("sfx/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "exploding", "fire in the hole", "blow", "blew", "blast", "firework", "dynamite", "grenade", "detonate", "detonating"]),
-    "gun": ([AudioSegment.from_wav(f"sfx/gun_{i}.wav") for i in range(1, 3)], ["shoot", "shot", "kill", "murder", "gun", "firing", "firearm", "bullet", "pistol", "rifle"]),
-    "molotov": ([AudioSegment.from_wav("sfx/molotov.wav")], ["fire", "molotov", "burn", "flame", "flaming", "ignite", "igniting", "arson", "light", "hot", "blaze", "blazing", "combust"]),
-    "ball": ([AudioSegment.from_wav("sfx/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
-    "burp": ([AudioSegment.from_wav("sfx/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp", "sandwich"]),
-    "megaphone": ([AudioSegment.from_wav("sfx/megaphone.wav")], ["hey", "shut", "listen"])
+    "bomb": ([AudioSegment.from_wav("audio/sfx/triggered/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("audio/sfx/triggered/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "exploding", "fire in the hole", "blow", "blew", "blast", "firework", "dynamite", "grenade", "detonate", "detonating"]),
+    "gun": ([AudioSegment.from_wav(f"audio/sfx/triggered/gun_{i}.wav") for i in range(1, 3)], ["shoot", "shot", "kill", "murder", "gun", "firing", "firearm", "bullet", "pistol", "rifle"]),
+    "molotov": ([AudioSegment.from_wav("audio/sfx/triggered/molotov.wav")], ["fire", "molotov", "burn", "flame", "flaming", "ignite", "igniting", "arson", "light", "hot", "blaze", "blazing", "combust"]),
+    "ball": ([AudioSegment.from_wav("audio/sfx/triggered/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
+    "burp": ([AudioSegment.from_wav("audio/sfx/triggered/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp", "sandwich"]),
+    "megaphone": ([AudioSegment.from_wav("audio/sfx/triggered/megaphone.wav")], ["hey", "shut", "listen"])
 }
-sfx_lightning = AudioSegment.from_wav("sfx/lightning.wav")
 
 # Transition audio segments
-transition_episode = AudioSegment.from_wav("transition/episode.wav")
+transition_episode = AudioSegment.from_wav("audio/transition/episode.wav")
 transition_episode = transition_episode.apply_gain(gain_sfx - transition_episode.dBFS)
-transition_news = AudioSegment.from_wav("transition/news.wav")
+transition_news = AudioSegment.from_wav("audio/transition/news.wav")
 transition_news = transition_news.apply_gain(gain_sfx - transition_news.dBFS)
 
 # Voice audio segments
-voice_gary = [AudioSegment.from_wav(f"voice/gary_{i}.wav") for i in range(1, 7)]
-voice_doodlebob = [AudioSegment.from_wav(f"voice/doodlebob_{i}.wav") for i in range(1, 19)]
-voice_failed = AudioSegment.from_wav("voice/failed.wav")
+voice_gary = [AudioSegment.from_wav(f"audio/voice/gary_{i}.wav") for i in range(1, 7)]
+voice_doodlebob = [AudioSegment.from_wav(f"audio/voice/doodlebob_{i}.wav") for i in range(1, 19)]
+voice_failed = AudioSegment.from_wav("audio/voice/failed.wav")
 
 # Silence audio segments
 silence_line_episode = AudioSegment.silent(200)
@@ -600,12 +600,12 @@ async def on_ready():
 
         # Set bot avatar if it is missing
         if client.user.avatar is None:
-            with open("img/Logo.gif", "rb") as file:
+            with open("image/profile/avatar.gif", "rb") as file:
                 await client.user.edit(avatar=file.read())
 
         # Set bot banner if it is missing
         if (await client.fetch_user(client.user.id)).banner is None:
-            with open("img/Banner.png", "rb") as file:
+            with open("image/profile/banner.png", "rb") as file:
                 await client.user.edit(banner=file.read())
 
         # Fetch all application emojis
@@ -616,7 +616,7 @@ async def on_ready():
         for emoji_file in listdir("emoji"):
             emoji_name = emoji_file.split(".")[0]
             if emoji_name not in emojis.keys():
-                with open(f"emoji/{emoji_file}", "rb") as file:
+                with open(f"image/emoji/{emoji_file}", "rb") as file:
                     emojis[emoji_name] = await client.create_application_emoji(name=emoji_name, image=file.read())
 
         # Set logging channel if specified
