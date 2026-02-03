@@ -1,75 +1,100 @@
 """
-TTS module using FakeYou for text-to-speech synthesis.
+TTS module using AI Sponge Rehydrated's local text-to-speech system.
 This is separate to allow for easy swapping of TTS providers.
 
 Written by Jeremy Noesen
 """
 
-from os import getenv
-from asyncio import sleep, wait_for, get_running_loop
+from uuid import uuid4
+from json import loads
 from io import BytesIO
-from fakeyou import FakeYou
+from aiohttp import ClientSession
+from websockets import connect, ConnectionClosed
 from pydub import AudioSegment
 
-# Log in to FakeYou
-fakeyou = FakeYou()
-fakeyou_username = getenv("FAKEYOU_USERNAME")
-fakeyou_password = getenv("FAKEYOU_PASSWORD")
-if fakeyou_username and fakeyou_password:
-    fakeyou.login(fakeyou_username, fakeyou_password)
-
-# Set the FakeYou timeout before a line fails
-fakeyou_timeout = 90
-
-# Characters dictionary with their model tokens
+# Characters dictionary with TTS system name and arpabet status
 characters = {
-    "SpongeBob": "weight_5by9kjm8vr8xsp7abe8zvaxc8",
-    "Patrick": "weight_154man2fzg19nrtc15drner7t",
-    "Squidward": "TM:3psksme51515",
-    "Sandy": "TM:214sp1nxxd63",
-    "Mr. Krabs": "weight_5bxbp9xqy61svfx03b25ezmwx",
-    "Plankton": "weight_ahxbf2104ngsgyegncaefyy6j",
-    "Mrs. Puff": "weight_129qhgze57zhndkkcq83e6b2a",
-    "Larry": "weight_k7qvaffwsft6vxbcps4wbyj58",
-    "Squilliam": "weight_zmjv8223ed6wx1fp234c79v9s",
-    "Karen": "weight_eckp92cd68r4yk68n6re3fwcb",
-    "Narrator": "weight_edzcfmq6y0vj7pte9pzhq5b6j",
-    "Bubble Buddy": "weight_sbr0372ysxbdahcvej96axy1t",
-    "Bubble Bass": "weight_h9g7rh6tj2hvfezrz8gjs4gwa",
-    "Mr. Fish": "weight_m1a1yqf9f2v8s1evfzcffk4k0",
-    "King Neptune": "weight_hmf2eqzj1zja1yww4zeya0cnm",
-    "Dirty Bubble": "weight_f7nm9e4sx49gjjknc2mgb9ggs"
+    "SpongeBob": ("SpongeBob", True),
+    "Patrick": ("Patrick", True),
+    "Squidward": ("Loudward", True),
+    "Sandy": ("Sandy", False),
+    "Mr. Krabs": ("Mr Krabs (Clancy Brown)", False),
+    "Plankton": ("Plankton v2 (Doug Lawrence)", True),
+    "Mrs. Puff": ("Mrs Puff", False),
+    "Larry": ("Larry", False),
+    "Squilliam": ("Squilliam Fancyson", True),
+    "Karen": ("Karen", True),
+    "Narrator": ("The French Narrator (Tom Kenny)", True),
+    "Bubble Buddy": ("BubbleBuddy-30", True),
+    "Bubble Bass": ("Bubble Bass", True),
+    "Perch": ("Perch Perkins", False),
+    "Pearl": ("Pearl Krabs", False),
+    "Mr. Fish": ("MrFish-30", True),
+    "Flying Dutchman": ("Flying Dutchman", True),
+    "King Neptune": ("KingNep", True),
+    "Man Ray": ("Manray2025", True),
+    "Dirty Bubble": ("DirtyBubble22", True)
 }
 
+# Base URLs of local TTS server
+http_url = "http://localhost:8000/"
+ws_url = "ws://localhost:8000/"
+
 # Whether to allow parallel requests
-allow_parallel = False
+allow_parallel = True
 
 # Character limits for input and output
-char_limit_min = 3
-char_limit_max = 256
+char_limit_min = 1
+char_limit_max = 512
 
 # Bitrate for compressed output audio
-bitrate = "256k"
+bitrate = "320k"
 
 
 async def speak(character: str, text: str):
     """
-    Speak a line of text as a character using FakeYou TTS.
+    Speak a line of text as a character using async I/O.
     :param character: Character voice to use
     :param text: Text to speak
     :return: AudioSegment of spoken text
     """
 
-    # Attempt to speak line
-    try:
-        output = await wait_for(get_running_loop().run_in_executor(None, fakeyou.say, text, characters[character]), fakeyou_timeout)
-        with BytesIO(output.content) as wav:
-            return AudioSegment.from_wav(wav)
+    # Connect to servers
+    async with ClientSession() as session:
+        async with connect(ws_url, ping_interval=10, ping_timeout=90, open_timeout=90) as socket:
 
-    # Line failed to generate
-    except Exception as e:
-        raise e
+            # Start synthesis job
+            unique_id = str(uuid4())
+            async with session.post(http_url + "synthesize", json={
+                "output_path": f"../Outputs/{unique_id}.wav",
+                "voicemodel": characters[character][0],
+                "text": text,
+                "uuid": unique_id,
+                "enable_arpa": characters[character][1]
+            }) as resp:
+                job_id = (await resp.json())["id"]
 
-    # Avoid rate limiting
-    finally:
-        await sleep(10)
+            # Wait for job to be ready via websocket
+            while True:
+                try:
+                    msg = loads(await socket.recv())
+                    if msg.get("id") == job_id:
+                        if msg.get("status") == "ready":
+                            await socket.close()
+                            break
+                        if msg.get("status") in ("failed", "removed"):
+                            raise Exception()
+                except ConnectionClosed:
+                    raise Exception()
+
+            # Download audio file
+            async with session.get(http_url + "downloads/" + job_id) as resp:
+                with BytesIO(await resp.read()) as wav:
+                    seg = AudioSegment.from_wav(wav)
+
+            # Delete file from server
+            async with session.delete(http_url + "remove/" + job_id):
+                pass
+
+    # Return pydub segment
+    return seg
