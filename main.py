@@ -535,7 +535,7 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} limit:{limit} filter:{filter} loud:{loud}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} device:{device} loud:{loud}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "DoodleBob":
