@@ -12,7 +12,7 @@ from math import ceil
 from io import BytesIO
 from os import getenv, listdir
 from dotenv import load_dotenv
-from discord import Status, Embed, Interaction, Color, Game, Intents, Client, File
+from discord import Embed, Interaction, Color, Intents, Client, File
 from discord.utils import escape_markdown
 from discord.app_commands import CommandTree, Range, describe, allowed_installs, allowed_contexts
 from pydub import AudioSegment
@@ -22,15 +22,11 @@ from pydub.effects import high_pass_filter
 load_dotenv()
 
 # Load TTS and GPT modules
-from tts import speak, allow_parallel, char_limit_min, char_limit_max, bitrate
+from tts import speak
 from llm import write
 
-# Discord activity settings
-activity_ready = Game("Ready!")
-activity_generating = Game("Generating...")
-
 # Initialize Discord client
-client = Client(intents=Intents.default(), activity=Game("Initializing..."), status=Status.idle)
+client = Client(intents=Intents.default())
 command_tree = CommandTree(client)
 
 # Logging channel
@@ -38,13 +34,11 @@ logging_channel = None
 
 # Embed settings and static embeds
 embed_color = Color.dark_theme()
-embed_delete_after = 5
 embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
 embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
-embed_in_use = Embed(title="Busy.", description="Currently in use.", color=embed_color)
 
 # Regex patterns for script modification
 regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
@@ -228,8 +222,9 @@ literal_time = Literal["Day", "Night"]
 literal_weather = Literal["Stormy", "Rainy", "Clear"]
 literal_device = Literal["None", "Phone", "Megaphone"]
 
-# Generation state
-generating = False
+# Character limits for input and output
+char_limit_min = 1
+char_limit_max = 512
 
 
 @command_tree.command(description="Generate an episode.")
@@ -248,28 +243,14 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
     :return: None
     """
 
-    # Get global variable
-    global generating
-
-    # Check if something is generating
-    if generating:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
-        return
-
     # Start generation
     try:
 
         # Show generating message
         await interaction.response.send_message(embed=embed_episode_start)
 
-        # Block generation
-        if not allow_parallel:
-            generating = True
-            await client.change_presence(activity=activity_generating, status=Status.dnd)
-
         # Log the interaction
-        if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic, as_needed=True)} location:{location} time:{time} weather:{weather} chaos:{chaos}", color=embed_color))
+        await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode topic:{escape_markdown(topic, as_needed=True)} location:{location} time:{time} weather:{weather} chaos:{chaos}", color=embed_color))
 
         # Get random location if none provided
         if location is None:
@@ -482,7 +463,7 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
         # Export the episode and send it
         with BytesIO() as output:
-            combined.export(output, "mp3", bitrate=bitrate)
+            combined.export(output, "mp3", bitrate="320k")
             await interaction.edit_original_response(embed=embed_output, attachments=[
                 File(output, title_formatted.replace("/", "\\").replace("\n", " ") + ".mp3")])
 
@@ -491,12 +472,6 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
         with BytesIO() as output:
             voice_failed.export(output, "wav")
             await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
-
-    # Unblock generation
-    finally:
-        if not allow_parallel:
-            generating = False
-            await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @command_tree.command(description="Make a character speak text.")
@@ -514,28 +489,14 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
     :return: None
     """
 
-    # Get global variable
-    global generating
-
-    # Check if something is generating
-    if generating:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
-        return
-
     # Start generation
     try:
 
         # Show generating message
         await interaction.response.send_message(embed=embed_tts)
 
-        # Block generation
-        if not allow_parallel:
-            generating = True
-            await client.change_presence(activity=activity_generating, status=Status.dnd)
-
         # Log the interaction
-        if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} device:{device} loud:{loud}", color=embed_color))
+        await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} device:{device} loud:{loud}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "DoodleBob":
@@ -589,12 +550,6 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
             voice_failed.export(output, "wav")
             await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
 
-    # Unblock generation
-    finally:
-        if not allow_parallel:
-            generating = False
-            await client.change_presence(activity=activity_ready, status=Status.online)
-
 
 @command_tree.command(description="Chat with a character.")
 @describe(character="Who to chat with.", message="What to say to them.")
@@ -609,28 +564,14 @@ async def chat(interaction: Interaction, character: literal_characters, message:
     :return: None
     """
 
-    # Get global variable
-    global generating
-
-    # Check if something is generating
-    if generating:
-        await interaction.response.send_message(ephemeral=True, delete_after=embed_delete_after, embed=embed_in_use)
-        return
-
     # Start generation
     try:
 
         # Show generating message
         await interaction.response.send_message(embed=embed_chat)
 
-        # Block generation
-        if not allow_parallel:
-            generating = True
-            await client.change_presence(activity=activity_generating, status=Status.dnd)
-
         # Log the interaction
-        if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
+        await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
 
         # Generate the chat response
         response = await write(f"Write a response to a discord message as {character} from SpongeBob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
@@ -646,12 +587,6 @@ async def chat(interaction: Interaction, character: literal_characters, message:
         with BytesIO() as output:
             voice_failed.export(output, "wav")
             await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
-
-    # Unblock generation
-    finally:
-        if not allow_parallel:
-            generating = False
-            await client.change_presence(activity=activity_ready, status=Status.online)
 
 
 @client.event
@@ -686,15 +621,10 @@ async def on_ready():
 
         # Set logging channel if specified
         global logging_channel
-        logging_channel_id = getenv("LOGGING_CHANNEL_ID")
-        if logging_channel_id:
-            logging_channel = await client.fetch_channel(int(logging_channel_id))
+        logging_channel = await client.fetch_channel(int(getenv("LOGGING_CHANNEL_ID")))
 
         # Sync command tree
         await command_tree.sync()
-
-        # Set status to ready
-        await client.change_presence(activity=activity_ready, status=Status.online)
 
     # Stop bot if any of the above fails
     except:

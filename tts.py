@@ -40,16 +40,6 @@ characters = {
 http_url = "http://localhost:8000/"
 ws_url = "ws://localhost:8000/"
 
-# Whether to allow parallel requests
-allow_parallel = True
-
-# Character limits for input and output
-char_limit_min = 1
-char_limit_max = 512
-
-# Bitrate for compressed output audio
-bitrate = "320k"
-
 
 async def speak(character: str, text: str):
     """
