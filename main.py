@@ -500,16 +500,15 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", device="Device to speak through.", loud="Whether to speak loudly.")
+@describe(character="Who should speak.", text="What should be said.", device="Device to speak through.", loud="Whether to speak loudly.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, device: literal_device = "None", loud: bool = False):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], device: literal_device = "None", loud: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
     :param character: Who should speak
     :param text: What should be said
-    :param limit: Whether to limit speaking time
     :param device: Device to speak through
     :param loud: Whether to speak loudly
     :return: None
@@ -550,15 +549,13 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
         else:
             seg = await speak(character, text)
 
+        # Limit the audio length based on text length
+        seg = seg[:1000 + (len(text) * 100)]
+
         # Footer text to show selected options
         footer = ""
 
-        # Apply length limit
-        if limit:
-            seg = seg[:1000 + (len(text) * 100)]
-            footer += "⏲️ "
-
-        # Apply filters
+        # Apply device filters
         if device == "Phone":
             seg = high_pass_filter(seg, 3000)
             footer += "☎️ "
