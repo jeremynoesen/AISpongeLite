@@ -226,7 +226,7 @@ literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. 
 literal_locations = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "News Studio", "Rock Bottom", "Bikini Bottom"]
 literal_time = Literal["Day", "Night"]
 literal_weather = Literal["Stormy", "Rainy", "Clear"]
-literal_filter = Literal["None", "Phone", "Megaphone"]
+literal_device = Literal["None", "Phone", "Megaphone"]
 
 # Generation state
 generating = False
@@ -500,17 +500,17 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", filter="Filter to speak through.", loud="Whether to speak loudly.")
+@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", device="Device to speak through.", loud="Whether to speak loudly.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, filter: literal_filter = "None", loud: bool = False):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, device: literal_device = "None", loud: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
     :param character: Who should speak
     :param text: What should be said
     :param limit: Whether to limit speaking time
-    :param filter: Filter to speak through
+    :param device: Device to speak through
     :param loud: Whether to speak loudly
     :return: None
     """
@@ -559,10 +559,10 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
             footer += "⏲️ "
 
         # Apply filters
-        if filter == "Phone":
+        if device == "Phone":
             seg = high_pass_filter(seg, 3000)
             footer += "☎️ "
-        elif filter == "Megaphone":
+        elif device == "Megaphone":
             seg = high_pass_filter(seg, 3000)
             footer += "📢 "
 
@@ -575,7 +575,7 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
             seg = seg.apply_gain(gain_voice-seg.dBFS)
 
         # Megaphone start sound effect
-        if filter == "Megaphone":
+        if device == "Megaphone":
             seg = silence_megaphone.append(seg, 0)
             sfx = sfx_triggered["megaphone"][0][0]
             seg = seg.overlay(sfx.apply_gain((gain_sfx + randint(-10, 0)) - sfx.dBFS), 0)
