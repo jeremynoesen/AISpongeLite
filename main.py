@@ -226,7 +226,6 @@ literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. 
 literal_locations = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "News Studio", "Rock Bottom", "Bikini Bottom"]
 literal_time = Literal["Day", "Night"]
 literal_weather = Literal["Stormy", "Rainy", "Clear"]
-literal_volume = Literal["Raw", "Normal", "Loud"]
 literal_filter = Literal["None", "Phone", "Megaphone"]
 
 # Generation state
@@ -501,10 +500,10 @@ async def episode(interaction: Interaction, topic: Range[str, char_limit_min, ch
 
 
 @command_tree.command(description="Make a character speak text.")
-@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", filter="Filter to speak through.", volume="How loud to speak.")
+@describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", filter="Filter to speak through.", loud="Whether to speak loudly.")
 @allowed_installs(True, False)
 @allowed_contexts(True, False, True)
-async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, filter: literal_filter = "None", volume: literal_volume = "Raw"):
+async def tts(interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, filter: literal_filter = "None", loud: bool = False):
     """
     Make a character speak text using text-to-speech.
     :param interaction: Interaction created by the command
@@ -512,7 +511,7 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
     :param text: What should be said
     :param limit: Whether to limit speaking time
     :param filter: Filter to speak through
-    :param volume: How loud to speak
+    :param loud: Whether to speak loudly
     :return: None
     """
 
@@ -537,7 +536,7 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
 
         # Log the interaction
         if logging_channel:
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} limit:{limit} phone:{phone} volume:{volume}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts character:{character} text:{escape_markdown(text, as_needed=True)} limit:{limit} filter:{filter} loud:{loud}", color=embed_color))
 
         # Speak text using voice files for DoodleBob
         if character == "DoodleBob":
@@ -568,13 +567,12 @@ async def tts(interaction: Interaction, character: literal_characters, text: Ran
             footer += "📢 "
 
         # Apply gain
-        if volume == "Loud":
+        if loud:
             seg = seg.apply_gain(gain_voice_distort)
             seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
             footer += "⚠️"
-        elif volume == "Normal":
+        else:
             seg = seg.apply_gain(gain_voice-seg.dBFS)
-            footer += "🗣️"
 
         # Megaphone start sound effect
         if filter == "Megaphone":
