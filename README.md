@@ -10,7 +10,8 @@ AI Sponge Lite is a self-hosted Discord bot that generates parody AI Sponge audi
 ### Characters
 
 SpongeBob, Patrick, Squidward, Sandy, Mr. Krabs, Plankton, Gary, Mrs. Puff, Larry, Squilliam, Karen, Narrator,
-Bubble Buddy, Bubble Bass, Perch, Pearl, DoodleBob, Mr. Fish, Flying Dutchman, King Neptune, Man Ray, and Dirty Bubble.
+Bubble Buddy, Bubble Bass, Perch Perkins, Pearl, DoodleBob, Mr. Fish, Flying Dutchman, King Neptune, Man Ray, and Dirty 
+Bubble.
 
 ## Usage
 

@@ -27,7 +27,7 @@ characters = {
     "Narrator": ("The French Narrator (Tom Kenny)", True),
     "Bubble Buddy": ("BubbleBuddy-30", True),
     "Bubble Bass": ("Bubble Bass", True),
-    "Perch": ("Perch Perkins", False),
+    "Perch Perkins": ("Perch Perkins", False),
     "Pearl": ("Pearl Krabs", False),
     "Mr. Fish": ("MrFish-30", True),
     "Flying Dutchman": ("Flying Dutchman", True),
