@@ -155,7 +155,7 @@ class News(Cog):
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode news topic:{escape_markdown(topic, as_needed=True)} chaos:{chaos}", color=embed_color))
 
             # Generate the script
-            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -389,7 +389,7 @@ async def setup(bot):
 
     # Fetch logging channel
     global logging_channel
-    logging_channel = await bot.fetch_channel(int(getenv("LOGGING_CHANNEL_ID")))
+    logging_channel = await bot.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
 
     # Fetch emojis
     global emojis
