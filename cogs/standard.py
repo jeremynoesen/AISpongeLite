@@ -12,7 +12,7 @@ from io import BytesIO
 from os import getenv
 from discord import Embed, Interaction, Color, File
 from discord.utils import escape_markdown
-from discord.ext.commands import Cog, Range
+from discord.ext.commands import GroupCog, Range
 from discord.app_commands import Range, describe, command
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter
@@ -206,7 +206,7 @@ char_limit_min = 1
 char_limit_max = 512
 
 
-class Standard(Cog):
+class Standard(GroupCog, name="standard", description="Generate episodes, TTS, and chats based on standard topics."):
     """
     Cog for generating standard episodes, TTS, and chats.
     """
@@ -247,7 +247,7 @@ class Standard(Cog):
             await interaction.response.send_message(embed=embed_episode_start)
 
             # Log the interaction
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/episode standard topic:{escape_markdown(topic, as_needed=True)} location:{location} time:{time} weather:{weather} chaos:{chaos}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic, as_needed=True)} location:{location} time:{time} weather:{weather} chaos:{chaos}", color=embed_color))
 
             # Get random location if none provided
             if location is None:
@@ -471,7 +471,7 @@ class Standard(Cog):
             await interaction.response.send_message(embed=embed_tts)
 
             # Log the interaction
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/tts standard character:{character} text:{escape_markdown(text, as_needed=True)} megaphone:{megaphone} loud:{loud}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text, as_needed=True)} megaphone:{megaphone} loud:{loud}", color=embed_color))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -541,7 +541,7 @@ class Standard(Cog):
             await interaction.response.send_message(embed=embed_chat)
 
             # Log the interaction
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/chat standard character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
+            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
 
             # Generate the chat response
             response = await write(f"Write a response to a discord message as {character} from SpongeBob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
