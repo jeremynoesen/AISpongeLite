@@ -382,7 +382,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
 
             # Generate the chat response
-            response = await write(f"Write a response to a news interview message as {character} from SpongeBob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
+            response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s brief response using the format: {character}: <response>. The question from \"{interaction.user.display_name}\" says: \"{message}\".")
 
             # Clean the response text
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip(), as_needed=True)
