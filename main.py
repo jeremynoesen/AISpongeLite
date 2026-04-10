@@ -17,6 +17,7 @@ load_dotenv()
 
 # List of cogs to load
 COGS = [
+    "cogs.patrons",
     "cogs.standard",
     "cogs.news"
 ]
