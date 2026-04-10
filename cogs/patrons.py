@@ -9,9 +9,6 @@ from patreon import API
 from discord.ext.tasks import loop
 from discord.ext.commands import Cog
 
-# Global list of Discord user IDs of active Patreon subscribers
-subscribed_discord_user_ids = []
-
 
 class Patrons(Cog):
     """
@@ -64,8 +61,7 @@ class Patrons(Cog):
                 break
 
         # Update the global list of Discord user IDs with the new list
-        global subscribed_discord_user_ids
-        subscribed_discord_user_ids = fetched_discord_user_ids
+        self.bot.subscribed_discord_user_ids = fetched_discord_user_ids
 
 
 async def setup(bot):

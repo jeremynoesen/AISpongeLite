@@ -30,6 +30,8 @@ embed_episode_end = Embed(title="Generating...", description="Mixing audio...", 
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
 embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
+embed_not_subscribed = Embed(title="Not Subscribed.", description="**[Subscribe to the AI Sponge Lite Patreon.](https://www.patreon.com/cw/AISpongeLite/membership)**", color=embed_color).set_image(url="attachment://explodeward.gif")
+embed_delete_after = 30
 
 # Regex patterns for script modification
 regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
@@ -232,6 +234,11 @@ class Standard(Cog):
         :param chaos: Whether to simulate chaos hour
         :return: None
         """
+
+        # Check if user is a patron
+        if interaction.user.id not in self.bot.subscribed_discord_user_ids:
+            await interaction.response.send_message(embed=embed_not_subscribed, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            return
 
         # Start generation
         try:
@@ -452,6 +459,11 @@ class Standard(Cog):
         :return: None
         """
 
+        # Check if user is a patron
+        if interaction.user.id not in self.bot.subscribed_discord_user_ids:
+            await interaction.response.send_message(embed=embed_not_subscribed, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            return
+
         # Start generation
         try:
 
@@ -516,6 +528,11 @@ class Standard(Cog):
         :param message: What to say to them
         :return: None
         """
+
+        # Check if user is a patron
+        if interaction.user.id not in self.bot.subscribed_discord_user_ids:
+            await interaction.response.send_message(embed=embed_not_subscribed, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            return
 
         # Start generation
         try:

@@ -36,6 +36,9 @@ class AISpongeLite(Bot):
 
         super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True))
 
+        # Initialize an empty list to store Discord user IDs of Patreon subscribers, which will be accessed throughout the bot
+        self.subscribed_discord_user_ids = []
+
 
     async def setup_hook(self):
         """
