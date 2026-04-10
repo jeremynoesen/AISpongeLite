@@ -15,11 +15,13 @@ Bubble.
 
 ## Usage
 
-- `/episode`: Generate an audio-only episode. This will create a full episode with multiple characters, sound effects,
+There are two types of commands available: standard and news. Each type has the following three commands:
+
+- `/<type> episode`: Generate an audio-only episode. This will create a full episode with multiple characters, sound effects,
   and background music.
-- `/tts`: Make a character speak text. You can also apply various audio effects to the generated speech based on the
+- `/<type> tts`: Make a character speak text. You can also apply various audio effects to the generated speech based on the
   effects available in episodes.
-- `/chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is
+- `/<type> chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is
   inserted into the prompt so the character can address you.
 
 ## Demonstration
