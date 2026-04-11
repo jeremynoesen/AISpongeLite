@@ -29,12 +29,12 @@ class Patrons(Cog):
     @loop(hours=1)
     async def fetch_patrons(self):
         """
-        Fetch active Patreon subscriber Discord user IDs, storing them in a global list.
+        Fetch active Patreon subscriber Discord user IDs, storing them in a global set.
         :return: None
         """
 
-        # Create an empty list to store updated list of Discord user IDs
-        fetched_discord_user_ids = [int(getenv("PATREON_CREATOR_DISCORD_USER_ID"))]
+        # Create a set to store updated set of Discord user IDs
+        fetched_discord_user_ids = {int(getenv("PATREON_CREATOR_DISCORD_USER_ID"))}
 
         # Log in to Patreon API
         api_client = API(getenv("PATREON_ACCESS_TOKEN"))
@@ -49,10 +49,10 @@ class Patrons(Cog):
             # Iterate through the members in the response
             for member in members_response.data():
 
-                # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the list
+                # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the set
                 discord_id = member.relationship('user').attribute('social_connections').get('discord')
                 if member.attribute('patron_status') == 'active_patron' and discord_id is not None:
-                    fetched_discord_user_ids.append(int(discord_id.get("user_id")))
+                    fetched_discord_user_ids.add(int(discord_id.get("user_id")))
 
             # Check if there is a next page of results
             try:
@@ -60,7 +60,7 @@ class Patrons(Cog):
             except Exception:
                 break
 
-        # Update the global list of Discord user IDs with the new list
+        # Update the global set of Discord user IDs with the new set
         self.bot.subscribed_discord_user_ids = fetched_discord_user_ids
 
 
