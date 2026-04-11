@@ -30,7 +30,7 @@ embed_episode_end = Embed(title="Generating...", description="Mixing audio...", 
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
 embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
-embed_not_subscribed = Embed(title="Not Subscribed.", description="**[Subscribe to the AI Sponge Lite Patreon.](https://www.patreon.com/cw/AISpongeLite/membership)**", color=embed_color).set_image(url="attachment://explodeward.gif")
+embed_not_subscribed = Embed(title="Not Subscribed.", description="**[Subscribe to the AI Sponge Lite Patreon to use.](https://www.patreon.com/cw/AISpongeLite/membership)**", color=embed_color).set_image(url="attachment://explodeward.gif")
 embed_delete_after = 30
 
 # Regex patterns for script modification
