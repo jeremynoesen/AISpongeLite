@@ -34,7 +34,7 @@ class Patrons(Cog):
         """
 
         # Create a set to store updated set of Discord user IDs
-        fetched_discord_user_ids = {int(getenv("PATREON_CREATOR_DISCORD_USER_ID"))}
+        fetched_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
 
         # Log in to Patreon API
         api_client = API(getenv("PATREON_ACCESS_TOKEN"))
