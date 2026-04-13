@@ -5,4 +5,4 @@ pydub~=0.25.1
 aiohttp~=3.13.5
 websockets~=16.0
 patreon-v2~=0.5.1
-setuptools~=81.0.0
+setuptools~=80.8.0
