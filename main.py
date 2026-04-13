@@ -6,7 +6,7 @@ Written by Jeremy Noesen
 """
 
 from os import getenv, listdir
-from discord import Intents
+from discord import Intents, Game
 from discord.app_commands import AppInstallationType, AppCommandContext
 from dotenv import load_dotenv
 from discord.ext.commands import Bot
@@ -34,7 +34,7 @@ class AISpongeLite(Bot):
         Initialize the bot with command prefix, intents, and allowed contexts
         """
 
-        super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True))
+        super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True), activity=Game("Standard and News!"))
 
         # Initialize variables used throughout the bot
         self.subscribed_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
