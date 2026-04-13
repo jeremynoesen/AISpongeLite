@@ -62,7 +62,7 @@ class AISpongeLite(Bot):
 
         # Fetch all application emojis
         self.fetched_emojis = {e.name: e for e in await self.fetch_application_emojis()}
-        print(f"Fetched emojis: {list(self.fetched_emojis.keys())}")
+        print(f"Fetched emojis: {set(self.fetched_emojis.keys())}")
 
         # Create missing application emojis
         for emoji_file in listdir("image/emoji"):
@@ -74,7 +74,7 @@ class AISpongeLite(Bot):
 
         # Set logging channel
         self.logging_channel = await self.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
-        print(f"Set logging channel to: {self.logging_channel} (ID: {self.logging_channel.id})")
+        print(f"Set logging channel to: {self.logging_channel}")
 
         # Load each cog from the COGS list
         for cog in COGS:
@@ -92,7 +92,7 @@ class AISpongeLite(Bot):
         :return: None
         """
 
-        print(f"Logged in as {self.user} (ID: {self.user.id})")
+        print(f"Logged in as: {self.user}")
 
 
 async def main():

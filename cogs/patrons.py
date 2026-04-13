@@ -62,6 +62,7 @@ class Patrons(Cog):
 
         # Update the global set of Discord user IDs with the new set
         self.bot.subscribed_discord_user_ids = fetched_discord_user_ids
+        print(f"Fetched Patreon subscribers: {self.bot.subscribed_discord_user_ids}")
 
 
 async def setup(bot):
