@@ -44,9 +44,37 @@ class AISpongeLite(Bot):
 
     async def setup_hook(self):
         """
-        Load cogs and sync slash commands globally
+        Upload assets, load cogs, and sync slash commands globally.
         :return: None
         """
+
+        # Set bot avatar if it is missing
+        if self.user.avatar is None:
+            with open("image/profile/avatar.gif", "rb") as file:
+                await self.user.edit(avatar=file.read())
+                print("Uploaded avatar")
+
+        # Set bot banner if it is missing
+        if (await self.fetch_user(self.user.id)).banner is None:
+            with open("image/profile/banner.png", "rb") as file:
+                await self.user.edit(banner=file.read())
+                print("Uploaded banner")
+
+        # Fetch all application emojis
+        self.fetched_emojis = {e.name: e for e in await self.fetch_application_emojis()}
+        print(f"Fetched emojis: {list(self.fetched_emojis.keys())}")
+
+        # Create missing application emojis
+        for emoji_file in listdir("image/emoji"):
+            emoji_name = emoji_file.split(".")[0]
+            if emoji_name not in self.fetched_emojis.keys():
+                with open(f"image/emoji/{emoji_file}", "rb") as file:
+                    self.fetched_emojis[emoji_name] = await self.create_application_emoji(name=emoji_name, image=file.read())
+                    print(f"Created emoji: {emoji_name}")
+
+        # Set logging channel
+        self.logging_channel = await self.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
+        print(f"Set logging channel to: {self.logging_channel} (ID: {self.logging_channel.id})")
 
         # Load each cog from the COGS list
         for cog in COGS:
@@ -60,34 +88,10 @@ class AISpongeLite(Bot):
 
     async def on_ready(self):
         """
-        Set up the bot's profile and emojis when ready.
+        Indicate that the bot is ready.
         :return: None
         """
 
-        # Set bot avatar if it is missing
-        if self.user.avatar is None:
-            with open("image/profile/avatar.gif", "rb") as file:
-                await self.user.edit(avatar=file.read())
-
-        # Set bot banner if it is missing
-        if (await self.fetch_user(self.user.id)).banner is None:
-            with open("image/profile/banner.png", "rb") as file:
-                await self.user.edit(banner=file.read())
-
-        # Fetch all application emojis
-        self.fetched_emojis = {e.name: e for e in await self.fetch_application_emojis()}
-
-        # Create missing application emojis
-        for emoji_file in listdir("image/emoji"):
-            emoji_name = emoji_file.split(".")[0]
-            if emoji_name not in self.fetched_emojis.keys():
-                with open(f"image/emoji/{emoji_file}", "rb") as file:
-                    self.fetched_emojis[emoji_name] = await self.create_application_emoji(name=emoji_name, image=file.read())
-
-        # Set logging channel if specified
-        self.logging_channel = await self.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
-
-        # Bot is ready
         print(f"Logged in as {self.user} (ID: {self.user.id})")
 
 
