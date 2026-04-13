@@ -9,7 +9,6 @@ from random import randint, randrange, choice, choices
 from re import sub
 from math import ceil
 from io import BytesIO
-from os import getenv
 from discord import Embed, Interaction, Color, File
 from discord.utils import escape_markdown
 from discord.ext.commands import GroupCog, Range
@@ -19,9 +18,6 @@ from pydub.effects import high_pass_filter
 from tts import speak
 from llm import write
 
-
-# Logging channel
-logging_channel = None
 
 # Embed settings and static embeds
 embed_color = Color.dark_theme()
@@ -35,9 +31,6 @@ embed_delete_after = 30
 
 # Regex patterns for script modification
 regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
-
-# Emojis for the characters
-emojis = {}
 
 # Characters dictionary with their embed colors
 characters = {
@@ -159,7 +152,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embed=embed_episode_start)
 
             # Log the interaction
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic, as_needed=True)} chaos:{chaos}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic, as_needed=True)} chaos:{chaos}", color=embed_color))
 
             # Generate the script
             script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
@@ -253,7 +246,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                     combined = combined.append(silence_line, 0)
 
                 # Add the line to the output script
-                embed_output.add_field(name="", value=f"{emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line, as_needed=True)}", inline=False)
+                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line, as_needed=True)}", inline=False)
 
                 # Line completed
                 current_line += 1
@@ -319,7 +312,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embed=embed_tts)
 
             # Log the interaction
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text, as_needed=True)}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text, as_needed=True)}", color=embed_color))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -346,7 +339,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             # Export and send the file
             with BytesIO() as output:
                 seg.export(output, "wav")
-                await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text, as_needed=True)).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+                await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text, as_needed=True)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                     File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
         # Generation failed
@@ -379,7 +372,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embed=embed_chat)
 
             # Log the interaction
-            await logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message, as_needed=True)}", color=embed_color))
 
             # Generate the chat response
             response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s brief response using the format: {character}: <response>. The question from \"{interaction.user.display_name}\" says: \"{message}\".")
@@ -388,7 +381,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip(), as_needed=True)
 
             # Send the response
-            await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=emojis[character.replace(' ', '').replace('.', '')].url))
+            await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
 
         # Generation failed
         except:
@@ -399,18 +392,9 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
 async def setup(bot):
     """
-    Register the News cog with the bot, and fetch the logging channel and relevant emojis.
+    Register the News cog with the bot.
     :param bot: The bot instance
     :return: None
     """
 
-    # Fetch logging channel
-    global logging_channel
-    logging_channel = await bot.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
-
-    # Fetch emojis
-    global emojis
-    emojis = {e.name: e for e in await bot.fetch_application_emojis()}
-
-    # Register cog
     await bot.add_cog(News(bot))

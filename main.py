@@ -5,7 +5,7 @@ AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, 
 Written by Jeremy Noesen
 """
 
-from os import getenv
+from os import getenv, listdir
 from discord import Intents
 from discord.app_commands import AppInstallationType, AppCommandContext
 from dotenv import load_dotenv
@@ -36,8 +36,10 @@ class AISpongeLite(Bot):
 
         super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True))
 
-        # Initialize a set to store Discord user IDs of Patreon subscribers, which will be accessed throughout the bot
+        # Initialize variables used throughout the bot
         self.subscribed_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
+        self.fetched_emojis = {}
+        self.logging_channel = None
 
 
     async def setup_hook(self):
@@ -58,10 +60,34 @@ class AISpongeLite(Bot):
 
     async def on_ready(self):
         """
-        Show when the bot has finished loading and is ready to use
+        Set up the bot's profile and emojis when ready.
         :return: None
         """
 
+        # Set bot avatar if it is missing
+        if self.user.avatar is None:
+            with open("image/profile/avatar.gif", "rb") as file:
+                await self.user.edit(avatar=file.read())
+
+        # Set bot banner if it is missing
+        if (await self.fetch_user(self.user.id)).banner is None:
+            with open("image/profile/banner.png", "rb") as file:
+                await self.user.edit(banner=file.read())
+
+        # Fetch all application emojis
+        self.fetched_emojis = {e.name: e for e in await self.fetch_application_emojis()}
+
+        # Create missing application emojis
+        for emoji_file in listdir("image/emoji"):
+            emoji_name = emoji_file.split(".")[0]
+            if emoji_name not in self.fetched_emojis.keys():
+                with open(f"image/emoji/{emoji_file}", "rb") as file:
+                    self.fetched_emojis[emoji_name] = await self.create_application_emoji(name=emoji_name, image=file.read())
+
+        # Set logging channel if specified
+        self.logging_channel = await self.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
+
+        # Bot is ready
         print(f"Logged in as {self.user} (ID: {self.user.id})")
 
 
