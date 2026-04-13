@@ -26,7 +26,7 @@ class Patrons(Cog):
         self.fetch_patrons.start()
 
 
-    @loop(hours=1)
+    @loop(minutes=5)
     async def fetch_patrons(self):
         """
         Fetch active Patreon subscriber Discord user IDs, storing them in a global set.
