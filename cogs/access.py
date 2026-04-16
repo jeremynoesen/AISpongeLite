@@ -1,5 +1,5 @@
 """
-Module to fetch Patreon subscribers, used to determine command permissions.
+Module to fetch Patreon subscribers and admin users, used to determine command permissions.
 
 Written by Jeremy Noesen
 """
@@ -10,9 +10,9 @@ from discord.ext.tasks import loop
 from discord.ext.commands import Cog
 
 
-class Patrons(Cog):
+class Access(Cog):
     """
-    Cog for fetching Patreon subscribers.
+    Cog for fetching Patreon subscribers and admin users.
     """
 
 
@@ -23,18 +23,18 @@ class Patrons(Cog):
         """
 
         self.bot = bot
-        self.fetch_patrons.start()
+        self.update.start()
 
 
     @loop(minutes=5)
-    async def fetch_patrons(self):
+    async def update(self):
         """
-        Fetch active Patreon subscriber Discord user IDs, storing them in a global set.
+        Fetch active Patreon subscriber and admin Discord user IDs, storing them in a global set.
         :return: None
         """
 
-        # Create a set to store updated set of Discord user IDs
-        fetched_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
+        # Create a set to store updated set of Discord user IDs, starting with the admin users
+        new_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
 
         # Log in to Patreon API
         api_client = API(getenv("PATREON_ACCESS_TOKEN"))
@@ -52,7 +52,7 @@ class Patrons(Cog):
                 # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the set
                 discord_id = member.relationship('user').attribute('social_connections').get('discord')
                 if member.attribute('patron_status') == 'active_patron' and discord_id is not None:
-                    fetched_discord_user_ids.add(int(discord_id.get("user_id")))
+                    new_discord_user_ids.add(int(discord_id.get("user_id")))
 
             # Check if there is a next page of results
             try:
@@ -61,16 +61,16 @@ class Patrons(Cog):
                 break
 
         # Update the global set of Discord user IDs with the new set
-        self.bot.subscribed_discord_user_ids = fetched_discord_user_ids
-        print(f"Fetched Patreon subscribers: {self.bot.subscribed_discord_user_ids}")
+        self.bot.permitted_discord_user_ids = new_discord_user_ids
+        print(f"Permitted users: {self.bot.permitted_discord_user_ids}")
 
 
 async def setup(bot):
     """
-    Register the Patrons cog with the bot.
+    Register the Access cog with the bot.
     :param bot: The bot instance
     :return: None
     """
 
     # Register cog
-    await bot.add_cog(Patrons(bot))
+    await bot.add_cog(Access(bot))

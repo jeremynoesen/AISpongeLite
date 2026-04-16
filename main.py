@@ -17,7 +17,7 @@ load_dotenv()
 
 # List of cogs to load
 COGS = [
-    "cogs.patrons",
+    "cogs.access",
     "cogs.standard",
     "cogs.news"
 ]
@@ -37,7 +37,7 @@ class AISpongeLite(Bot):
         super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True), activity=Game("Standard and News!"))
 
         # Initialize variables used throughout the bot
-        self.subscribed_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
+        self.permitted_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
         self.fetched_emojis = {}
         self.logging_channel = None
 
@@ -74,7 +74,7 @@ class AISpongeLite(Bot):
 
         # Set logging channel
         self.logging_channel = await self.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
-        print(f"Set logging channel to: {self.logging_channel}")
+        print(f"Set logging channel: {self.logging_channel}")
 
         # Load each cog from the COGS list
         for cog in COGS:
@@ -83,7 +83,7 @@ class AISpongeLite(Bot):
 
         # Sync slash commands globally
         await self.tree.sync()
-        print("Slash commands synced globally")
+        print("Slash commands synced")
 
 
     async def on_ready(self):
@@ -92,7 +92,7 @@ class AISpongeLite(Bot):
         :return: None
         """
 
-        print(f"Logged in as: {self.user}")
+        print(f"Logged in: {self.user}")
 
 
 async def main():
