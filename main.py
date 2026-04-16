@@ -13,7 +13,7 @@ from discord.ext.commands import Bot
 from asyncio import run
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 # List of cogs to load
 COGS = [

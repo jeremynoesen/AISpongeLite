@@ -8,6 +8,7 @@ from os import getenv
 from patreon import API
 from discord.ext.tasks import loop
 from discord.ext.commands import Cog
+from dotenv import load_dotenv
 
 
 class Access(Cog):
@@ -32,6 +33,9 @@ class Access(Cog):
         Fetch active Patreon subscriber and admin Discord user IDs, storing them in a global set.
         :return: None
         """
+
+        # Reload environment variables from .env file
+        load_dotenv(override=True)
 
         # Create a set to store updated set of Discord user IDs, starting with the admin users
         new_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
