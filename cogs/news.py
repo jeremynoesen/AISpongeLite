@@ -68,28 +68,28 @@ music_just_breaking_softer = AudioSegment.from_mp3("audio/music/just_breaking_so
 
 # SFX audio segments
 sfx_random = {
-    AudioSegment.from_wav("audio/sfx/random/steel_sting.wav"): 5,
-    AudioSegment.from_wav("audio/sfx/random/boowomp.wav"): 5,
-    AudioSegment.from_wav("audio/sfx/random/my_leg_1.wav"): 5,
-    AudioSegment.from_wav("audio/sfx/random/my_leg_2.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/fling_1.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/fling_2.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/kick.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/squish_1.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/squish_2.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/explosion.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/ignite.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/steel_sting.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/boowomp.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/my_leg_1.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/my_leg_2.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/bonk.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/foghorn.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/vibe_link_b.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/this_guy_stinks.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/you_what.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/dolphin.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/boo_you_stink.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/bonk.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/fling_1.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/fling_2.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/kick.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/squish_1.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/squish_2.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/dramatic_cue_a.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/dramatic_cue_d.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/alarm.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/phone_call.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/explosion.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/ignite.wav"): 1
+    AudioSegment.from_wav("audio/sfx/random/phone_call.wav"): 1
 }
 
 # Transition audio segments
