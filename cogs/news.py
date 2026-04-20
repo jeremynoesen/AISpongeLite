@@ -105,6 +105,7 @@ voice_failed = AudioSegment.from_wav("audio/voice/failed.wav")
 silence_line = AudioSegment.silent(400)
 silence_intro = AudioSegment.silent(2000)
 silence_music = AudioSegment.silent(7500)
+silence_phone = AudioSegment.silent(400)
 
 # Literal type
 literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch Perkins", "Pearl", "DoodleBob", "Mr. Fish", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
@@ -233,7 +234,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                 # Apply phone filter for callers
                 if character not in ["Perch Perkins", "Mr. Fish"]:
                     seg = high_pass_filter(seg, 3000)
-                    combined = combined.append(silence_line, 0)
+                    combined = combined.append(silence_phone, 0)
 
                 # Apply gain
                 seg = seg.apply_gain(gain_voice-seg.dBFS)
@@ -332,6 +333,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:
                 seg = high_pass_filter(seg, 3000)
+                seg = silence_phone.append(seg, 0)
 
             # Apply gain
             seg = seg.apply_gain(gain_voice-seg.dBFS)
