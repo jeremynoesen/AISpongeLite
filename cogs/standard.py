@@ -187,6 +187,7 @@ silence_line = AudioSegment.silent(200)
 silence_intro = AudioSegment.silent(500)
 silence_music = AudioSegment.silent(3000)
 silence_megaphone = AudioSegment.silent(500)
+silence_outro = AudioSegment.silent(500)
 
 # Literal types
 literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch Perkins", "Pearl", "DoodleBob", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
@@ -383,7 +384,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.edit_original_response(embed=embed_episode_end)
 
             # Add silence at the end of the episode
-            combined = combined.append(silence_line, 0)
+            combined = combined.append(silence_outro, 0)
 
             # Add music to the episode based on location
             music = choices(list(locations[location][0].keys()), list(locations[location][0].values()))[0]
@@ -424,7 +425,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
 
             # Add the transition SFX to the beginning of the episode and fade out the end
-            combined = silence_intro.append(combined, 0).overlay(transition).fade_out(len(silence_line))
+            combined = silence_intro.append(combined, 0).overlay(transition).fade_out(len(silence_outro))
 
             # Export the episode and send it
             with BytesIO() as output:
