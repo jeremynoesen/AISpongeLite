@@ -170,7 +170,7 @@ sfx_triggered = {
     "molotov": ([AudioSegment.from_wav("audio/sfx/triggered/molotov.wav")], ["fire", "molotov", "burn", "flame", "flaming", "ignite", "igniting", "arson", "light", "hot", "blaze", "blazing", "combust"]),
     "ball": ([AudioSegment.from_wav("audio/sfx/triggered/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
     "burp": ([AudioSegment.from_wav("audio/sfx/triggered/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp", "sandwich"]),
-    "megaphone": ([AudioSegment.from_wav("audio/sfx/triggered/megaphone.wav")], ["hey", "shut", "listen"])
+    "megaphone": ([AudioSegment.from_wav("audio/sfx/triggered/megaphone.wav")], ["hey", "shut", "listen", "fuck"])
 }
 
 # Transition audio segments
@@ -186,7 +186,6 @@ voice_failed = AudioSegment.from_wav("audio/voice/failed.wav")
 silence_line = AudioSegment.silent(200)
 silence_intro = AudioSegment.silent(500)
 silence_music = AudioSegment.silent(3000)
-silence_megaphone = AudioSegment.silent(500)
 silence_outro = AudioSegment.silent(500)
 
 # Literal types
@@ -349,7 +348,6 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                         if sfx == "megaphone":
                             if randrange(5) == 0:
                                 sfx_positions[sfx].append(len(combined))
-                                combined = combined.append(silence_megaphone, 0)
                                 seg = high_pass_filter(seg, 3000)
                         else:
                             if randrange(5) > 0:
@@ -495,7 +493,6 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Add megaphone sound effect
             if megaphone:
-                seg = silence_megaphone.append(seg, 0)
                 sfx = sfx_triggered["megaphone"][0][0]
                 seg = seg.overlay(sfx.apply_gain((gain_sfx + randint(-10, 0)) - sfx.dBFS), 0)
 
