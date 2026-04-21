@@ -494,7 +494,11 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             # Add megaphone sound effect
             if megaphone:
                 sfx = sfx_triggered["megaphone"][0][0]
-                seg = seg.overlay(sfx.apply_gain((gain_sfx + randint(-10, 0)) - sfx.dBFS), 0)
+                sfx = sfx.apply_gain((gain_sfx + randint(-10, 0)) - sfx.dBFS)
+                if len(sfx) > len(seg):
+                    seg = sfx.overlay(seg)
+                else:
+                    seg = seg.overlay(sfx, 0)
 
             # Export and send the file
             with BytesIO() as output:
