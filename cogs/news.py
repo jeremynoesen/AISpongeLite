@@ -103,7 +103,7 @@ voice_failed = AudioSegment.from_wav("audio/voice/failed.wav")
 
 # Silence audio segments
 silence_line = AudioSegment.silent(400)
-silence_intro = AudioSegment.silent(1300)
+silence_intro = AudioSegment.silent(1250)
 silence_music = AudioSegment.silent(8000)
 silence_phone = AudioSegment.silent(400)
 silence_outro = AudioSegment.silent(500)
