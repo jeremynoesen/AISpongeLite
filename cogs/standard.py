@@ -152,6 +152,7 @@ sfx_random = {
     AudioSegment.from_wav("audio/sfx/random/anchor.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/train.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/ignite.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/inflate.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/foghorn.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/vibe_link_b.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/this_guy_stinks.wav"): 1,
@@ -161,7 +162,8 @@ sfx_random = {
     AudioSegment.from_wav("audio/sfx/random/dramatic_cue_a.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/dramatic_cue_d.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/alarm.wav"): 1,
-    AudioSegment.from_wav("audio/sfx/random/phone_call.wav"): 1
+    AudioSegment.from_wav("audio/sfx/random/phone_call.wav"): 1,
+    AudioSegment.from_wav("audio/sfx/random/kiss.wav"): 1
 }
 sfx_lightning = AudioSegment.from_wav("audio/sfx/random/lightning.wav")
 sfx_triggered = {
