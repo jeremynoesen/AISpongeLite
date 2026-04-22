@@ -70,7 +70,9 @@ music_just_breaking_softer = AudioSegment.from_mp3("audio/music/just_breaking_so
 sfx_random = {
     AudioSegment.from_wav("audio/sfx/random/fling_1.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/fling_2.wav"): 10,
-    AudioSegment.from_wav("audio/sfx/random/kick.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/kick_1.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/kick_2.wav"): 10,
+    AudioSegment.from_wav("audio/sfx/random/kick_3.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/explosion.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/ignite.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/steel_sting.wav"): 1,
