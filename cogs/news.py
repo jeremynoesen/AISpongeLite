@@ -71,8 +71,6 @@ sfx_random = {
     AudioSegment.from_wav("audio/sfx/random/fling_1.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/fling_2.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/kick.wav"): 10,
-    AudioSegment.from_wav("audio/sfx/random/squish_1.wav"): 10,
-    AudioSegment.from_wav("audio/sfx/random/squish_2.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/explosion.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/ignite.wav"): 10,
     AudioSegment.from_wav("audio/sfx/random/steel_sting.wav"): 1,
