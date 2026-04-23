@@ -143,7 +143,7 @@ sfx_random = {
     AudioSegment.from_wav("audio/sfx/random/my_leg_2.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/crash_1.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/crash_2.wav"): 5,
-    AudioSegment.from_wav("audio/sfx/random/glass_shatter.wav"): 5,
+    AudioSegment.from_wav("audio/sfx/random/crash_3.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/bonk.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/fling_1.wav"): 5,
     AudioSegment.from_wav("audio/sfx/random/fling_2.wav"): 5,
