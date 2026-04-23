@@ -34,7 +34,7 @@ class AISpongeLite(Bot):
         Initialize the bot with command prefix, intents, and allowed contexts
         """
 
-        super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True), activity=Game("Standard and News!"))
+        super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True), activity=Game("4.1.0"))
 
         # Initialize variables used throughout the bot
         self.permitted_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
