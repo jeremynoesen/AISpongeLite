@@ -271,7 +271,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 weather = "Clear"
 
             # Generate the script
-            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a SpongeBob episode about a topic that takes place on a {weather} {time} in {location} and features {locations[location][2]}, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a SpongeBob episode about a topic that takes place on a {weather} {time} at {location} and features {locations[location][2]}, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
