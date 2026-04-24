@@ -268,7 +268,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             combined = combined.overlay(music_loop)
 
             # Add random SFX to the episode
-            for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else randint(1, ceil(min(total_lines, 25) / 5)))):
+            for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(total_lines, 25) / 5))):
                 combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
 
             # Add the transition SFX to the beginning of the episode
