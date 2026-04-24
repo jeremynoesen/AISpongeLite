@@ -351,16 +351,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
                 # Check if any of the word-activated SFX should happen
                 for sfx in sfx_triggered.keys():
-                    if any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
+                    if randrange(2) == 0 and any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
                         if sfx == "megaphone":
-                            if randrange(5) == 0:
-                                sfx_positions[sfx].append(len(combined))
-                                seg = high_pass_filter(seg, 3000)
-                                break
+                            sfx_positions[sfx].append(len(combined))
+                            seg = high_pass_filter(seg, 3000)
                         else:
-                            if randrange(5) > 0:
-                                sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
-                                break
+                            sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
+                        break
 
                 # Apply gain, forcing a loud event sometimes
                 if randrange(20) == 0:
