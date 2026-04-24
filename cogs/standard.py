@@ -177,7 +177,8 @@ sfx_triggered = {
     "molotov": ([AudioSegment.from_wav("audio/sfx/triggered/molotov.wav")], ["fire", "molotov", "burn", "flame", "flaming", "ignite", "igniting", "arson", "light", "hot", "blaze", "blazing", "combust"]),
     "ball": ([AudioSegment.from_wav("audio/sfx/triggered/ball.wav")], ["ball", "bounce", "bouncing", "bouncy", "foul", "soccer", "goal", "catch", "throw", "toss", "kick"]),
     "burp": ([AudioSegment.from_wav("audio/sfx/triggered/burp.wav")], ["krabby patty", "krabby patties", "food", "burger", "hungry", "hungrier", "ice cream", "pizza", "pie", "fries", "fry", "consume", "consuming", "consumption", "cake", "shake", "sushi", "ketchup", "mustard", "mayo", "starve", "starving", "snack", "burp", "sandwich"]),
-    "megaphone": ([AudioSegment.from_wav("audio/sfx/triggered/megaphone.wav")], ["hey", "shut", "listen", "fuck"])
+    "megaphone": ([AudioSegment.from_wav("audio/sfx/triggered/megaphone.wav")], ["hey", "shut", "listen", "fuck"]),
+    "police": ([AudioSegment.from_wav("audio/sfx/triggered/police.wav")], ["police", "cops"])
 }
 
 # Transition audio segments
