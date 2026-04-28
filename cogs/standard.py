@@ -4,7 +4,7 @@ Standard episode type, based on AI Sponge Rehydrated standard topics.
 Written by Jeremy Noesen
 """
 
-from typing import Literal
+from typing import Literal, get_args
 from random import randint, randrange, choice, choices
 from re import sub
 from math import ceil
@@ -251,11 +251,11 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Get random location if none provided
             if location is None:
-                location = choice([key for key in locations.keys()])
+                location = choice(list(get_args(literal_locations)))
 
             # Get random time if none provided
             if time is None:
-                time = choice(list(ambiance_time.keys()))
+                time = choice(list(get_args(literal_time)))
             ambiance = ambiance_time[time]
 
             # Get rain intensity
