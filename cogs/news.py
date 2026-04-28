@@ -11,7 +11,7 @@ from math import ceil
 from io import BytesIO
 from discord import Embed, Interaction, Color, File
 from discord.utils import escape_markdown
-from discord.ext.commands import GroupCog, Range
+from discord.ext.commands import GroupCog
 from discord.app_commands import Range, describe, command
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter
