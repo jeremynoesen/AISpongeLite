@@ -413,7 +413,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
                 # Add lightning if rain is intense
                 if rain_intensity > 0:
-                    for i in range(ceil(len(combined) / 1000) if chaos else ceil(min(total_lines, 25) / (10 - rain_intensity))):
+                    for i in range(ceil(len(combined) / 1000) if chaos else (ceil(min(total_lines, 25) / 5) + rain_intensity)):
                         combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), randrange(len(combined)))
 
             # Add word-activated SFX to the episode
