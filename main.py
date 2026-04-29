@@ -37,7 +37,7 @@ class AISpongeLite(Bot):
         super().__init__(command_prefix="/", intents=Intents.default(), allowed_installs=AppInstallationType(guild=True, user=False), allowed_contexts=AppCommandContext(guild=True, dm_channel=False, private_channel=True), activity=Game("4.1.0"))
 
         # Initialize variables used throughout the bot
-        self.permitted_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
+        self.permitted_discord_user_ids = {int(x) for x in str(getenv("DISCORD_ADMIN_USER_IDS")).split(",")}
         self.fetched_emojis = {}
         self.logging_channel = None
 
@@ -73,7 +73,7 @@ class AISpongeLite(Bot):
                     print(f"Created emoji: {emoji_name}")
 
         # Set logging channel
-        self.logging_channel = await self.fetch_channel(int(getenv("DISCORD_LOGGING_CHANNEL_ID")))
+        self.logging_channel = await self.fetch_channel(int(str(getenv("DISCORD_LOGGING_CHANNEL_ID"))))
         print(f"Set logging channel: {self.logging_channel}")
 
         # Load each cog from the COGS list
@@ -103,7 +103,7 @@ async def main():
 
     bot = AISpongeLite()
     async with bot:
-        await bot.start(getenv("DISCORD_BOT_TOKEN"))
+        await bot.start(str(getenv("DISCORD_BOT_TOKEN")))
 
 
 # Run the bot

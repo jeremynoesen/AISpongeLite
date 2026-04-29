@@ -38,7 +38,7 @@ class Access(Cog):
         load_dotenv(override=True)
 
         # Create a set to store updated set of Discord user IDs, starting with the admin users
-        new_discord_user_ids = {int(x) for x in getenv("DISCORD_ADMIN_USER_IDS").split(",")}
+        new_discord_user_ids = {int(x) for x in str(getenv("DISCORD_ADMIN_USER_IDS")).split(",")}
 
         # Log in to Patreon API
         api_client = API(getenv("PATREON_ACCESS_TOKEN"))
