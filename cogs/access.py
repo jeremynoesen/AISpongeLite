@@ -42,13 +42,14 @@ class Access(Cog):
 
         # Log in to Patreon API
         api_client = API(getenv("PATREON_ACCESS_TOKEN"))
+        campaign_id = api_client.get_campaigns(1).data()[0].id()
 
         # Loop through paginated responses to fetch all members of the Patreon campaign
         cursor = None
         while True:
 
             # Fetch a page of members, including their social connections and patron status
-            members_response = api_client.get_campaigns_by_id_members(getenv("PATREON_CAMPAIGN_ID"), 1000, cursor=cursor, includes=["user"], fields={"member": ["patron_status"], "user": ["social_connections"]})
+            members_response = api_client.get_campaigns_by_id_members(campaign_id, 1000, cursor=cursor, includes=["user"], fields={"member": ["patron_status"], "user": ["social_connections"]})
 
             # Iterate through the members in the response
             for member in members_response.data():
