@@ -4,7 +4,7 @@ News episode type, based on AI Sponge Rehydrated news topics.
 Written by Jeremy Noesen
 """
 
-from typing import Literal
+from typing import Literal, get_args
 from random import randint, randrange, choice, choices
 from re import sub
 from math import ceil
@@ -32,8 +32,9 @@ embed_delete_after = 30
 # Regex patterns for script modification
 regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
 
-# Characters dictionary with their embed colors
-characters = {
+# Characters and their embed colors
+characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch Perkins", "Pearl", "DoodleBob", "Mr. Fish", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
+data_characters = {
     "SpongeBob": 0xc3ac30,
     "Patrick": 0xeea68b,
     "Squidward": 0x9abab2,
@@ -107,9 +108,6 @@ silence_intro = AudioSegment.silent(1250)
 silence_music = AudioSegment.silent(8000)
 silence_phone = AudioSegment.silent(400)
 
-# Literal type
-literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch Perkins", "Pearl", "DoodleBob", "Mr. Fish", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
-
 # Character limits for input and output
 char_limit_min = 1
 char_limit_max = 512
@@ -170,8 +168,8 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                     title_formatted = title
 
             # Keep track of current line and the total number of lines
-            current_line = 1
-            total_lines = len(lines)
+            line_index = 1
+            line_count = len(lines)
 
             # Create the embed for the output
             embed_output = Embed(title=escape_markdown(title_formatted), color=0x316ec3)
@@ -183,40 +181,40 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{current_line}/{min(total_lines, 25)}`...", color=embed_color))
+                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{line_index}/{min(line_count, 25)}`...", color=embed_color))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
                 if len(line_parts) != 2:
-                    total_lines -= 1
+                    line_count -= 1
                     continue
 
                 # Skip line if it is too short
-                output_line = sub(regex_actions, "", line_parts[1].strip())[:char_limit_max].strip()
-                if len(output_line) < char_limit_min:
-                    total_lines -= 1
+                current_line = sub(regex_actions, "", line_parts[1].strip())[:char_limit_max].strip()
+                if len(current_line) < char_limit_min:
+                    line_count -= 1
                     continue
 
                 # Get the character
-                character = ""
-                for key in characters.keys():
-                    key_casefold = key.casefold()
-                    character_casefold = line_parts[0].casefold()
-                    if key_casefold in character_casefold or character_casefold in key_casefold:
-                        character = key
+                current_character = ""
+                for character in list(get_args(characters)):
+                    character_casefold = character.casefold()
+                    string_casefold = line_parts[0].casefold()
+                    if character_casefold in string_casefold or string_casefold in character_casefold:
+                        current_character = character
                         break
 
                 # Skip line if no character was found
-                if not character:
-                    total_lines -= 1
+                if not current_character:
+                    line_count -= 1
                     continue
 
                 # Speak line using voice files for DoodleBob
-                if character == "DoodleBob":
+                if current_character == "DoodleBob":
                     seg = choice(voice_doodlebob)
 
                 # Speak line using voice files for Gary
-                elif character == "Gary":
+                elif current_character == "Gary":
                     seg = choice(voice_gary)
 
                 # Speak line for all other characters
@@ -224,17 +222,17 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
                     # Attempt to speak line
                     try:
-                        seg = await speak(character, output_line)
+                        seg = await speak(current_character, current_line)
 
                     # Failed sound effect on failure
                     except:
                         seg = voice_failed
 
                 # Limit the audio length based on text length
-                seg = seg[:1000 + (len(output_line) * 100)]
+                seg = seg[:1000 + (len(current_line) * 100)]
 
                 # Apply phone filter for callers
-                if character not in ["Perch Perkins", "Mr. Fish"]:
+                if current_character not in ["Perch Perkins", "Mr. Fish"]:
                     seg = high_pass_filter(seg, 3000)
                     combined = combined.append(silence_phone, 0)
 
@@ -245,17 +243,17 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                 combined = combined.append(seg, 0)
 
                 # Add line spacing unless a cutoff event occurs
-                if output_line[-1] not in "-–—":
+                if current_line[-1] not in "-–—":
                     combined = combined.append(silence_line, 0)
 
                 # Add the line to the output script
-                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line)}", inline=False)
+                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[current_character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(current_line)}", inline=False)
 
                 # Line completed
-                current_line += 1
+                line_index += 1
 
                 # Embeds have a 25 field limit. Skip remaining lines.
-                if current_line > 25:
+                if line_index > 25:
                     break
 
             # Show final generating message
@@ -270,7 +268,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             combined = combined.overlay(music_loop)
 
             # Add random SFX to the episode
-            for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(total_lines, 25) / 5))):
+            for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5))):
                 combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
 
             # Add the transition SFX to the beginning of the episode
@@ -291,7 +289,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
     @command(name="tts", description="Make a news character speak text.")
     @describe(character="Who should speak.", text="What should be said.")
-    async def tts(self, interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max]):
+    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max]):
         """
         Make a character from news episodes speak text using text-to-speech.
         :param interaction: Interaction created by the command
@@ -340,7 +338,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             # Export and send the file
             with BytesIO() as output:
                 seg.export(output, "wav")
-                await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+                await interaction.edit_original_response(embed=Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                     File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
         # Generation failed
@@ -352,7 +350,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
     @command(name="chat", description="Chat with a news character.")
     @describe(character="Who to chat with.", message="What to say to them.")
-    async def chat(self, interaction: Interaction, character: literal_characters, message: Range[str, char_limit_min, char_limit_max]):
+    async def chat(self, interaction: Interaction, character: characters, message: Range[str, char_limit_min, char_limit_max]):
         """
         Chat with one of the characters from news episodes.
         :param interaction: Interaction created by the command
@@ -382,7 +380,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
             # Send the response
-            await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
+            await interaction.edit_original_response(embed=Embed(description=output, color=data_characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
 
         # Generation failed
         except:

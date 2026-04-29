@@ -32,8 +32,9 @@ embed_delete_after = 30
 # Regex patterns for script modification
 regex_actions = r"^[*<([][^:@#]+?[])>*]\s+"
 
-# Characters dictionary with their embed colors
-characters = {
+# Characters and their embed colors
+characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch Perkins", "Pearl", "DoodleBob", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
+data_characters = {
     "SpongeBob": 0xc3ac30,
     "Patrick": 0xeea68b,
     "Squidward": 0x9abab2,
@@ -70,10 +71,12 @@ fade_ambiance = 500
 fade_music = 5000
 
 # Ambiance audio segments
+times = Literal["Day", "Night"]
 ambiance_time = {
     "Day": AudioSegment.from_wav("audio/ambiance/day.wav"),
     "Night": AudioSegment.from_wav("audio/ambiance/night.wav")
 }
+weathers = Literal["Stormy", "Rainy", "Clear"]
 ambiance_rain = AudioSegment.from_wav("audio/ambiance/rain.wav")
 
 # Music audio segments
@@ -88,8 +91,9 @@ music_comic_walk = AudioSegment.from_wav("audio/music/comic_walk.wav")
 music_gator = AudioSegment.from_wav("audio/music/gator.wav")
 music_rock_bottom = AudioSegment.from_wav("audio/music/rock_bottom.wav")
 
-# Locations with their assigned music segments and embed colors
-locations = {
+# Locations with their assigned music segments, embed colors, and characters
+locations = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "Rock Bottom", "Bikini Bottom"]
+data_locations = {
     "SpongeBob's House": ({
         music_stars_and_games: 5,
         music_seaweed: 1,
@@ -195,12 +199,6 @@ silence_line = AudioSegment.silent(200)
 silence_intro = AudioSegment.silent(500)
 silence_music = AudioSegment.silent(3000)
 
-# Literal types
-literal_characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry", "Squilliam", "Karen", "Narrator", "Bubble Buddy", "Bubble Bass", "Perch Perkins", "Pearl", "DoodleBob", "Flying Dutchman", "King Neptune", "Man Ray", "Dirty Bubble"]
-literal_locations = Literal["SpongeBob's House", "Patrick's House", "Squidward's House", "Sandy's Treedome", "Krusty Krab", "Chum Bucket", "Boating School", "Rock Bottom", "Bikini Bottom"]
-literal_time = Literal["Day", "Night"]
-literal_weather = Literal["Stormy", "Rainy", "Clear"]
-
 # Character limits for input and output
 char_limit_min = 1
 char_limit_max = 512
@@ -223,7 +221,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
     @command(name="episode", description="Generate a standard episode.")
     @describe(topic="What the episode is about.", location="Where the episode takes place.", time="When the episode takes place.", weather="What the weather is like.", chaos="Whether to simulate chaos hour.")
-    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: literal_locations = None, time: literal_time = None, weather: literal_weather = None, chaos: bool = False):
+    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations = None, time: times = None, weather: weathers = None, chaos: bool = False):
         """
         Generate a standard episode about a topic.
         :param interaction: Interaction created by the command
@@ -251,11 +249,11 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Get random location if none provided
             if location is None:
-                location = choice(list(get_args(literal_locations)))
+                location = choice(list(get_args(locations)))
 
             # Get random time if none provided
             if time is None:
-                time = choice(list(get_args(literal_time)))
+                time = choice(list(get_args(times)))
             ambiance = ambiance_time[time]
 
             # Get rain intensity
@@ -273,7 +271,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 weather = "Clear"
 
             # Generate the script
-            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a SpongeBob episode about a topic that takes place on a {weather} {time} at {location} and features {locations[location][2]}, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a SpongeBob episode about a topic that takes place on a {weather} {time} at {location} and features {data_locations[location][2]}, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by ten lines of brief character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -287,11 +285,11 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     title_formatted = title
 
             # Keep track of current line and the total number of lines
-            current_line = 1
-            total_lines = len(lines)
+            line_index = 1
+            line_count = len(lines)
 
             # Create the embed for the output
-            embed_output = Embed(title=escape_markdown(title_formatted), color=locations[location][1])
+            embed_output = Embed(title=escape_markdown(title_formatted), color=data_locations[location][1])
 
             # Variables used for generation data
             sfx_positions = {key: [] for key in sfx_triggered.keys()}
@@ -301,40 +299,40 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{current_line}/{min(total_lines, 25)}`...", color=embed_color))
+                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{line_index}/{min(line_count, 25)}`...", color=embed_color))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
                 if len(line_parts) != 2:
-                    total_lines -= 1
+                    line_count -= 1
                     continue
 
                 # Skip line if it is too short
-                output_line = sub(regex_actions, "", line_parts[1].strip())[:char_limit_max].strip()
-                if len(output_line) < char_limit_min:
-                    total_lines -= 1
+                current_line = sub(regex_actions, "", line_parts[1].strip())[:char_limit_max].strip()
+                if len(current_line) < char_limit_min:
+                    line_count -= 1
                     continue
 
                 # Get the character
-                character = ""
-                for key in characters.keys():
-                    key_casefold = key.casefold()
-                    character_casefold = line_parts[0].casefold()
-                    if key_casefold in character_casefold or character_casefold in key_casefold:
-                        character = key
+                current_character = ""
+                for character in list(get_args(characters)):
+                    character_casefold = character.casefold()
+                    string_casefold = line_parts[0].casefold()
+                    if character_casefold in string_casefold or string_casefold in character_casefold:
+                        current_character = character
                         break
 
                 # Skip line if no character was found
-                if not character:
-                    total_lines -= 1
+                if not current_character:
+                    line_count -= 1
                     continue
 
                 # Speak line using voice files for DoodleBob
-                if character == "DoodleBob":
+                if current_character == "DoodleBob":
                     seg = choice(voice_doodlebob)
 
                 # Speak line using voice files for Gary
-                elif character == "Gary":
+                elif current_character == "Gary":
                     seg = choice(voice_gary)
 
                 # Speak line for all other characters
@@ -342,18 +340,18 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
                     # Attempt to speak line
                     try:
-                        seg = await speak(character, output_line)
+                        seg = await speak(current_character, current_line)
 
                     # Failed sound effect on failure
                     except:
                         seg = voice_failed
 
                 # Limit the audio length based on text length
-                seg = seg[:1000 + (len(output_line) * 100)]
+                seg = seg[:1000 + (len(current_line) * 100)]
 
                 # Check if any of the word-activated SFX should happen
                 for sfx in sfx_triggered.keys():
-                    if randrange(2) == 0 and any(keyword in output_line.casefold() for keyword in sfx_triggered[sfx][1]):
+                    if randrange(2) == 0 and any(keyword in current_line.casefold() for keyword in sfx_triggered[sfx][1]):
                         if sfx == "megaphone":
                             sfx_positions[sfx].append(len(combined))
                             seg = high_pass_filter(seg, 3000)
@@ -372,24 +370,24 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 combined = combined.append(seg, 0)
 
                 # Add line spacing unless a cutoff event occurs
-                if output_line[-1] not in "-–—":
+                if current_line[-1] not in "-–—":
                     combined = combined.append(silence_line, 0)
 
                 # Add the line to the output script
-                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(output_line)}", inline=False)
+                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[current_character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(current_line)}", inline=False)
 
                 # Line completed
-                current_line += 1
+                line_index += 1
 
                 # Embeds have a 25 field limit. Skip remaining lines.
-                if current_line > 25:
+                if line_index > 25:
                     break
 
             # Show final generating message
             await interaction.edit_original_response(embed=embed_episode_end)
 
             # Add music to the episode based on location
-            music = choices(list(locations[location][0].keys()), list(locations[location][0].values()))[0]
+            music = choices(list(data_locations[location][0].keys()), list(data_locations[location][0].values()))[0]
             music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
             music_loop = silence_music.append(music.fade_in(fade_music), 0)
             while len(music_loop) < len(combined):
@@ -413,7 +411,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
                 # Add lightning if rain is intense
                 if rain_intensity > 0:
-                    for i in range((ceil(len(combined) / 1000) if chaos else ceil(min(total_lines, 25) / 5)) + rain_intensity):
+                    for i in range((ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5)) + rain_intensity):
                         combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), randrange(len(combined)))
 
             # Add word-activated SFX to the episode
@@ -423,7 +421,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-10, 0)) - variant.dBFS), position)
 
             # Add random SFX to the episode
-            for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(total_lines, 25) / 5))):
+            for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5))):
                 combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
 
             # Add the transition SFX to the beginning of the episode
@@ -444,7 +442,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
     @command(name="tts", description="Make a standard character speak text.")
     @describe(character="Who should speak.", text="What should be said.", megaphone="Whether to speak through a megaphone.", loud="Whether to speak loudly.")
-    async def tts(self, interaction: Interaction, character: literal_characters, text: Range[str, char_limit_min, char_limit_max], megaphone: bool = False, loud: bool = False):
+    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], megaphone: bool = False, loud: bool = False):
         """
         Make a character from standard episodes speak text using text-to-speech.
         :param interaction: Interaction created by the command
@@ -507,7 +505,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             # Export and send the file
             with BytesIO() as output:
                 seg.export(output, "wav")
-                await interaction.edit_original_response(embed=Embed(color=characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+                await interaction.edit_original_response(embed=Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
                     File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
         # Generation failed
@@ -519,7 +517,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
     @command(name="chat", description="Chat with a standard character.")
     @describe(character="Who to chat with.", message="What to say to them.")
-    async def chat(self, interaction: Interaction, character: literal_characters, message: Range[str, char_limit_min, char_limit_max]):
+    async def chat(self, interaction: Interaction, character: characters, message: Range[str, char_limit_min, char_limit_max]):
         """
         Chat with one of the characters from standard episodes.
         :param interaction: Interaction created by the command
@@ -549,7 +547,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
             # Send the response
-            await interaction.edit_original_response(embed=Embed(description=output, color=characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
+            await interaction.edit_original_response(embed=Embed(description=output, color=data_characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
 
         # Generation failed
         except:
