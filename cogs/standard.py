@@ -316,9 +316,9 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
                 # Get the character
                 current_character = ""
+                string_casefold = line_parts[0].casefold()
                 for character in list(get_args(characters)):
                     character_casefold = character.casefold()
-                    string_casefold = line_parts[0].casefold()
                     if character_casefold in string_casefold or string_casefold in character_casefold:
                         current_character = character
                         break
@@ -351,8 +351,9 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 seg = seg[:1000 + (len(current_line) * 100)]
 
                 # Check if any of the word-activated SFX should happen
+                current_line_casefold = current_line.casefold()
                 for sfx in sfx_triggered.keys():
-                    if randrange(2) == 0 and any(keyword in current_line.casefold() for keyword in sfx_triggered[sfx][1]):
+                    if randrange(2) == 0 and any(keyword in current_line_casefold for keyword in sfx_triggered[sfx][1]):
                         if sfx == "megaphone":
                             sfx_positions[sfx].append(len(combined))
                             seg = high_pass_filter(seg, 3000)

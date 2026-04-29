@@ -198,9 +198,9 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
                 # Get the character
                 current_character = ""
+                string_casefold = line_parts[0].casefold()
                 for character in list(get_args(characters)):
                     character_casefold = character.casefold()
-                    string_casefold = line_parts[0].casefold()
                     if character_casefold in string_casefold or string_casefold in character_casefold:
                         current_character = character
                         break
