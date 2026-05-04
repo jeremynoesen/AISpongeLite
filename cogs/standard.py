@@ -86,7 +86,7 @@ music_rake_hornpipe = AudioSegment.from_wav("audio/music/rake_hornpipe.wav")
 music_seaweed = AudioSegment.from_wav("audio/music/seaweed.wav")
 music_hello_sailor_b = AudioSegment.from_wav("audio/music/hello_sailor_b.wav")
 music_drunken_sailor = AudioSegment.from_wav("audio/music/drunken_sailor.wav")
-music_stars_and_games = low_pass_filter(high_pass_filter(AudioSegment.from_wav("audio/music/stars_and_games.wav"), 6000), 6000)
+music_stars_and_games = low_pass_filter(high_pass_filter(AudioSegment.from_wav("audio/music/stars_and_games.wav"), 5000), 5000)
 music_comic_walk = AudioSegment.from_wav("audio/music/comic_walk.wav")
 music_gator = AudioSegment.from_wav("audio/music/gator.wav")
 music_rock_bottom = AudioSegment.from_wav("audio/music/rock_bottom.wav")
@@ -356,7 +356,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     if randrange(2) == 0 and any(keyword in current_line_casefold for keyword in sfx_triggered[sfx][1]):
                         if sfx == "megaphone":
                             sfx_positions[sfx].append(len(combined))
-                            seg = high_pass_filter(seg, 3000)
+                            seg = high_pass_filter(seg, 5000)
                         else:
                             sfx_positions[sfx].append(len(combined) + randrange(len(seg)))
                         break
@@ -486,7 +486,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Apply megaphone filter
             if megaphone:
-                seg = high_pass_filter(seg, 3000)
+                seg = high_pass_filter(seg, 5000)
 
             # Apply gain
             if loud:

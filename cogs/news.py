@@ -234,7 +234,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
                 # Apply phone filter for callers
                 if current_character not in ["Perch Perkins", "Mr. Fish"]:
-                    seg = high_pass_filter(seg, 3000)
+                    seg = high_pass_filter(seg, 5000)
                     combined = combined.append(silence_phone, 0)
 
                 # Apply gain
@@ -330,7 +330,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:
-                seg = high_pass_filter(seg, 3000)
+                seg = high_pass_filter(seg, 5000)
                 seg = silence_phone.append(seg, 0)
 
             # Apply gain
