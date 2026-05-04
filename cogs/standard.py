@@ -417,17 +417,17 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 # Add lightning if rain is intense
                 if rain_intensity > 0:
                     for i in range((ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5)) + rain_intensity):
-                        combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), randrange(len(combined)))
+                        combined = combined.overlay(sfx_lightning, randrange(len(combined)), gain_during_overlay=((gain_sfx + randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS))
 
             # Add word-activated SFX to the episode
             for sfx in sfx_triggered.keys():
                 for position in sfx_positions[sfx]:
                     variant = choice(sfx_triggered[sfx][0])
-                    combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-10, 0)) - variant.dBFS), position)
+                    combined = combined.overlay(variant, position, gain_during_overlay=((gain_sfx + randint(-10, 0)) - variant.dBFS))
 
             # Add random SFX to the episode
             for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5))):
-                combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
+                combined = combined.overlay(sfx, randrange(len(combined)), gain_during_overlay=((gain_sfx + randint(-5, 5)) - sfx.dBFS))
 
             # Add the transition SFX to the beginning of the episode
             combined = silence_intro.append(combined, 0).overlay(transition)
@@ -505,7 +505,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 if len(sfx) > len(seg):
                     seg = sfx.overlay(seg)
                 else:
-                    seg = seg.overlay(sfx, 0)
+                    seg = seg.overlay(sfx)
 
             # Export and send the file
             with BytesIO() as output:
