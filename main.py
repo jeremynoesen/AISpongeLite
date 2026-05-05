@@ -16,7 +16,7 @@ from asyncio import run
 load_dotenv(override=True)
 
 # List of cogs to load
-COGS = [
+cogs = [
     "cogs.access",
     "cogs.standard",
     "cogs.news"
@@ -77,7 +77,7 @@ class AISpongeLite(Bot):
         print(f"Set logging channel: {self.logging_channel}")
 
         # Load each cog from the COGS list
-        for cog in COGS:
+        for cog in cogs:
             await self.load_extension(cog)
             print(f"Loaded cog: {cog}")
 
