@@ -9,7 +9,7 @@ from uuid import uuid4
 from json import loads
 from io import BytesIO
 from aiohttp import ClientSession
-from websockets import connect, ConnectionClosed
+from websockets import connect
 from pydub import AudioSegment
 
 # Characters dictionary with TTS system name and arpabet status
@@ -66,16 +66,13 @@ async def speak(character: str, text: str):
 
             # Wait for job to be ready via websocket
             while True:
-                try:
-                    msg = loads(await socket.recv())
-                    if msg.get("id") == job_id:
-                        if msg.get("status") == "ready":
-                            await socket.close()
-                            break
-                        if msg.get("status") in ("failed", "removed"):
-                            raise Exception()
-                except ConnectionClosed:
-                    raise Exception()
+                msg = loads(await socket.recv())
+                if msg.get("id") == job_id:
+                    if msg.get("status") == "ready":
+                        await socket.close()
+                        break
+                    if msg.get("status") in ("failed", "removed"):
+                        raise Exception()
 
             # Download audio file
             async with session.get(http_url + "downloads/" + job_id) as resp:
