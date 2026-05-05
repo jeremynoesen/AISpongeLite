@@ -10,7 +10,6 @@ from discord import Intents, Game
 from discord.app_commands import AppInstallationType, AppCommandContext
 from dotenv import load_dotenv
 from discord.ext.commands import Bot
-from asyncio import run
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -95,17 +94,6 @@ class AISpongeLite(Bot):
         print(f"Logged in: {self.user}")
 
 
-async def main():
-    """
-    Main function to create an instance of the bot and start it using the token from environment variables
-    :return: None
-    """
-
-    bot = AISpongeLite()
-    async with bot:
-        await bot.start(str(getenv("DISCORD_BOT_TOKEN")))
-
-
 # Run the bot
 if __name__ == "__main__":
-    run(main())
+    AISpongeLite().run(str(getenv("DISCORD_BOT_TOKEN")))
