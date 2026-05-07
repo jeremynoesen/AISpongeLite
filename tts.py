@@ -72,7 +72,7 @@ async def speak(character: str, text: str):
                         await socket.close()
                         break
                     if msg.get("status") in ("failed", "removed"):
-                        raise Exception()
+                        raise Exception(f"TTS job {job_id} status is either \"failed\" or \"removed\"")
 
             # Download audio file
             async with session.get(http_url + "downloads/" + job_id) as resp:

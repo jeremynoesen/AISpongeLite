@@ -4,11 +4,15 @@ Module to fetch Patreon subscribers and admin users, used to determine command p
 Written by Jeremy Noesen
 """
 
+from logging import getLogger
 from os import getenv
 from patreon import API
 from discord.ext.tasks import loop
 from discord.ext.commands import Cog
 from dotenv import load_dotenv
+
+# Set up logger
+logger = getLogger(__name__)
 
 
 class Access(Cog):
@@ -62,12 +66,14 @@ class Access(Cog):
             # Check if there is a next page of results
             try:
                 cursor = api.extract_cursor(members)
+
+            # This is the last page
             except:
                 break
 
         # Update the global set of Discord user IDs with the new set
         self.bot.permitted_discord_user_ids = new_discord_user_ids
-        print(f"Permitted users: {self.bot.permitted_discord_user_ids}")
+        logger.info(f"Permitted users: {self.bot.permitted_discord_user_ids}")
 
 
 async def setup(bot):

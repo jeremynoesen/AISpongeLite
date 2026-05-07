@@ -4,6 +4,7 @@ Standard episode type, based on AI Sponge Rehydrated standard topics.
 Written by Jeremy Noesen
 """
 
+from logging import getLogger
 from typing import Literal, get_args
 from random import randint, randrange, choice, choices
 from re import sub
@@ -18,6 +19,8 @@ from pydub.effects import high_pass_filter, low_pass_filter
 from tts import speak
 from llm import write
 
+# Set up logger
+logger = getLogger(__name__)
 
 # Embed settings and static embeds
 embed_color = Color.dark_theme()
@@ -346,8 +349,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     try:
                         seg = await speak(current_character, current_line)
 
-                    # Failed sound effect on failure
-                    except:
+                    # Line failed to generate
+                    except Exception as exception:
+
+                        # Log error
+                        logger.warning(exception)
+
+                        # Use failed sound as seg
                         seg = voice_failed
 
                 # Limit the audio length based on text length
@@ -439,7 +447,12 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     File(output, title_formatted.replace("/", "\\").replace("\n", " ") + ".mp3")])
 
         # Generation failed
-        except:
+        except Exception as exception:
+
+            # Log error
+            logger.warning(exception)
+
+            # Show failed message
             with BytesIO() as output:
                 voice_failed.export(output, "wav")
                 await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
@@ -514,7 +527,12 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
         # Generation failed
-        except:
+        except Exception as exception:
+
+            # Log error
+            logger.warning(exception)
+
+            # Show failed message
             with BytesIO() as output:
                 voice_failed.export(output, "wav")
                 await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])
@@ -555,7 +573,12 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.edit_original_response(embed=Embed(description=output, color=data_characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
 
         # Generation failed
-        except:
+        except Exception as exception:
+
+            # Log error
+            logger.warning(exception)
+
+            # Show failed message
             with BytesIO() as output:
                 voice_failed.export(output, "wav")
                 await interaction.edit_original_response(embed=embed_failed, attachments=[File(output, "Failed.wav")])

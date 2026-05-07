@@ -5,11 +5,16 @@ AI Sponge Lite is a Discord bot that generates parody AI Sponge audio episodes, 
 Written by Jeremy Noesen
 """
 
+from logging import getLogger
 from os import getenv, listdir
-from discord import Intents, Game
+from discord import Intents, Game, utils
 from discord.app_commands import AppInstallationType, AppCommandContext
 from dotenv import load_dotenv
 from discord.ext.commands import Bot
+
+# Set up logger
+utils.setup_logging()
+logger = getLogger(__name__)
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -51,17 +56,17 @@ class AISpongeLite(Bot):
         if self.user.avatar is None:
             with open("image/profile/avatar.gif", "rb") as file:
                 await self.user.edit(avatar=file.read())
-                print("Uploaded avatar")
+                logger.info("Uploaded avatar")
 
         # Set bot banner if it is missing
         if (await self.fetch_user(self.user.id)).banner is None:
             with open("image/profile/banner.png", "rb") as file:
                 await self.user.edit(banner=file.read())
-                print("Uploaded banner")
+                logger.info("Uploaded banner")
 
         # Fetch all application emojis
         self.fetched_emojis = {e.name: e for e in await self.fetch_application_emojis()}
-        print(f"Fetched emojis: {set(self.fetched_emojis.keys())}")
+        logger.info(f"Fetched emojis: {set(self.fetched_emojis.keys())}")
 
         # Create missing application emojis
         for emoji_file in listdir("image/emoji"):
@@ -69,20 +74,20 @@ class AISpongeLite(Bot):
             if emoji_name not in self.fetched_emojis.keys():
                 with open(f"image/emoji/{emoji_file}", "rb") as file:
                     self.fetched_emojis[emoji_name] = await self.create_application_emoji(name=emoji_name, image=file.read())
-                    print(f"Created emoji: {emoji_name}")
+                    logger.info(f"Created emoji: {emoji_name}")
 
         # Set logging channel
         self.logging_channel = await self.fetch_channel(int(str(getenv("DISCORD_LOGGING_CHANNEL_ID"))))
-        print(f"Set logging channel: {self.logging_channel}")
+        logger.info(f"Set logging channel: {self.logging_channel}")
 
         # Load each cog from the COGS list
         for cog in cogs:
             await self.load_extension(cog)
-            print(f"Loaded cog: {cog}")
+            logger.info(f"Loaded cog: {cog}")
 
         # Sync slash commands globally
         await self.tree.sync()
-        print("Slash commands synced")
+        logger.info("Slash commands synced")
 
 
     async def on_ready(self):
@@ -91,9 +96,9 @@ class AISpongeLite(Bot):
         :return: None
         """
 
-        print(f"Logged in: {self.user}")
+        logger.info(f"Logged in: {self.user}")
 
 
 # Run the bot
 if __name__ == "__main__":
-    AISpongeLite().run(str(getenv("DISCORD_BOT_TOKEN")))
+    AISpongeLite().run(str(getenv("DISCORD_BOT_TOKEN")), log_handler=None)
