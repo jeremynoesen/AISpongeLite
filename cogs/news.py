@@ -272,8 +272,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.edit_original_response(embed=embed_episode_end)
 
             # Add music to the episode
-            music = music_just_breaking_softer
-            music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
+            music = music_just_breaking_softer.apply_gain((gain_music + randint(-5, 5)) - music_just_breaking_softer.dBFS)
             music_loop = silence_music.append(music, 0)
             while len(music_loop) < len(combined):
                 music_loop = music_loop.append(music, 0)
