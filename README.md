@@ -7,6 +7,9 @@
 AI Sponge Lite is a Discord bot that generates parody, audio-only SpongeBob episodes, TTS, and chats inspired by
 [AI Sponge Rehydrated](https://aisponge.riskivr.com/).
 
+*This project depends on the private, closed-source text-to-speech server used by AI Sponge Rehydrated. It is not
+possible to run this project yourself.*
+
 ### Characters
 
 SpongeBob, Patrick, Squidward, Sandy, Mr. Krabs, Plankton, Gary, Mrs. Puff, Larry, Squilliam, Karen, Narrator,
@@ -17,10 +20,10 @@ Bubble.
 
 There are two types of commands available: standard and news. Each type has the following three commands:
 
-- `/<type> episode`: Generate an audio-only episode. This will create a full episode with multiple characters, sound effects,
-  and background music.
-- `/<type> tts`: Make a character speak text. You can also apply various audio effects to the generated speech based on the
-  effects available in episodes.
+- `/<type> episode`: Generate an audio-only episode. This will create a full episode with multiple characters, sound
+  effects, and background music.
+- `/<type> tts`: Make a character speak text. You can also apply various audio effects to the generated speech based on
+  the effects available in episodes.
 - `/<type> chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is
   inserted into the prompt so the character can address you.
 
