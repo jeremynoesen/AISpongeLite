@@ -193,7 +193,7 @@ sfx_triggered = {
 }
 
 # Transition audio segments
-transition = AudioSegment.from_wav("audio/transition/episode.wav")
+transition = AudioSegment.from_wav("audio/transition/standard.wav")
 transition = transition.apply_gain(gain_sfx - transition.dBFS)
 
 # Voice audio segments
