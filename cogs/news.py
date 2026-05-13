@@ -105,8 +105,8 @@ transition = AudioSegment.from_wav("audio/transition/news.wav")
 transition = transition.apply_gain(gain_sfx - transition.dBFS)
 
 # Voice audio segments
-voice_gary = [AudioSegment.from_wav(f"audio/voice/gary_{i}.wav") for i in range(1, 7)]
-voice_doodlebob = [AudioSegment.from_wav(f"audio/voice/doodlebob_{i}.wav") for i in range(1, 19)]
+voice_gary = [AudioSegment.from_wav(f"audio/voice/gary/gary_{i}.wav") for i in range(1, 7)]
+voice_doodlebob = [AudioSegment.from_wav(f"audio/voice/doodlebob/doodlebob_{i}.wav") for i in range(1, 19)]
 voice_failed = AudioSegment.from_wav("audio/voice/failed.wav")
 
 # Silence audio segments
@@ -148,7 +148,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
@@ -316,7 +316,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
@@ -382,7 +382,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation

@@ -79,8 +79,8 @@ fade_music = 5000
 # Ambiance audio segments
 times = Literal["Day", "Night"]
 ambiance_time = {
-    "Day": AudioSegment.from_wav("audio/ambiance/day.wav"),
-    "Night": AudioSegment.from_wav("audio/ambiance/night.wav")
+    "Day": AudioSegment.from_wav("audio/ambiance/time/day.wav"),
+    "Night": AudioSegment.from_wav("audio/ambiance/time/night.wav")
 }
 weathers = Literal["Stormy", "Rainy", "Clear"]
 ambiance_rain = AudioSegment.from_wav("audio/ambiance/rain.wav")
@@ -181,7 +181,7 @@ sfx_random = {
     AudioSegment.from_wav("audio/sfx/random/phone_call.wav"): 1,
     AudioSegment.from_wav("audio/sfx/random/kiss.wav"): 1
 }
-sfx_lightning = AudioSegment.from_wav("audio/sfx/random/lightning.wav")
+sfx_lightning = AudioSegment.from_wav("audio/sfx/lightning.wav")
 sfx_triggered = {
     "bomb": ([AudioSegment.from_wav("audio/sfx/triggered/bomb_fuse.wav").apply_gain(-20) + AudioSegment.from_wav("audio/sfx/triggered/bomb_explosion.wav")], ["boom", "bomb", "explosion", "explode", "exploding", "fire in the hole", "blow", "blew", "blast", "firework", "dynamite", "grenade", "detonate", "detonating"]),
     "gun": ([AudioSegment.from_wav(f"audio/sfx/triggered/gun_{i}.wav") for i in range(1, 3)], ["shoot", "shot", "kill", "murder", "gun", "firing", "firearm", "bullet", "pistol", "rifle"]),
@@ -197,8 +197,8 @@ transition = AudioSegment.from_wav("audio/transition/standard.wav")
 transition = transition.apply_gain(gain_sfx - transition.dBFS)
 
 # Voice audio segments
-voice_gary = [AudioSegment.from_wav(f"audio/voice/gary_{i}.wav") for i in range(1, 7)]
-voice_doodlebob = [AudioSegment.from_wav(f"audio/voice/doodlebob_{i}.wav") for i in range(1, 19)]
+voice_gary = [AudioSegment.from_wav(f"audio/voice/gary/gary_{i}.wav") for i in range(1, 7)]
+voice_doodlebob = [AudioSegment.from_wav(f"audio/voice/doodlebob/doodlebob_{i}.wav") for i in range(1, 19)]
 voice_failed = AudioSegment.from_wav("audio/voice/failed.wav")
 
 # Silence audio segments
@@ -242,7 +242,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
@@ -473,7 +473,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
@@ -551,7 +551,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/misc/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation

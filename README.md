@@ -29,9 +29,9 @@ There are two types of commands available: standard and news. Each type has the 
 
 ## Demonstration
 
-![Episode](image/demo/episode.png)
-![TTS](image/demo/tts.png)
-![Chat](image/demo/chat.png)
+![Episode](image/demonstration/episode.png)
+![TTS](image/demonstration/tts.png)
+![Chat](image/demonstration/chat.png)
 
 ## Wall of Fame
 
