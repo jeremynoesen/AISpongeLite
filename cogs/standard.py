@@ -427,13 +427,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 # Add lightning if rain is intense
                 if rain_intensity > 0:
                     for i in range((ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5)) + rain_intensity):
-                        combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-10 + rain_intensity, 0)) - sfx_lightning.dBFS), randrange(len(combined)))
+                        combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-5, 5) + rain_intensity) - sfx_lightning.dBFS), randrange(len(combined)))
 
             # Add word-activated SFX to the episode
             for sfx in sfx_triggered.keys():
                 for position in sfx_positions[sfx]:
                     variant = choice(sfx_triggered[sfx][0])
-                    combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-10, 0)) - variant.dBFS), position)
+                    combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-5, 5)) - variant.dBFS), position)
 
             # Add random SFX to the episode
             for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5))):
@@ -516,7 +516,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             # Add megaphone sound effect
             if megaphone:
                 sfx = sfx_triggered["megaphone"][0][0]
-                sfx = sfx.apply_gain((gain_sfx + randint(-10, 0)) - sfx.dBFS)
+                sfx = sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS)
                 if len(sfx) > len(seg):
                     seg = sfx.overlay(seg)
                 else:
