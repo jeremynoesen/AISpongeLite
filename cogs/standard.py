@@ -206,9 +206,11 @@ silence_line = AudioSegment.silent(200)
 silence_intro = AudioSegment.silent(500)
 silence_music = AudioSegment.silent(3000)
 
-# Character limits for input and output
+# Limits for input and output
 char_limit_min = 1
 char_limit_max = 512
+line_limit_base = 1000
+line_limit_multiplier = 100
 
 
 class Standard(GroupCog, name="standard", description="Generate episodes, TTS, and chats based on standard topics."):
@@ -359,7 +361,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                         seg = voice_failed
 
                 # Limit the audio length based on text length
-                seg = seg[:1000 + (len(current_line) * 100)]
+                seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
 
                 # Check if any of the word-activated SFX should happen
                 current_line_casefold = current_line.casefold()
@@ -498,7 +500,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 seg = await speak(character, text)
 
             # Limit the audio length based on text length
-            seg = seg[:1000 + (len(text) * 100)]
+            seg = seg[:line_limit_base + (len(text) * line_limit_multiplier)]
 
             # Apply megaphone filter
             if megaphone:

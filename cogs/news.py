@@ -115,9 +115,11 @@ silence_intro = AudioSegment.silent(1250)
 silence_music = AudioSegment.silent(8000)
 silence_phone = AudioSegment.silent(400)
 
-# Character limits for input and output
+# Limits for input and output
 char_limit_min = 1
 char_limit_max = 512
+line_limit_base = 1000
+line_limit_multiplier = 100
 
 
 class News(GroupCog, name="news", description="Generate episodes, TTS, and chats based on news topics."):
@@ -241,7 +243,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                         seg = voice_failed
 
                 # Limit the audio length based on text length
-                seg = seg[:1000 + (len(current_line) * 100)]
+                seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
 
                 # Apply phone filter for callers
                 if current_character not in ["Perch Perkins", "Mr. Fish"]:
@@ -341,7 +343,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                 seg = await speak(character, text)
 
             # Limit the audio length based on text length
-            seg = seg[:1000 + (len(text) * 100)]
+            seg = seg[:line_limit_base + (len(text) * line_limit_multiplier)]
 
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:
