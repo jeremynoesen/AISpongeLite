@@ -66,6 +66,8 @@ data_characters = {
 gain_music = -35
 gain_sfx = -25
 gain_voice = -15
+gain_random_neg = -5
+gain_random_pos = 5
 
 # Filter cutoffs
 cutoff_filter = 5000
@@ -274,7 +276,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.edit_original_response(embed=embed_episode_end)
 
             # Add music to the episode
-            music = music_just_breaking_softer.apply_gain((gain_music + randint(-5, 5)) - music_just_breaking_softer.dBFS)
+            music = music_just_breaking_softer.apply_gain((gain_music + randint(gain_random_neg, gain_random_pos)) - music_just_breaking_softer.dBFS)
             music_loop = silence_music.append(music, 0)
             while len(music_loop) < len(combined):
                 music_loop = music_loop.append(music, 0)
@@ -282,7 +284,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
             # Add random SFX to the episode
             for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5))):
-                combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
+                combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(gain_random_neg, gain_random_pos)) - sfx.dBFS), randrange(len(combined)))
 
             # Add the transition SFX to the beginning of the episode
             combined = silence_intro.append(combined, 0).overlay(transition)

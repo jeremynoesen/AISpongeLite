@@ -68,6 +68,8 @@ gain_sfx = -25
 gain_voice = -15
 gain_voice_loud = -10
 gain_voice_distort = 20
+gain_random_neg = -5
+gain_random_pos = 5
 
 # Filter cutoffs
 cutoff_filter = 5000
@@ -267,13 +269,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Get rain intensity
             if weather == "Stormy":
-                rain_intensity = randint(1, 5)
+                rain_intensity = randint(1, gain_random_pos)
             elif weather == "Rainy":
-                rain_intensity = randint(-5, 0)
+                rain_intensity = randint(gain_random_neg, 0)
             elif weather == "Clear":
                 rain_intensity = None
             elif randrange(5) == 0:
-                rain_intensity = randint(-5, 5)
+                rain_intensity = randint(gain_random_neg, gain_random_pos)
                 weather = "Rainy" if rain_intensity <= 0 else "Stormy"
             else:
                 rain_intensity = None
@@ -403,14 +405,14 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Add music to the episode based on location
             music = choices(list(data_locations[location][0].keys()), list(data_locations[location][0].values()))[0]
-            music = music.apply_gain((gain_music + randint(-5, 5)) - music.dBFS)
+            music = music.apply_gain((gain_music + randint(gain_random_neg, gain_random_pos)) - music.dBFS)
             music_loop = silence_music.append(music.fade_in(fade_music), 0)
             while len(music_loop) < len(combined):
                 music_loop = music_loop.append(music, 0)
             combined = combined.overlay(music_loop)
 
             # Add day or night ambiance to the episode
-            ambiance = ambiance.apply_gain((gain_ambiance + randint(-5, 5)) - ambiance.dBFS)
+            ambiance = ambiance.apply_gain((gain_ambiance + randint(gain_random_neg, gain_random_pos)) - ambiance.dBFS)
             ambiance_loop = ambiance.fade_in(fade_ambiance)
             while len(ambiance_loop) < len(combined):
                 ambiance_loop = ambiance_loop.append(ambiance, 0)
@@ -427,17 +429,17 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 # Add lightning if rain is intense
                 if rain_intensity > 0:
                     for i in range((ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5)) + rain_intensity):
-                        combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(-5, 5) + rain_intensity) - sfx_lightning.dBFS), randrange(len(combined)))
+                        combined = combined.overlay(sfx_lightning.apply_gain((gain_sfx + randint(gain_random_neg, gain_random_pos) + rain_intensity) - sfx_lightning.dBFS), randrange(len(combined)))
 
             # Add word-activated SFX to the episode
             for sfx in sfx_triggered.keys():
                 for position in sfx_positions[sfx]:
                     variant = choice(sfx_triggered[sfx][0])
-                    combined = combined.overlay(variant.apply_gain((gain_sfx + randint(-5, 5)) - variant.dBFS), position)
+                    combined = combined.overlay(variant.apply_gain((gain_sfx + randint(gain_random_neg, gain_random_pos)) - variant.dBFS), position)
 
             # Add random SFX to the episode
             for sfx in choices(list(sfx_random.keys()), list(sfx_random.values()), k=(ceil(len(combined) / 1000) if chaos else ceil(min(line_count, 25) / 5))):
-                combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS), randrange(len(combined)))
+                combined = combined.overlay(sfx.apply_gain((gain_sfx + randint(gain_random_neg, gain_random_pos)) - sfx.dBFS), randrange(len(combined)))
 
             # Add the transition SFX to the beginning of the episode
             combined = silence_intro.append(combined, 0).overlay(transition)
@@ -516,7 +518,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             # Add megaphone sound effect
             if megaphone:
                 sfx = sfx_triggered["megaphone"][0][0]
-                sfx = sfx.apply_gain((gain_sfx + randint(-5, 5)) - sfx.dBFS)
+                sfx = sfx.apply_gain((gain_sfx + randint(gain_random_neg, gain_random_pos)) - sfx.dBFS)
                 if len(sfx) > len(seg):
                     seg = sfx.overlay(seg)
                 else:
