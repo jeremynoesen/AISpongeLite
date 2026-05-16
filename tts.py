@@ -77,7 +77,7 @@ async def speak(character: str, text: str):
             # Download audio file
             async with session.get(http_url + "downloads/" + job_id) as resp:
                 with BytesIO(await resp.read()) as wav:
-                    seg = AudioSegment.from_wav(wav)
+                    seg = AudioSegment.from_wav(wav)[:1000 + (len(text) * 100)]
 
             # Delete file from server
             async with session.delete(http_url + "remove/" + job_id):
