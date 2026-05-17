@@ -65,6 +65,7 @@ data_characters = {
 # Gain settings for audio segments
 gain_music = -35
 gain_sfx = -25
+gain_transition = -25
 gain_voice = -15
 gain_random_neg = -5
 gain_random_pos = 5
@@ -104,7 +105,7 @@ sfx_random = {
 
 # Transition audio segments
 transition = AudioSegment.from_wav("audio/transition/news.wav")
-transition = transition.apply_gain(gain_sfx - transition.dBFS)
+transition = transition.apply_gain(gain_transition - transition.dBFS)
 
 # Voice audio segments
 voice_gary = [AudioSegment.from_wav(f"audio/voice/gary/gary_{i}.wav") for i in range(1, 7)]

@@ -65,6 +65,7 @@ data_characters = {
 gain_ambiance = -45
 gain_music = -35
 gain_sfx = -25
+gain_transition = -25
 gain_voice = -15
 gain_voice_loud = -10
 gain_voice_distort = 20
@@ -196,7 +197,7 @@ sfx_triggered = {
 
 # Transition audio segments
 transition = AudioSegment.from_wav("audio/transition/standard.wav")
-transition = transition.apply_gain(gain_sfx - transition.dBFS)
+transition = transition.apply_gain(gain_transition - transition.dBFS)
 
 # Voice audio segments
 voice_gary = [AudioSegment.from_wav(f"audio/voice/gary/gary_{i}.wav") for i in range(1, 7)]
