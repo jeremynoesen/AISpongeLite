@@ -231,7 +231,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
     @command(name="episode", description="Generate a standard episode.")
     @describe(topic="What the episode is about.", location="Where the episode takes place.", time="When the episode takes place.", weather="What the weather is like.", chaos="Whether to simulate chaos hour.")
-    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations = None, time: times = None, weather: weathers = None, chaos: bool = False):
+    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations | None = None, time: times | None = None, weather: weathers | None = None, chaos: bool = False):
         """
         Generate a standard episode about a topic.
         :param interaction: Interaction created by the command
