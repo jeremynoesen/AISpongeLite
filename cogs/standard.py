@@ -69,6 +69,7 @@ gain_transition = -25
 gain_voice = -15
 gain_voice_loud = -10
 gain_voice_distort = 20
+gain_voice_quiet = -30
 gain_random_neg = -5
 gain_random_pos = 5
 
@@ -212,6 +213,8 @@ silence_music = AudioSegment.silent(3000)
 # Limits for input and output
 char_limit_min = 1
 char_limit_max = 512
+line_limit_base = 1000
+line_limit_multiplier = 100
 
 
 class Standard(GroupCog, name="standard", description="Generate episodes, TTS, and chats based on standard topics."):
@@ -302,8 +305,9 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             embed_output = Embed(title=escape_markdown(title_formatted), color=data_locations[location][1])
 
             # Variables used for generation data
-            sfx_positions = {key: [] for key in sfx_triggered.keys()}
             combined = AudioSegment.empty()
+            sfx_positions = {key: [] for key in sfx_triggered.keys()}
+            cutoff_lines: dict[int, AudioSegment] = {}
 
             # Process each line
             for line in lines:
@@ -361,6 +365,14 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                         # Use failed sound as seg
                         seg = voice_failed
 
+                # Limit the audio length based on text length
+                cutoff = line_limit_base + (len(current_line) * line_limit_multiplier)
+                if len(seg) > cutoff:
+                    cutoff_seg = seg[cutoff:]
+                    cutoff_seg = cutoff_seg.apply_gain(gain_voice_quiet - cutoff_seg.dBFS)
+                    cutoff_lines[len(combined) + cutoff] = cutoff_seg
+                    seg = seg[:cutoff]
+
                 # Check if any of the word-activated SFX should happen
                 current_line_casefold = current_line.casefold()
                 for sfx in sfx_triggered.keys():
@@ -375,9 +387,9 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 # Apply gain, forcing a loud event sometimes
                 if randrange(20) == 0:
                     seg = seg.apply_gain(gain_voice_distort)
-                    seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
+                    seg = seg.apply_gain(gain_voice_loud - seg.dBFS)
                 else:
-                    seg = seg.apply_gain(gain_voice-seg.dBFS)
+                    seg = seg.apply_gain(gain_voice - seg.dBFS)
 
                 # Add the line to the combined audio segment
                 combined = combined.append(seg, 0)
@@ -398,6 +410,10 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Show final generating message
             await interaction.edit_original_response(embed=embed_episode_end)
+
+            # Add back cutoff line segments
+            for position in cutoff_lines.keys():
+                combined = combined.overlay(cutoff_lines[position], position)
 
             # Add music to the episode based on location
             music = choices(list(data_locations[location][0].keys()), list(data_locations[location][0].values()))[0]
@@ -504,9 +520,9 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             # Apply gain
             if loud:
                 seg = seg.apply_gain(gain_voice_distort)
-                seg = seg.apply_gain(gain_voice_loud-seg.dBFS)
+                seg = seg.apply_gain(gain_voice_loud - seg.dBFS)
             else:
-                seg = seg.apply_gain(gain_voice-seg.dBFS)
+                seg = seg.apply_gain(gain_voice - seg.dBFS)
 
             # Add megaphone sound effect
             if megaphone:

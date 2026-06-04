@@ -121,6 +121,8 @@ silence_phone = AudioSegment.silent(400)
 # Limits for input and output
 char_limit_min = 1
 char_limit_max = 512
+line_limit_base = 1000
+line_limit_multiplier = 100
 
 
 class News(GroupCog, name="news", description="Generate episodes, TTS, and chats based on news topics."):
@@ -243,13 +245,16 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                         # Use failed sound as seg
                         seg = voice_failed
 
+                # Limit the audio length based on text length
+                seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
+
                 # Apply phone filter for callers
                 if current_character not in ["Perch Perkins", "Mr. Fish"]:
                     seg = high_pass_filter(seg, cutoff_filter)
                     combined = combined.append(silence_phone, 0)
 
                 # Apply gain
-                seg = seg.apply_gain(gain_voice-seg.dBFS)
+                seg = seg.apply_gain(gain_voice - seg.dBFS)
 
                 # Add the line to the combined audio segment
                 combined = combined.append(seg, 0)
@@ -346,7 +351,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                 seg = silence_phone.append(seg, 0)
 
             # Apply gain
-            seg = seg.apply_gain(gain_voice-seg.dBFS)
+            seg = seg.apply_gain(gain_voice - seg.dBFS)
 
             # Export and send the file
             with BytesIO() as output:
