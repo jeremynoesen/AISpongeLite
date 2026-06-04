@@ -309,13 +309,14 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
 
     @command(name="tts", description="Make a news character speak text.")
-    @describe(character="Who should speak.", text="What should be said.")
-    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max]):
+    @describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.")
+    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False):
         """
         Make a character from news episodes speak text using text-to-speech.
         :param interaction: Interaction created by the command
         :param character: Who should speak
         :param text: What should be said
+        :param limit: Whether to limit speaking time
         :return: None
         """
 
@@ -331,7 +332,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embed=embed_tts)
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)} limit:{limit}", color=embed_color))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -344,6 +345,10 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             # Speak line for all other characters
             else:
                 seg = await speak(character, text)
+
+            # Apply audio limiter
+            if limit:
+                seg = seg[:line_limit_base + (len(text) * line_limit_multiplier)]
 
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:
