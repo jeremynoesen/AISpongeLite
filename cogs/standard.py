@@ -69,7 +69,7 @@ gain_transition = -25
 gain_voice = -15
 gain_voice_loud = -10
 gain_voice_distort = 20
-gain_voice_quiet = -30
+gain_voice_quiet = -15
 gain_random_neg = -5
 gain_random_pos = 5
 
@@ -365,14 +365,6 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                         # Use failed sound as seg
                         seg = voice_failed
 
-                # Limit the audio length based on text length
-                cutoff = line_limit_base + (len(current_line) * line_limit_multiplier)
-                if len(seg) > cutoff:
-                    cutoff_seg = seg[cutoff:]
-                    cutoff_seg = cutoff_seg.apply_gain(gain_voice_quiet - cutoff_seg.dBFS)
-                    cutoff_lines[len(combined) + cutoff] = cutoff_seg
-                    seg = seg[:cutoff]
-
                 # Check if any of the word-activated SFX should happen
                 current_line_casefold = current_line.casefold()
                 for sfx in sfx_triggered.keys():
@@ -390,6 +382,12 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     seg = seg.apply_gain(gain_voice_loud - seg.dBFS)
                 else:
                     seg = seg.apply_gain(gain_voice - seg.dBFS)
+
+                # Limit the audio length based on text length
+                cutoff = line_limit_base + (len(current_line) * line_limit_multiplier)
+                if len(seg) > cutoff:
+                    cutoff_lines[len(combined) + cutoff] = seg[cutoff:].apply_gain(gain_voice_quiet)
+                    seg = seg[:cutoff]
 
                 # Add the line to the combined audio segment
                 combined = combined.append(seg, 0)
@@ -514,15 +512,6 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             else:
                 seg = await speak(character, text)
 
-            # Apply audio limiter
-            cutoff_seg = None
-            if limit:
-                cutoff = line_limit_base + (len(text) * line_limit_multiplier)
-                if len(seg) > cutoff:
-                    cutoff_seg = seg[cutoff:]
-                    cutoff_seg = cutoff_seg.apply_gain(gain_voice_quiet - cutoff_seg.dBFS)
-                    seg = seg[:cutoff]
-
             # Apply megaphone filter
             if megaphone:
                 seg = high_pass_filter(seg, cutoff_filter)
@@ -534,9 +523,11 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             else:
                 seg = seg.apply_gain(gain_voice - seg.dBFS)
 
-            # Add cutoff segment
-            if cutoff_seg is not None:
-                seg = seg.append(cutoff_seg, 0)
+            # Apply audio limiter
+            if limit:
+                cutoff = line_limit_base + (len(text) * line_limit_multiplier)
+                if len(seg) > cutoff:
+                    seg = seg[:cutoff].append(seg[cutoff:].apply_gain(gain_voice_quiet), 0)
 
             # Add megaphone sound effect
             if megaphone:

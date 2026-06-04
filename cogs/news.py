@@ -245,9 +245,6 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                         # Use failed sound as seg
                         seg = voice_failed
 
-                # Limit the audio length based on text length
-                seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
-
                 # Apply phone filter for callers
                 if current_character not in ["Perch Perkins", "Mr. Fish"]:
                     seg = high_pass_filter(seg, cutoff_filter)
@@ -255,6 +252,9 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
                 # Apply gain
                 seg = seg.apply_gain(gain_voice - seg.dBFS)
+
+                # Limit the audio length based on text length
+                seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
 
                 # Add the line to the combined audio segment
                 combined = combined.append(seg, 0)
@@ -346,10 +346,6 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             else:
                 seg = await speak(character, text)
 
-            # Apply audio limiter
-            if limit:
-                seg = seg[:line_limit_base + (len(text) * line_limit_multiplier)]
-
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:
                 seg = high_pass_filter(seg, cutoff_filter)
@@ -357,6 +353,10 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
             # Apply gain
             seg = seg.apply_gain(gain_voice - seg.dBFS)
+
+            # Apply audio limiter
+            if limit:
+                seg = seg[:line_limit_base + (len(text) * line_limit_multiplier)]
 
             # Export and send the file
             with BytesIO() as output:
