@@ -69,7 +69,7 @@ gain_transition = -25
 gain_voice = -15
 gain_voice_loud = -10
 gain_voice_distort = 20
-gain_voice_quiet = -20
+gain_voice_quiet = -15
 gain_random_neg = -5
 gain_random_pos = 5
 
