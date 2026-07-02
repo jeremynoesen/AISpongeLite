@@ -38,42 +38,51 @@ class Access(Cog):
         :return: None
         """
 
-        # Reload environment variables from .env file
-        load_dotenv(override=True)
+        # Attempt to update
+        try:
 
-        # Create a set to store updated set of Discord user IDs, starting with the admin users
-        new_discord_user_ids = {int(x) for x in str(getenv("DISCORD_ADMIN_USER_IDS")).split(",")}
+            # Reload environment variables from .env file
+            load_dotenv(override=True)
 
-        # Log in to Patreon API
-        api = API(getenv("PATREON_ACCESS_TOKEN"))
-        campaign_id = api.get_campaigns(1).data()[0].id()
+            # Create a set to store updated set of Discord user IDs, starting with the admin users
+            new_discord_user_ids = {int(x) for x in str(getenv("DISCORD_ADMIN_USER_IDS")).split(",")}
 
-        # Loop through paginated responses to fetch all members of the Patreon campaign
-        cursor = None
-        while True:
+            # Log in to Patreon API
+            api = API(getenv("PATREON_ACCESS_TOKEN"))
+            campaign_id = api.get_campaigns(1).data()[0].id()
 
-            # Fetch a page of members, including their social connections and patron status
-            members = api.get_campaigns_by_id_members(campaign_id, 1000, cursor=cursor, includes=["user"], fields={"member": ["patron_status"], "user": ["social_connections"]})
+            # Loop through paginated responses to fetch all members of the Patreon campaign
+            cursor = None
+            while True:
 
-            # Iterate through the members in the response
-            for member in members.data():
+                # Fetch a page of members, including their social connections and patron status
+                members = api.get_campaigns_by_id_members(campaign_id, 1000, cursor=cursor, includes=["user"], fields={"member": ["patron_status"], "user": ["social_connections"]})
 
-                # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the set
-                discord_id = member.relationship('user').attribute('social_connections').get('discord')
-                if member.attribute('patron_status') == 'active_patron' and discord_id is not None:
-                    new_discord_user_ids.add(int(discord_id.get("user_id")))
+                # Iterate through the members in the response
+                for member in members.data():
 
-            # Check if there is a next page of results
-            try:
-                cursor = api.extract_cursor(members)
+                    # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the set
+                    discord_id = member.relationship('user').attribute('social_connections').get('discord')
+                    if member.attribute('patron_status') == 'active_patron' and discord_id is not None:
+                        new_discord_user_ids.add(int(discord_id.get("user_id")))
 
-            # This is the last page
-            except:
-                break
+                # Check if there is a next page of results
+                try:
+                    cursor = api.extract_cursor(members)
 
-        # Update the global set of Discord user IDs with the new set
-        self.bot.permitted_discord_user_ids = new_discord_user_ids
-        logger.info(f"Permitted users: {self.bot.permitted_discord_user_ids}")
+                # This is the last page
+                except:
+                    break
+
+            # Update the global set of Discord user IDs with the new set
+            self.bot.permitted_discord_user_ids = new_discord_user_ids
+            logger.info(f"Permitted users: {self.bot.permitted_discord_user_ids}")
+
+        # Update failed
+        except Exception as exception:
+
+            # Log error
+            logger.warning(exception)
 
 
 async def setup(bot):
