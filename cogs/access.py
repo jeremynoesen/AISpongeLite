@@ -28,6 +28,7 @@ class Access(Cog):
         """
 
         self.bot = bot
+        self.update.add_exception_type(Exception)
         self.update.start()
 
 
@@ -38,51 +39,42 @@ class Access(Cog):
         :return: None
         """
 
-        # Attempt to update
-        try:
+        # Reload environment variables from .env file
+        load_dotenv(override=True)
 
-            # Reload environment variables from .env file
-            load_dotenv(override=True)
+        # Create a set to store updated set of Discord user IDs, starting with the admin users
+        new_discord_user_ids = {int(x) for x in str(getenv("DISCORD_ADMIN_USER_IDS")).split(",")}
 
-            # Create a set to store updated set of Discord user IDs, starting with the admin users
-            new_discord_user_ids = {int(x) for x in str(getenv("DISCORD_ADMIN_USER_IDS")).split(",")}
+        # Log in to Patreon API
+        api = API(getenv("PATREON_ACCESS_TOKEN"))
+        campaign_id = api.get_campaigns(1).data()[0].id()
 
-            # Log in to Patreon API
-            api = API(getenv("PATREON_ACCESS_TOKEN"))
-            campaign_id = api.get_campaigns(1).data()[0].id()
+        # Loop through paginated responses to fetch all members of the Patreon campaign
+        cursor = None
+        while True:
 
-            # Loop through paginated responses to fetch all members of the Patreon campaign
-            cursor = None
-            while True:
+            # Fetch a page of members, including their social connections and patron status
+            members = api.get_campaigns_by_id_members(campaign_id, 1000, cursor=cursor, includes=["user"], fields={"member": ["patron_status"], "user": ["social_connections"]})
 
-                # Fetch a page of members, including their social connections and patron status
-                members = api.get_campaigns_by_id_members(campaign_id, 1000, cursor=cursor, includes=["user"], fields={"member": ["patron_status"], "user": ["social_connections"]})
+            # Iterate through the members in the response
+            for member in members.data():
 
-                # Iterate through the members in the response
-                for member in members.data():
+                # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the set
+                discord_id = member.relationship('user').attribute('social_connections').get('discord')
+                if member.attribute('patron_status') == 'active_patron' and discord_id is not None:
+                    new_discord_user_ids.add(int(discord_id.get("user_id")))
 
-                    # Check if the member is an active patron and has a linked Discord account, then add their Discord user ID to the set
-                    discord_id = member.relationship('user').attribute('social_connections').get('discord')
-                    if member.attribute('patron_status') == 'active_patron' and discord_id is not None:
-                        new_discord_user_ids.add(int(discord_id.get("user_id")))
+            # Check if there is a next page of results
+            try:
+                cursor = api.extract_cursor(members)
 
-                # Check if there is a next page of results
-                try:
-                    cursor = api.extract_cursor(members)
+            # This is the last page
+            except:
+                break
 
-                # This is the last page
-                except:
-                    break
-
-            # Update the global set of Discord user IDs with the new set
-            self.bot.permitted_discord_user_ids = new_discord_user_ids
-            logger.info(f"Permitted users: {self.bot.permitted_discord_user_ids}")
-
-        # Update failed
-        except Exception as exception:
-
-            # Log error
-            logger.warning(exception)
+        # Update the global set of Discord user IDs with the new set
+        self.bot.permitted_discord_user_ids = new_discord_user_ids
+        logger.info(f"Permitted users: {self.bot.permitted_discord_user_ids}")
 
 
 async def setup(bot):
