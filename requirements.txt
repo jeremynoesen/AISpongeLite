@@ -1,9 +1,9 @@
 discord.py~=2.7.1
 python-dotenv~=1.2.2
-openai~=2.53.0
+openai~=3.0.0
 pydub~=0.25.1
 aiohttp~=3.14.3
-websockets~=16.1.1
-patreon-v2~=0.5.1
-setuptools~=80.8.0
 pylette~=6.0.0
+patreon-v2~=0.5.1
+websockets~=16.1.1
+setuptools~=80.8.0
