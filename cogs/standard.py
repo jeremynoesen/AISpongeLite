@@ -30,7 +30,7 @@ embed_episode_start = Embed(title="Generating...", description="Writing script..
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
-embed_not_permitted = Embed(title="Not Permitted.", description="> **[Subscribe to the AI Sponge Lite Patreon](https://www.patreon.com/cw/AISpongeLite/membership)**\n> **or boost this server to use AI Sponge Lite.**", color=embed_color).set_image(url="attachment://explodeward.gif")
+embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** or boost this server to unlock **/standard** commands.", color=embed_color).set_image(url="attachment://banner.png")
 embed_delete_after = 30
 
 # Regex patterns for script modification
@@ -570,7 +570,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
         # Check if user has access
         if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/profile/banner.png"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
