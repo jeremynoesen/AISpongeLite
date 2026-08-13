@@ -11,7 +11,7 @@ from random import randint, randrange, choice, choices
 from re import sub
 from math import ceil
 from io import BytesIO
-from discord import Embed, Interaction, Color, File
+from discord import Embed, Interaction, File
 from discord.utils import escape_markdown
 from discord.ext.commands import GroupCog
 from discord.app_commands import Range, describe, command
@@ -25,12 +25,11 @@ from llm import write
 logger = getLogger(__name__)
 
 # Embed settings and static embeds
-embed_color = Color.dark_theme()
-embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
-embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
-embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
-embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
-embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** or boost this server to unlock **/standard** commands.", color=embed_color).set_image(url="attachment://banner.png")
+embed_episode_start = Embed(title="Generating...", description="Writing script...")
+embed_episode_end = Embed(title="Generating...", description="Mixing audio...")
+embed_tts = Embed(title="Generating...", description="Speaking text...")
+embed_failed = Embed(title="Failed.", description="An error occurred.")
+embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** or boost this server to unlock **/standard** commands.", color=0x1849b0).set_image(url="attachment://banner.png")
 embed_delete_after = 30
 
 # Regex patterns for script modification
@@ -259,7 +258,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embed=embed_episode_start)
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic)} location:{location} time:{time} weather:{weather} chaos:{chaos}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic)} location:{location} time:{time} weather:{weather} chaos:{chaos}"))
 
             # Get random location if none provided
             if location is None:
@@ -314,7 +313,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{line_index}/{min(line_count, 25)}`...", color=embed_color))
+                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{line_index}/{min(line_count, 25)}`..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -499,7 +498,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embed=embed_tts)
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -581,13 +580,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embeds=[user_embed])
 
             # Log interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard chat character:{character} message:{escape_markdown(message)}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard chat character:{character} message:{escape_markdown(message)}"))
 
             # Small delay for visual effect
             await sleep(1)
 
             # Show typing indicator
-            typing_embed = Embed(description=f"-# {self.bot.fetched_emojis['Typing']} ​ ​ ​ **{character}** is typing...", color=embed_color)
+            typing_embed = Embed(description=f"-# {self.bot.fetched_emojis['Typing']} ​ ​ ​ **{character}** is typing...")
             await interaction.edit_original_response(embeds=[user_embed, typing_embed])
 
             # Generate chat response
