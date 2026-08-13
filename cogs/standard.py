@@ -27,7 +27,6 @@ logger = getLogger(__name__)
 # Embed settings and static embeds
 embed_episode_start = Embed(title="Generating...", description="Writing script...")
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...")
-embed_tts = Embed(title="Generating...", description="Speaking text...")
 embed_failed = Embed(title="Failed.", description="An error occurred.")
 embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** or boost this server to unlock **/standard** commands.", color=0x1849b0).set_image(url="attachment://banner.png")
 embed_delete_after = 30
@@ -494,11 +493,19 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
-            # Show generating message
-            await interaction.response.send_message(embed=embed_tts)
+            # Show transcript
+            transcript_embed = Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            await interaction.response.send_message(embeds=[transcript_embed])
 
             # Log the interaction
             await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit}"))
+
+            # Small delay for visual effect
+            await sleep(1)
+
+            # Show recording indicator
+            recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
+            await interaction.edit_original_response(embeds=[recording_embed, transcript_embed])
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -541,7 +548,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             # Export and send the file
             with BytesIO() as output:
                 seg.export(output, "wav")
-                await interaction.edit_original_response(embed=Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+                await interaction.edit_original_response(embeds=[transcript_embed], attachments=[
                     File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
         # Generation failed
@@ -586,7 +593,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await sleep(1)
 
             # Show typing indicator
-            typing_embed = Embed(description=f"-# {self.bot.fetched_emojis['Typing']} ​ ​ ​ **{character}** is typing...")
+            typing_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is typing...")
             await interaction.edit_original_response(embeds=[user_embed, typing_embed])
 
             # Generate chat response
