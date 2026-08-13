@@ -6,3 +6,4 @@ aiohttp~=3.14.3
 websockets~=16.1.1
 patreon-v2~=0.5.1
 setuptools~=80.8.0
+pylette~=6.0.0

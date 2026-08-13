@@ -4,6 +4,7 @@ News episode type, based on AI Sponge Rehydrated news topics.
 Written by Jeremy Noesen
 """
 
+from asyncio import sleep
 from logging import getLogger
 from typing import Literal, get_args
 from random import randint, randrange, choice, choices
@@ -16,6 +17,7 @@ from discord.ext.commands import GroupCog
 from discord.app_commands import Range, describe, command
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter
+from pylette import extract_colors
 from tts import speak
 from llm import write
 
@@ -27,7 +29,6 @@ embed_color = Color.dark_theme()
 embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
 embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
 embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
-embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
 embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
 embed_not_permitted = Embed(title="Not Permitted.", description="> **[Subscribe to the AI Sponge Lite Patreon](https://www.patreon.com/cw/AISpongeLite/membership)**\n> **or boost this server to use AI Sponge Lite.**", color=embed_color).set_image(url="attachment://explodeward.gif")
 embed_delete_after = 30
@@ -395,20 +396,27 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         # Start generation
         try:
 
-            # Show generating message
-            await interaction.response.send_message(embed=embed_chat)
+            # Show user's own message
+            user_embed = Embed(description=escape_markdown(message), color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+            await interaction.response.send_message(embeds=[user_embed])
 
-            # Log the interaction
+            # Log interaction
             await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message)}", color=embed_color))
 
-            # Generate the chat response
-            response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The question from \"{interaction.user.display_name}\" says: \"{message}\".")
+            # Small delay for visual effect
+            await sleep(1)
 
-            # Clean the response text
+            # Show typing indicator
+            typing_embed = Embed(description=f"-# {self.bot.fetched_emojis['Typing']} ​ ​ ​ **{character}** is typing...", color=embed_color)
+            await interaction.edit_original_response(embeds=[user_embed, typing_embed])
+
+            # Generate chat response
+            response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The question from \"{interaction.user.display_name}\" says: \"{message}\".")
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
-            # Send the response
-            await interaction.edit_original_response(embed=Embed(description=output, color=data_characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
+            # Show character's response
+            character_embed = Embed(description=output, color=data_characters[character]).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            await interaction.edit_original_response(embeds=[user_embed, character_embed])
 
         # Generation failed
         except Exception as exception:
