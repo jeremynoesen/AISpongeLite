@@ -25,7 +25,7 @@ from llm import write
 logger = getLogger(__name__)
 
 # Reused embeds
-embed_failed = Embed(title="Failed.", description="An error occurred.")
+embed_failed = Embed(title="Generation Failed!", description="Edit your input, or try again later.", color=0xff0000)
 embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** or boost this server to unlock **/standard** commands.", color=0x1849b0).set_image(url="attachment://banner.png")
 embed_delete_after = 30
 
