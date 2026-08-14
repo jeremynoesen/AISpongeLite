@@ -24,9 +24,7 @@ from llm import write
 # Set up logger
 logger = getLogger(__name__)
 
-# Embed settings and static embeds
-embed_episode_start = Embed(title="Generating...", description="Writing script...")
-embed_episode_end = Embed(title="Generating...", description="Mixing audio...")
+# Reused embeds
 embed_failed = Embed(title="Failed.", description="An error occurred.")
 embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** or boost this server to unlock **/standard** commands.", color=0x1849b0).set_image(url="attachment://banner.png")
 embed_delete_after = 30
@@ -254,7 +252,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         try:
 
             # Show generating message
-            await interaction.response.send_message(embed=embed_episode_start)
+            await interaction.response.send_message(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
             await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic)} location:{location} time:{time} weather:{weather} chaos:{chaos}"))
@@ -312,7 +310,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{line_index}/{min(line_count, 25)}`..."))
+                await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -396,7 +394,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     combined = combined.append(silence_line, 0)
 
                 # Add the line to the output script
-                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[current_character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(current_line)}", inline=False)
+                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[current_character.replace(' ', '').replace('.', '')]} ​ ​ ​ {escape_markdown(current_line)}", inline=False)
 
                 # Line completed
                 line_index += 1
@@ -406,7 +404,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=embed_episode_end)
+            await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add back cutoff line segments
             for position in cutoff_lines.keys():
