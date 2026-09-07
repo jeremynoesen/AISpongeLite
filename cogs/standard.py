@@ -595,7 +595,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.edit_original_response(embeds=[user_embed, typing_embed])
 
             # Generate chat response
-            response = await write(f"Write a response to a discord message as {character} from SpongeBob. Only respond with {character}'s brief response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
+            response = await write(f"Write a response to a discord message as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
             # Show character's response

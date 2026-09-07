@@ -14,14 +14,14 @@ openrouter = OpenRouter(api_key=getenv("OPENROUTER_API_KEY"))
 
 async def write(prompt: str):
     """
-    Respond to a prompt using OpenRouter nousresearch/hermes-4-70b
+    Respond to a prompt using OpenRouter
     :param prompt: Input text prompt
     :return: Model response string
     """
 
     # Get response to prompt
     response = await openrouter.chat.send_async(
-        model="nousresearch/hermes-4-70b",
+        model="sao10k/l3-lunaris-8b",
         max_tokens=700,
         messages=[
             {
