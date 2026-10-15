@@ -11,9 +11,10 @@ from io import BytesIO
 from aiohttp import ClientSession
 from websockets import connect
 from pydub import AudioSegment
+from typing import Literal
 
-# Characters dictionary with TTS system name and arpabet status
-characters = {
+# Characters dictionary with TTS system name and arpabet status for Standard and FakeYou TTS servers
+characters_standard_fakeyou = {
     "SpongeBob": ("SpongeBob", True),
     "Patrick": ("Patrick", True),
     "Squidward": ("Loudward", True),
@@ -36,26 +37,55 @@ characters = {
     "Dirty Bubble": ("DirtyBubble22", True)
 }
 
-# Base URLs of local TTS server
-http_url = "http://localhost:8000/"
-ws_url = "ws://localhost:8000/"
+# Characters dictionary with TTS system name and arpabet status for Uberduck TTS server
+characters_uberduck = {
+    "SpongeBob": ("Another_SpongeBob_test_Tacotron_2_model", True),
+    "Patrick": ("Patrick", False),
+    "Squidward": ("Squidward Tentacles_199_finalized", True),
+    "Sandy": ("Sandy", False),
+    "Mr. Krabs": ("Mr Krabs", False),
+    "Plankton": ("Plankton v2 (Doug Lawrence)", True),
+    "Mrs. Puff": ("Mrs Puff_99_finalized", True),
+    "Larry": ("Larry", False),
+}
+
+# Base URLs of local TTS servers
+url_http = "http://localhost"
+url_ws = "ws://localhost"
+
+# Ports for different TTS servers
+port_standard = 8000
+port_uberduck = 8001
+port_fakeyou = 8002
 
 
-async def speak(character: str, text: str):
+async def speak(character: str, text: str, server: Literal["standard", "uberduck", "fakeyou"]):
     """
     Speak a line of text as a character using async I/O.
     :param character: Character voice to use
     :param text: Text to speak
+    :param server: Which TTS server to use
     :return: AudioSegment of spoken text
     """
 
+    # Select TTS server
+    if server == "standard":
+        port = port_standard
+        characters = characters_standard_fakeyou
+    elif server == "uberduck":
+        port = port_uberduck
+        characters = characters_uberduck
+    elif server == "fakeyou":
+        port = port_fakeyou
+        characters = characters_standard_fakeyou
+
     # Connect to servers
     async with ClientSession() as session:
-        async with connect(ws_url, ping_interval=10, ping_timeout=90, open_timeout=90) as socket:
+        async with connect(f"{url_ws}:{port}", ping_interval=10, ping_timeout=90, open_timeout=90) as socket:
 
             # Start synthesis job
             unique_id = str(uuid4())
-            async with session.post(http_url + "synthesize", json={
+            async with session.post(f"{url_http}:{port}/synthesize", json={
                 "output_path": f"../Outputs/{unique_id}.wav",
                 "voicemodel": characters[character][0],
                 "text": text,
@@ -75,12 +105,12 @@ async def speak(character: str, text: str):
                         raise Exception(f"TTS job {job_id} status is either \"failed\" or \"removed\"")
 
             # Download audio file
-            async with session.get(http_url + "downloads/" + job_id) as resp:
+            async with session.get(f"{url_http}:{port}/downloads/" + job_id) as resp:
                 with BytesIO(await resp.read()) as wav:
                     seg = AudioSegment.from_wav(wav)
 
             # Delete file from server
-            async with session.delete(http_url + "remove/" + job_id):
+            async with session.delete(f"{url_http}:{port}/remove/" + job_id):
                 pass
 
     # Return pydub segment
