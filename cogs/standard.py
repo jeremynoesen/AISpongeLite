@@ -491,19 +491,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
-            # Show transcript
+            # Show transcript and recording indicator
+            recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
             transcript_embed = Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
-            await interaction.response.send_message(embeds=[transcript_embed])
+            await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
             await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit}"))
-
-            # Small delay for visual effect
-            await sleep(1)
-
-            # Show recording indicator
-            recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
-            await interaction.edit_original_response(embeds=[recording_embed, transcript_embed])
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
