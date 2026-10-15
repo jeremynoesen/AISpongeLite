@@ -138,13 +138,14 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
 
     @command(name="episode", description="Generate a news episode.")
-    @describe(topic="What the episode is about.", chaos="Whether to simulate chaos hour.")
-    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], chaos: bool = False):
+    @describe(topic="What the episode is about.", chaos="Whether to simulate the chaos event.", strokefest="Whether to simulate the strokefest event.")
+    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], chaos: bool = False, strokefest: bool = False):
         """
         Generate a news episode about a topic.
         :param interaction: Interaction created by the command
         :param topic: What the episode is about
-        :param chaos: Whether to simulate chaos hour
+        :param chaos: Whether to simulate the chaos event
+        :param strokefest: Whether to simulate the strokefest event
         :return: None
         """
 
@@ -231,7 +232,10 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
                     # Attempt to speak line
                     try:
-                        seg = await speak(current_character, current_line)
+                        if strokefest:
+                            seg = await speak(current_character, current_line, "fakeyou")
+                        else:
+                            seg = await speak(current_character, current_line, "standard")
 
                     # Line failed to generate
                     except Exception as exception:
@@ -306,14 +310,15 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
 
     @command(name="tts", description="Make a news character speak text.")
-    @describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.")
-    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False):
+    @describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", strokefest="Whether to simulate the strokefest event.")
+    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, strokefest: bool = False):
         """
         Make a character from news episodes speak text using text-to-speech.
         :param interaction: Interaction created by the command
         :param character: Who should speak
         :param text: What should be said
         :param limit: Whether to limit speaking time
+        :param strokefest: Whether to simulate the strokefest event
         :return: None
         """
 
@@ -343,7 +348,10 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
             # Speak line for all other characters
             else:
-                seg = await speak(character, text)
+                if strokefest:
+                    seg = await speak(character, text, "fakeyou")
+                else:
+                    seg = await speak(character, text, "standard")
 
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:

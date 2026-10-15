@@ -230,8 +230,8 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
 
     @command(name="episode", description="Generate a standard episode.")
-    @describe(topic="What the episode is about.", location="Where the episode takes place.", time="When the episode takes place.", weather="What the weather is like.", chaos="Whether to simulate chaos hour.")
-    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations | None = None, time: times | None = None, weather: weathers | None = None, chaos: bool = False):
+    @describe(topic="What the episode is about.", location="Where the episode takes place.", time="When the episode takes place.", weather="What the weather is like.", chaos="Whether to simulate the chaos event.", strokefest="Whether to simulate the strokefest event.")
+    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], location: locations | None = None, time: times | None = None, weather: weathers | None = None, chaos: bool = False, strokefest: bool = False):
         """
         Generate a standard episode about a topic.
         :param interaction: Interaction created by the command
@@ -239,7 +239,8 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         :param location: Where the episode takes place
         :param time: When the episode takes place
         :param weather: What the weather is like
-        :param chaos: Whether to simulate chaos hour
+        :param chaos: Whether to simulate the chaos event
+        :param strokefest: Whether to simulate the strokefest event
         :return: None
         """
 
@@ -351,7 +352,10 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
                     # Attempt to speak line
                     try:
-                        seg = await speak(current_character, current_line)
+                        if strokefest:
+                            seg = await speak(current_character, current_line, "fakeyou")
+                        else:
+                            seg = await speak(current_character, current_line, "standard")
 
                     # Line failed to generate
                     except Exception as exception:
@@ -470,8 +474,8 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
 
     @command(name="tts", description="Make a standard character speak text.")
-    @describe(character="Who should speak.", text="What should be said.", megaphone="Whether to speak through a megaphone.", loud="Whether to speak loudly.", limit="Whether to limit speaking time.")
-    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], megaphone: bool = False, loud: bool = False, limit: bool = False):
+    @describe(character="Who should speak.", text="What should be said.", megaphone="Whether to speak through a megaphone.", loud="Whether to speak loudly.", limit="Whether to limit speaking time.", strokefest="Whether to simulate the strokefest event.")
+    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], megaphone: bool = False, loud: bool = False, limit: bool = False, strokefest: bool = False):
         """
         Make a character from standard episodes speak text using text-to-speech.
         :param interaction: Interaction created by the command
@@ -480,6 +484,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         :param megaphone: Whether to speak through a megaphone
         :param loud: Whether to speak loudly
         :param limit: Whether to limit speaking time
+        :param strokefest: Whether to simulate the strokefest event
         :return: None
         """
 
@@ -509,7 +514,10 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
 
             # Speak line for all other characters
             else:
-                seg = await speak(character, text)
+                if strokefest:
+                    seg = await speak(character, text, "fakeyou")
+                else:
+                    seg = await speak(character, text, "standard")
 
             # Apply megaphone filter
             if megaphone:
