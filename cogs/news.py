@@ -4,32 +4,29 @@ News episode type, based on AI Sponge Rehydrated news topics.
 Written by Jeremy Noesen
 """
 
+from asyncio import sleep
 from logging import getLogger
 from typing import Literal, get_args
 from random import randint, randrange, choice, choices
 from re import sub
 from math import ceil
 from io import BytesIO
-from discord import Embed, Interaction, Color, File
+from discord import Embed, Interaction, File
 from discord.utils import escape_markdown
 from discord.ext.commands import GroupCog
 from discord.app_commands import Range, describe, command
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter
+from pylette import extract_colors
 from tts import speak
 from llm import write
 
 # Set up logger
 logger = getLogger(__name__)
 
-# Embed settings and static embeds
-embed_color = Color.dark_theme()
-embed_episode_start = Embed(title="Generating...", description="Writing script...", color=embed_color)
-embed_episode_end = Embed(title="Generating...", description="Mixing audio...", color=embed_color)
-embed_tts = Embed(title="Generating...", description="Speaking text...", color=embed_color)
-embed_chat = Embed(title="Generating...", description="Writing response...", color=embed_color)
-embed_failed = Embed(title="Failed.", description="An error occurred.", color=embed_color)
-embed_not_permitted = Embed(title="Not Permitted.", description="> **[Subscribe to the AI Sponge Lite Patreon](https://www.patreon.com/cw/AISpongeLite/membership)**\n> **or boost this server to use AI Sponge Lite.**", color=embed_color).set_image(url="attachment://explodeward.gif")
+# Reused embeds
+embed_failed = Embed(title="Generation Failed!", description="Edit your input, or try again later.", color=0xff0000)
+embed_not_permitted = Embed(title="Gain Access to AI Sponge Lite!", description="**[Purchase a subscription](https://www.patreon.com/cw/AISpongeLite/membership)** to unlock **/news** commands.", color=0x1849b0).set_image(url="attachment://banner.png")
 embed_delete_after = 30
 
 # Regex patterns for script modification
@@ -141,18 +138,19 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
 
     @command(name="episode", description="Generate a news episode.")
-    @describe(topic="What the episode is about.", chaos="Whether to simulate chaos hour.")
-    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], chaos: bool = False):
+    @describe(topic="What the episode is about.", chaos="Whether to simulate the chaos event.", strokefest="Whether to simulate the strokefest event.")
+    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], chaos: bool = False, strokefest: bool = False):
         """
         Generate a news episode about a topic.
         :param interaction: Interaction created by the command
         :param topic: What the episode is about
-        :param chaos: Whether to simulate chaos hour
+        :param chaos: Whether to simulate the chaos event
+        :param strokefest: Whether to simulate the strokefest event
         :return: None
         """
 
         # Check if user has access
-        if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
+        if interaction.user.id not in self.bot.permitted_discord_user_ids:
             await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
@@ -160,13 +158,13 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         try:
 
             # Show generating message
-            await interaction.response.send_message(embed=embed_episode_start)
+            await interaction.response.send_message(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic)} chaos:{chaos}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic)} chaos:{chaos}"))
 
             # Generate the script
-            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: headline: <headline> followed by ten lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: headline: <headline> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -193,7 +191,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(title="Generating...", description=f"Speaking line `{line_index}/{min(line_count, 25)}`...", color=embed_color))
+                await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -234,7 +232,10 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
                     # Attempt to speak line
                     try:
-                        seg = await speak(current_character, current_line)
+                        if strokefest:
+                            seg = await speak(current_character, current_line, "fakeyou")
+                        else:
+                            seg = await speak(current_character, current_line, "standard")
 
                     # Line failed to generate
                     except Exception as exception:
@@ -264,7 +265,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                     combined = combined.append(silence_line, 0)
 
                 # Add the line to the output script
-                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[current_character.replace(' ', '').replace('.', '')]} ​ ​ {escape_markdown(current_line)}", inline=False)
+                embed_output.add_field(name="", value=f"{self.bot.fetched_emojis[current_character.replace(' ', '').replace('.', '')]} ​ ​ ​ {escape_markdown(current_line)}", inline=False)
 
                 # Line completed
                 line_index += 1
@@ -274,7 +275,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=embed_episode_end)
+            await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add music to the episode
             music = music_just_breaking_softer.apply_gain((gain_music + randint(gain_random_neg, gain_random_pos)) - music_just_breaking_softer.dBFS)
@@ -309,30 +310,33 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
 
     @command(name="tts", description="Make a news character speak text.")
-    @describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.")
-    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False):
+    @describe(character="Who should speak.", text="What should be said.", limit="Whether to limit speaking time.", strokefest="Whether to simulate the strokefest event.")
+    async def tts(self, interaction: Interaction, character: characters, text: Range[str, char_limit_min, char_limit_max], limit: bool = False, strokefest: bool = False):
         """
         Make a character from news episodes speak text using text-to-speech.
         :param interaction: Interaction created by the command
         :param character: Who should speak
         :param text: What should be said
         :param limit: Whether to limit speaking time
+        :param strokefest: Whether to simulate the strokefest event
         :return: None
         """
 
         # Check if user has access
-        if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
+        if interaction.user.id not in self.bot.permitted_discord_user_ids:
             await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
         try:
 
-            # Show generating message
-            await interaction.response.send_message(embed=embed_tts)
+            # Show transcript and recording indicator
+            recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
+            transcript_embed = Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)} limit:{limit}", color=embed_color))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)} limit:{limit}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -344,7 +348,10 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
             # Speak line for all other characters
             else:
-                seg = await speak(character, text)
+                if strokefest:
+                    seg = await speak(character, text, "fakeyou")
+                else:
+                    seg = await speak(character, text, "standard")
 
             # Apply phone to callers
             if character not in ["Perch Perkins", "Mr. Fish"]:
@@ -361,7 +368,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             # Export and send the file
             with BytesIO() as output:
                 seg.export(output, "wav")
-                await interaction.edit_original_response(embed=Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url), attachments=[
+                await interaction.edit_original_response(embeds=[transcript_embed], attachments=[
                     File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
 
         # Generation failed
@@ -388,27 +395,34 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         """
 
         # Check if user has access
-        if interaction.user.premium_since is None and interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+        if interaction.user.id not in self.bot.permitted_discord_user_ids:
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/profile/banner.png"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
         try:
 
-            # Show generating message
-            await interaction.response.send_message(embed=embed_chat)
+            # Show user's own message
+            user_embed = Embed(description=escape_markdown(message), color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+            await interaction.response.send_message(embeds=[user_embed])
 
-            # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message)}", color=embed_color))
+            # Log interaction
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message)}"))
 
-            # Generate the chat response
+            # Small delay for visual effect
+            await sleep(1)
+
+            # Show typing indicator
+            typing_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is typing...")
+            await interaction.edit_original_response(embeds=[user_embed, typing_embed])
+
+            # Generate chat response
             response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The question from \"{interaction.user.display_name}\" says: \"{message}\".")
-
-            # Clean the response text
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
-            # Send the response
-            await interaction.edit_original_response(embed=Embed(description=output, color=data_characters[character]).set_footer(text=message, icon_url=interaction.user.display_avatar.url).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url))
+            # Show character's response
+            character_embed = Embed(description=output, color=data_characters[character]).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            await interaction.edit_original_response(embeds=[user_embed, character_embed])
 
         # Generation failed
         except Exception as exception:
