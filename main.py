@@ -48,7 +48,7 @@ class AISpongeLite(Bot):
 
     async def setup_hook(self):
         """
-        Upload assets, load cogs, and sync slash commands globally.
+        Upload assets, load cogs, and sync command tree globally.
         :return: None
         """
 
@@ -85,9 +85,9 @@ class AISpongeLite(Bot):
             await self.load_extension(cog)
             logger.info(f"Loaded cog: {cog}")
 
-        # Sync slash commands globally
+        # Sync command tree globally
         await self.tree.sync()
-        logger.info("Slash commands synced")
+        logger.info("Command tree synced")
 
 
     async def on_ready(self):
