@@ -259,7 +259,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{topic_clean} location:{location} time:{time} weather:{weather} chaos:{chaos} strokefest:{strokefest}"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{topic}```"))
 
             # Get random location if none provided
             if location is None:
@@ -500,16 +500,13 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
-            # Escape markdown in text for display
-            text_clean = escape_markdown(text)
-
             # Show transcript and recording indicator
             recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
-            transcript_embed = Embed(color=data_characters[character], description=text_clean).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            transcript_embed = Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{text_clean} megaphone:{megaphone} loud:{loud} limit:{limit} strokefest:{strokefest}"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{text}```"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -589,15 +586,12 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
-            # Escape markdown in message for display
-            message_clean = escape_markdown(message)
-
             # Show user's own message
-            user_embed = Embed(description=message_clean, color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+            user_embed = Embed(description=escape_markdown(message), color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
             await interaction.response.send_message(embeds=[user_embed])
 
             # Log interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard chat character:{character} message:{message_clean}"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{message}```"))
 
             # Small delay for visual effect
             await sleep(1)
