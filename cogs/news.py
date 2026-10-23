@@ -157,11 +157,14 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         # Start generation
         try:
 
+            # Escape markdown in topic for display
+            topic_clean = escape_markdown(topic)
+
             # Show generating message
-            await interaction.response.send_message(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
+            await interaction.response.send_message(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic)} chaos:{chaos} strokefest:{strokefest}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{topic_clean} chaos:{chaos} strokefest:{strokefest}"))
 
             # Generate the script
             script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: headline: <headline> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
@@ -191,7 +194,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
+                await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -276,7 +279,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
+            await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add music to the episode
             music = music_just_breaking_softer.apply_gain((gain_music + randint(gain_random_neg, gain_random_pos)) - music_just_breaking_softer.dBFS)
@@ -331,13 +334,16 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         # Start generation
         try:
 
+            # Escape markdown in text for display
+            text_clean = escape_markdown(text)
+
             # Show transcript and recording indicator
             recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
-            transcript_embed = Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            transcript_embed = Embed(color=data_characters[character], description=text_clean).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)} limit:{limit} strokefest:{strokefest}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{text_clean} limit:{limit} strokefest:{strokefest}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -403,12 +409,15 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         # Start generation
         try:
 
+            # Escape markdown in message for display
+            message_clean = escape_markdown(message)
+
             # Show user's own message
-            user_embed = Embed(description=escape_markdown(message), color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+            user_embed = Embed(description=message_clean, color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
             await interaction.response.send_message(embeds=[user_embed])
 
             # Log interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{escape_markdown(message)}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news chat character:{character} message:{message_clean}"))
 
             # Small delay for visual effect
             await sleep(1)

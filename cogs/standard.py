@@ -252,11 +252,14 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
+            # Escape markdown in topic for display
+            topic_clean = escape_markdown(topic)
+
             # Show generating message
-            await interaction.response.send_message(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
+            await interaction.response.send_message(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic)} location:{location} time:{time} weather:{weather} chaos:{chaos} strokefest:{strokefest}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{topic_clean} location:{location} time:{time} weather:{weather} chaos:{chaos} strokefest:{strokefest}"))
 
             # Get random location if none provided
             if location is None:
@@ -311,7 +314,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
+                await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -409,7 +412,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
+            await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add back cutoff line segments
             for position in cutoff_lines.keys():
@@ -497,13 +500,16 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
+            # Escape markdown in text for display
+            text_clean = escape_markdown(text)
+
             # Show transcript and recording indicator
             recording_embed = Embed(description=f"-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ **{character}** is recording...")
-            transcript_embed = Embed(color=data_characters[character], description=escape_markdown(text)).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
+            transcript_embed = Embed(color=data_characters[character], description=text_clean).set_author(name=character, icon_url=self.bot.fetched_emojis[character.replace(' ', '').replace('.', '')].url)
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit} strokefest:{strokefest}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{text_clean} megaphone:{megaphone} loud:{loud} limit:{limit} strokefest:{strokefest}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -583,12 +589,15 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
+            # Escape markdown in message for display
+            message_clean = escape_markdown(message)
+
             # Show user's own message
-            user_embed = Embed(description=escape_markdown(message), color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+            user_embed = Embed(description=message_clean, color=int(extract_colors(image=interaction.user.display_avatar.url)[0].hex[1:], 16)).set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
             await interaction.response.send_message(embeds=[user_embed])
 
             # Log interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard chat character:{character} message:{escape_markdown(message)}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard chat character:{character} message:{message_clean}"))
 
             # Small delay for visual effect
             await sleep(1)
