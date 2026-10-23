@@ -161,7 +161,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{topic}```"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{topic}```\n{interaction.user.mention}"))
 
             # Generate the script
             script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: headline: <headline> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
@@ -337,7 +337,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{text}```"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{text}```\n{interaction.user.mention}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -408,7 +408,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embeds=[user_embed])
 
             # Log interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{message}```"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{message}```\n{interaction.user.mention}"))
 
             # Small delay for visual effect
             await sleep(1)

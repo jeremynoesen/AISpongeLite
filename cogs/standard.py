@@ -256,7 +256,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{topic}```"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{topic}```\n{interaction.user.mention}"))
 
             # Get random location if none provided
             if location is None:
@@ -503,7 +503,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{text}```"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{text}```\n{interaction.user.mention}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
@@ -588,7 +588,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embeds=[user_embed])
 
             # Log interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{message}```"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{message}```\n{interaction.user.mention}"))
 
             # Small delay for visual effect
             await sleep(1)
