@@ -385,10 +385,11 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     seg = seg.apply_gain(gain_voice - seg.dBFS)
 
                 # Limit the audio length based on text length
-                cutoff = line_limit_base + (len(current_line) * line_limit_multiplier)
-                if len(seg) > cutoff:
-                    cutoff_lines[len(combined) + cutoff] = seg[cutoff:].apply_gain(gain_voice_quiet)
-                    seg = seg[:cutoff]
+                if not strokefest:
+                    cutoff = line_limit_base + (len(current_line) * line_limit_multiplier)
+                    if len(seg) > cutoff:
+                        cutoff_lines[len(combined) + cutoff] = seg[cutoff:].apply_gain(gain_voice_quiet)
+                        seg = seg[:cutoff]
 
                 # Add the line to the combined audio segment
                 combined = combined.append(seg, 0)
@@ -531,7 +532,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 seg = seg.apply_gain(gain_voice - seg.dBFS)
 
             # Apply audio limiter
-            if limit:
+            if limit and not strokefest:
                 cutoff = line_limit_base + (len(text) * line_limit_multiplier)
                 if len(seg) > cutoff:
                     seg = seg[:cutoff].append(seg[cutoff:].apply_gain(gain_voice_quiet), 0)

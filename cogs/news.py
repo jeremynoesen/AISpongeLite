@@ -255,7 +255,8 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                 seg = seg.apply_gain(gain_voice - seg.dBFS)
 
                 # Limit the audio length based on text length
-                seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
+                if not strokefest:
+                    seg = seg[:line_limit_base + (len(current_line) * line_limit_multiplier)]
 
                 # Add the line to the combined audio segment
                 combined = combined.append(seg, 0)
@@ -362,7 +363,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             seg = seg.apply_gain(gain_voice - seg.dBFS)
 
             # Apply audio limiter
-            if limit:
+            if limit and not strokefest:
                 seg = seg[:line_limit_base + (len(text) * line_limit_multiplier)]
 
             # Export and send the file
