@@ -256,7 +256,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic)} location:{location} time:{time} weather:{weather} chaos:{chaos}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard episode topic:{escape_markdown(topic)} location:{location} time:{time} weather:{weather} chaos:{chaos} strokefest:{strokefest}"))
 
             # Get random location if none provided
             if location is None:
@@ -502,7 +502,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/standard tts character:{character} text:{escape_markdown(text)} megaphone:{megaphone} loud:{loud} limit:{limit} strokefest:{strokefest}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":

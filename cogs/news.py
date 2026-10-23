@@ -161,7 +161,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embed=Embed(description=f"```{escape_markdown(topic)}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic)} chaos:{chaos}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news episode topic:{escape_markdown(topic)} chaos:{chaos} strokefest:{strokefest}"))
 
             # Generate the script
             script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: headline: <headline> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
@@ -336,7 +336,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.response.send_message(embeds=[recording_embed, transcript_embed])
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)} limit:{limit}"))
+            await self.bot.logging_channel.send(embed=Embed(title=interaction.user.id, description=f"/news tts character:{character} text:{escape_markdown(text)} limit:{limit} strokefest:{strokefest}"))
 
             # Speak text using voice files for DoodleBob
             if character == "DoodleBob":
