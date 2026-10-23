@@ -157,11 +157,8 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
         # Start generation
         try:
 
-            # Escape markdown in topic for display
-            topic_clean = escape_markdown(topic)
-
             # Show generating message
-            await interaction.response.send_message(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
+            await interaction.response.send_message(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
             await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{topic}```"))
@@ -194,7 +191,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
+                await interaction.edit_original_response(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -279,7 +276,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
+            await interaction.edit_original_response(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add music to the episode
             music = music_just_breaking_softer.apply_gain((gain_music + randint(gain_random_neg, gain_random_pos)) - music_just_breaking_softer.dBFS)

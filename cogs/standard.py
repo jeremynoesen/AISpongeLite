@@ -252,11 +252,8 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
-            # Escape markdown in topic for display
-            topic_clean = escape_markdown(topic)
-
             # Show generating message
-            await interaction.response.send_message(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
+            await interaction.response.send_message(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
             await self.bot.logging_channel.send(embed=Embed(description=f"{interaction.user.mention}\n```{topic}```"))
@@ -314,7 +311,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
+                await interaction.edit_original_response(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -412,7 +409,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=Embed(description=f"```{topic_clean}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
+            await interaction.edit_original_response(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add back cutoff line segments
             for position in cutoff_lines.keys():
