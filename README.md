@@ -41,8 +41,8 @@ this project:
 - Explode
 - lulu ♡
 - ImpendingSunlit BellRelocated
-- Just A Bottle Of Water
-- Charles Mitchell
+- JonyGX
+- Lastorder
 
 Thank you to all my supporters for helping to keep this project alive, and thank you especially to everyone listed
 above for your generous support!
