@@ -151,7 +151,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
         # Check if user has access
         if interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/profile/banner.png"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
@@ -328,7 +328,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
         # Check if user has access
         if interaction.user.id not in self.bot.permitted_discord_user_ids:
-            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/embed/explodeward.gif"), ephemeral=True, delete_after=embed_delete_after)
+            await interaction.response.send_message(embed=embed_not_permitted, file=File("image/profile/banner.png"), ephemeral=True, delete_after=embed_delete_after)
             return
 
         # Start generation
