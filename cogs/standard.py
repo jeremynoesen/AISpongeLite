@@ -252,11 +252,14 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
         # Start generation
         try:
 
+            # Display version of topic
+            topic_display = topic.replace("```", "'''")
+
             # Show generating message
-            await interaction.response.send_message(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
+            await interaction.response.send_message(embed=Embed(description=f"```{topic_display}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"```{topic}```\n{interaction.user.mention}"))
+            await self.bot.logging_channel.send(embed=Embed(description=f"```{topic_display}```\n{interaction.user.mention}"))
 
             # Get random location if none provided
             if location is None:
@@ -311,7 +314,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             for line in lines:
 
                 # Update generation status
-                await interaction.edit_original_response(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
+                await interaction.edit_original_response(embed=Embed(description=f"```{topic_display}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Processing line {line_index} of {min(line_count, 25)}..."))
 
                 # Skip line if it is improperly formatted
                 line_parts = line.split(":", 1)
@@ -409,7 +412,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                     break
 
             # Show final generating message
-            await interaction.edit_original_response(embed=Embed(description=f"```{topic}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
+            await interaction.edit_original_response(embed=Embed(description=f"```{topic_display}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Mixing audio..."))
 
             # Add back cutoff line segments
             for position in cutoff_lines.keys():
