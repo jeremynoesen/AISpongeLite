@@ -17,7 +17,7 @@ from discord.ext.commands import GroupCog
 from discord.app_commands import Range, describe, command
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter
-from pylette import extract_colors
+from Pylette import extract_colors
 from tts import speak
 from llm import write
 
