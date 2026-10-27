@@ -69,6 +69,8 @@ async def speak(character: str, text: str, server: Literal["standard", "uberduck
     """
 
     # Select TTS server
+    port = port_standard
+    characters = characters_standard_fakeyou
     if server == "standard":
         port = port_standard
         characters = characters_standard_fakeyou
