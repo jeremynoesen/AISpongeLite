@@ -195,8 +195,9 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                         # Log error
                         logger.warning(exception)
 
-                        # Use failed sound as seg
-                        seg = voice_failed
+                        # Skip line on failure
+                        line_count -= 1
+                        continue
 
                 # Apply gain, forcing a loud event sometimes
                 if randrange(20) == 0:
