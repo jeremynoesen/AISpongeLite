@@ -371,9 +371,9 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
 
             # Export and send the file
             with BytesIO() as output:
-                seg.export(output, "wav")
+                seg.export(output, "mp3", bitrate="320k")
                 await interaction.edit_original_response(embeds=[transcript_embed], attachments=[
-                    File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".wav")])
+                    File(output, character + ": " + text.replace("/", "\\").replace("\n", " ") + ".mp3")])
 
         # Generation failed
         except Exception as exception:
