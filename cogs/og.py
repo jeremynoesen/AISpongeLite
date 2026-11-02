@@ -141,7 +141,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
             line_count = len(lines)
 
             # Create the embed for the output
-            embed_output = Embed(title=escape_markdown(title_formatted), color=0xfef4ad)
+            embed_output = Embed(title=escape_markdown(title_formatted), color=0x57f3ff)
 
             # Variables used for generation data
             combined = AudioSegment.empty()
