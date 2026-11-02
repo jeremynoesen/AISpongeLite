@@ -23,7 +23,8 @@ load_dotenv(override=True)
 cogs = [
     "cogs.access",
     "cogs.standard",
-    "cogs.news"
+    "cogs.news",
+    "cogs.og"
 ]
 
 
