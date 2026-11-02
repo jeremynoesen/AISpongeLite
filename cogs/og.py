@@ -31,15 +31,15 @@ embed_delete_after = 30
 # Characters and their embed colors
 characters = Literal["SpongeBob", "Patrick", "Squidward", "Sandy", "Mr. Krabs", "Plankton", "Gary", "Mrs. Puff", "Larry"]
 data_characters = {
-    "SpongeBob": 0xf6ea71,
-    "Patrick": 0xdb635e,
-    "Squidward": 0x9edad3,
-    "Sandy": 0xf3f3f1,
-    "Mr. Krabs": 0xf94b30,
-    "Plankton": 0x208346,
-    "Gary": 0xb48e83,
-    "Mrs. Puff": 0xf8f0bc,
-    "Larry": 0xfa771b
+    "SpongeBob": 0xe7e277,
+    "Patrick": 0xc05e57,
+    "Squidward": 0xa5e0da,
+    "Sandy": 0xe3e1d1,
+    "Mr. Krabs": 0xe43c12,
+    "Plankton": 0x1f7c44,
+    "Gary": 0xa4817d,
+    "Mrs. Puff": 0xe3d4a7,
+    "Larry": 0xd76e1c
 }
 
 # Gain settings for audio segments
