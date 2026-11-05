@@ -18,7 +18,7 @@ Bubble.
 
 ## Usage
 
-There are two types of commands available: standard and news. Each type has the following three commands:
+There are three types of commands available: standard, news, and og. Each type has the following three commands:
 
 - `/<type> episode`: Generate an audio-only episode. This will create a full episode with multiple characters, sound
   effects, and background music.
@@ -26,6 +26,8 @@ There are two types of commands available: standard and news. Each type has the 
   the effects available in episodes.
 - `/<type> chat`: Chat with a character. History is not remembered, so each message is independent. Your display name is
   inserted into the prompt so the character can address you.
+
+Each command has some required and some optional options, which vary depending on the command type.
 
 ## Demonstration
 
