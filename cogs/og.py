@@ -124,9 +124,9 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
             await interaction.response.send_message(embed=Embed(description=f"```{topic_display}```\n-# {self.bot.fetched_emojis['Processing']} ​ ​ ​ Writing script..."))
 
             # Log the interaction
-            await self.bot.logging_channel.send(embed=Embed(description=f"```{topic_display}```\n{interaction.user.mention}"))
+            log_message = await self.bot.logging_channel.send(embed=Embed(description=f"```{topic_display}```\n{interaction.user.mention}"))
             if song:
-                await self.bot.logging_channel.send(content=song)
+                await log_message.reply(content=song)
 
             # Whether the topic is a song topic
             song_topic = "sings" in topic and song
