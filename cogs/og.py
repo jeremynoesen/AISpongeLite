@@ -135,12 +135,12 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
             if song_topic:
                 topic_words = topic.lower().split()
                 singer = topic_words[topic_words.index("sings") - 1].title().replace("bob", "Bob")
-                song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: {singer}: \"$PLACEHOLDER$\"."
+                song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: \"{singer}: $PLACEHOLDER$\"."
                 length_prompt = "five"
             else:
                 song_prompt = ""
                 length_prompt = "twenty"
-            script = await write(f"Write a script for a SpongeBob episode about a topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by around {length_prompt} lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".{song_prompt}")
+            script = await write(f"Write a script for a SpongeBob episode about a topic. Only respond with a two-word, SpongeBob-style title using the format: \"title: <title>\" followed by around {length_prompt} lines of character dialogue using the format: \"<character>: <dialogue>\". The topic is: \"{topic}\".{song_prompt}")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -407,7 +407,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
             await interaction.edit_original_response(embeds=[user_embed, typing_embed])
 
             # Generate chat response
-            response = await write(f"Write a response as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The message says: \"{message}\".")
+            response = await write(f"Write a response as {character} from SpongeBob. Only respond with {character}'s response using the format: \"{character}: <response>\". The message says: \"{message}\".")
             output = escape_markdown(response.split(":", 1)[1].strip()[:char_limit_max].strip())
 
             # Show character's response

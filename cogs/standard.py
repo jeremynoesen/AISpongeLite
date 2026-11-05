@@ -285,7 +285,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
                 weather = "Clear"
 
             # Generate the script
-            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a SpongeBob episode about a topic that takes place on a {weather} {time} at {location} and features {data_locations[location][2]}, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a SpongeBob episode about a topic that takes place on a {weather} {time} at {location} and features {data_locations[location][2]}, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: \"title: <title>\" followed by around twenty lines of character dialogue using the format: \"<character>: <dialogue>\". The topic is: \"{topic}\".")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -601,7 +601,7 @@ class Standard(GroupCog, name="standard", description="Generate episodes, TTS, a
             await interaction.edit_original_response(embeds=[user_embed, typing_embed])
 
             # Generate chat response
-            response = await write(f"Write a response to a discord message as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The message from \"{interaction.user.display_name}\" says: \"{message}\".")
+            response = await write(f"Write a response to a discord message as {character} from SpongeBob. Only respond with {character}'s response using the format: \"{character}: <response>\". The message from \"{interaction.user.display_name}\" says: \"{message}\".")
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
             # Show character's response

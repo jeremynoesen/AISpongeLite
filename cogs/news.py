@@ -167,7 +167,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await self.bot.logging_channel.send(embed=Embed(description=f"```{topic_display}```\n{interaction.user.mention}"))
 
             # Generate the script
-            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: headline: <headline> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            script = await write(f"Write a fucking chaotic, profanity-filled, and morally incorrect script for a Bikini Bottom news report about a topic that is broadcasted live from the Bikini Bottom News Studio and features Perch Perkins and Mr. Fish as news anchors, and any other characters mentioned in the topic as callers. Only respond with a two-word, SpongeBob-style breaking news headline using the format: \"headline: <headline>\" followed by around twenty lines of character dialogue using the format: \"<character>: <dialogue>\". The topic is: \"{topic}\".")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -421,7 +421,7 @@ class News(GroupCog, name="news", description="Generate episodes, TTS, and chats
             await interaction.edit_original_response(embeds=[user_embed, typing_embed])
 
             # Generate chat response
-            response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s response using the format: {character}: <response>. The question from \"{interaction.user.display_name}\" says: \"{message}\".")
+            response = await write(f"Write a response to a news interview question as {character} from SpongeBob. Only respond with {character}'s response using the format: \"{character}: <response>\". The question from \"{interaction.user.display_name}\" says: \"{message}\".")
             output = escape_markdown(sub(regex_actions, "", response.split(":", 1)[1].strip())[:char_limit_max].strip())
 
             # Show character's response
