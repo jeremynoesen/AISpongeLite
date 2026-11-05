@@ -135,7 +135,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
             # Generate the script
             if song_topic:
                 singer = topic_words[topic_words.index("sings") - 1].title().replace("bob", "Bob")
-                song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: \"{singer}: $PLACEHOLDER$\"."
+                song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: \"{singer}: *sings*\"."
                 length_prompt = "five"
             else:
                 song_prompt = ""
@@ -196,7 +196,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                     continue
 
                 # Use song for line
-                if song_topic and "$placeholder$" in current_line.lower():
+                if song_topic and "*sings*" in current_line.lower():
 
                     # Unique ID for file name
                     unique_id = str(uuid4())
