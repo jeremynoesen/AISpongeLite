@@ -153,7 +153,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
             # Leave prompt alone for normal topics
             else:
                 song_prompt = ""
-                length_prompt = "twenty"
+                length_prompt = "ten"
 
             # Generate the script
             script = await write(f"Write a script for a SpongeBob episode about a topic. Only respond with a two-word, SpongeBob-style title using the format: \"title: <title>\" followed by around {length_prompt} lines of character dialogue using the format: \"<character>: <dialogue>\". The topic is: \"{topic}\".{song_prompt}")
