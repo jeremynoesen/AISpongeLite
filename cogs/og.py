@@ -129,11 +129,11 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                 await log_message.reply(content=song)
 
             # Whether the topic is a song topic
-            song_topic = "sings" in topic and song
+            topic_words = topic.lower().split()
+            song_topic = song and "sings" in topic_words
 
             # Generate the script
             if song_topic:
-                topic_words = topic.lower().split()
                 singer = topic_words[topic_words.index("sings") - 1].title().replace("bob", "Bob")
                 song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: \"{singer}: $PLACEHOLDER$\"."
                 length_prompt = "five"
