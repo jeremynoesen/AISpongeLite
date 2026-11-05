@@ -6,6 +6,7 @@ Written by Jeremy Noesen
 
 from asyncio import sleep
 from logging import getLogger
+from os import remove
 from typing import Literal, get_args
 from random import randrange, choices
 from math import ceil
@@ -17,6 +18,8 @@ from discord.app_commands import Range, describe, command
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter
 from Pylette import extract_colors
+from yt_dlp import YoutubeDL
+from uuid import uuid4
 from tts import speak
 from llm import write
 
@@ -96,12 +99,13 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
 
 
     @command(name="episode", description="Generate an OG episode.")
-    @describe(topic="What the episode is about.")
-    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max]):
+    @describe(topic="What the episode is about.", song="Link to an AI cover.")
+    async def episode(self, interaction: Interaction, topic: Range[str, char_limit_min, char_limit_max], song: str | None = None):
         """
         Generate an OG episode about a topic.
         :param interaction: Interaction created by the command
         :param topic: What the episode is about
+        :param song: Link to an AI cover
         :return: None
         """
 
@@ -121,9 +125,22 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
 
             # Log the interaction
             await self.bot.logging_channel.send(embed=Embed(description=f"```{topic_display}```\n{interaction.user.mention}"))
+            if song:
+                await self.bot.logging_channel.send(content=song)
+
+            # Whether the topic is a song topic
+            song_topic = "sings" in topic and song
 
             # Generate the script
-            script = await write(f"Write a script for a SpongeBob episode about a topic that features SpongeBob, Patrick, Squidward, and any other characters mentioned in the topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by around twenty lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".")
+            if song_topic:
+                topic_words = topic.lower().split()
+                singer = topic_words[topic_words.index("sings") - 1].title().replace("bob", "Bob")
+                song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: {singer}: \"$PLACEHOLDER$\"."
+                length_prompt = "five"
+            else:
+                song_prompt = ""
+                length_prompt = "twenty"
+            script = await write(f"Write a script for a SpongeBob episode about a topic. Only respond with a two-word, SpongeBob-style title using the format: title: <title> followed by around {length_prompt} lines of character dialogue using the format: <character>: <dialogue>. The topic is: \"{topic}\".{song_prompt}")
 
             # Clean the script
             lines = script.replace("\n\n", "\n").replace(":\n", ": ").strip().split("\n")
@@ -178,8 +195,40 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                     line_count -= 1
                     continue
 
+                # Use song for line
+                if song_topic and "$placeholder$" in current_line.lower():
+
+                    # Unique ID for file name
+                    unique_id = str(uuid4())
+
+                    # Download wav using yt-dlp
+                    options = {
+                        "format": "bestaudio/best",
+                        "outtmpl": f"temp/{unique_id}",
+                        "postprocessors": [
+                            {
+                                "key": "FFmpegExtractAudio",
+                                "preferredcodec": "wav",
+                            }
+                        ],
+                    }
+                    with YoutubeDL(options) as ydl:
+                        info = ydl.extract_info(song, False)
+                        if info['duration'] > 300:
+                            raise Exception("Video is longer than five minutes.")
+                        ydl.download([song])
+
+                    # Load wav file
+                    seg = AudioSegment.from_wav(f"temp/{unique_id}.wav")
+
+                    # Delete wav file
+                    remove(f"temp/{unique_id}.wav")
+
+                    # Override line text
+                    current_line = "*sings*"
+
                 # Speak line using voice file for Gary
-                if current_character == "Gary":
+                elif current_character == "Gary":
                     seg = voice_gary
 
                 # Speak line for all other characters
@@ -200,7 +249,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                         continue
 
                 # Apply gain, forcing a loud event sometimes
-                if randrange(20) == 0:
+                if not song_topic and randrange(20) == 0:
                     seg = seg.apply_gain(gain_voice_distort)
                     seg = seg.apply_gain(gain_voice_loud - seg.dBFS)
                 else:
