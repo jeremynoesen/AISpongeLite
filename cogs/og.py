@@ -129,17 +129,33 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                 await log_message.reply(content=song)
 
             # Whether the topic is a song topic
-            topic_words = topic.lower().split()
-            is_song_topic = song and "sings" in topic_words
+            topic_casefold = topic.casefold()
+            is_song_topic = song and "sings" in topic_casefold
 
-            # Generate the script
+            # Edit prompt for song topics
             if is_song_topic:
-                singer = topic_words[topic_words.index("sings") - 1].title().replace("bob", "Bob")
+
+                # Get the singer
+                singer = ""
+                for character in list(get_args(characters)):
+                    if f"{character.casefold()} sings" in topic_casefold:
+                        singer = character
+                        break
+
+                # Stop generation if no singer is found
+                if not singer:
+                    raise Exception("Invalid singer for song topic.")
+
+                # Song topic prompt modifications
                 song_prompt = f" {singer}'s singing must only occur once on its own line, which must be replaced with: \"{singer}: *sings*\"."
                 length_prompt = "five"
+
+            # Leave prompt alone for normal topics
             else:
                 song_prompt = ""
                 length_prompt = "twenty"
+
+            # Generate the script
             script = await write(f"Write a script for a SpongeBob episode about a topic. Only respond with a two-word, SpongeBob-style title using the format: \"title: <title>\" followed by around {length_prompt} lines of character dialogue using the format: \"<character>: <dialogue>\". The topic is: \"{topic}\".{song_prompt}")
 
             # Clean the script
@@ -196,7 +212,7 @@ class OG(GroupCog, name="og", description="Generate episodes, TTS, and chats bas
                     continue
 
                 # Use song for line
-                is_song_line = is_song_topic and "*sings*" in current_line.lower()
+                is_song_line = is_song_topic and "*sings*" in current_line.casefold()
                 if is_song_line:
 
                     # Unique ID for file name
