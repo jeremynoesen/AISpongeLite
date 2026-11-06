@@ -1,8 +1,5 @@
 """
-TTS module using AI Sponge Rehydrated's local text-to-speech system.
-This is separate to allow for easy swapping of TTS providers.
-
-Written by Jeremy Noesen
+Module that interfaces with AI Sponge Rehydrated's local text-to-speech system.
 """
 
 from uuid import uuid4

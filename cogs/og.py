@@ -1,7 +1,5 @@
 """
-OG episode type, based on OG AI Sponge topics.
-
-Written by Jeremy Noesen
+OG commands, based on OG AI Sponge topics.
 """
 
 from asyncio import sleep

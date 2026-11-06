@@ -1,7 +1,5 @@
 """
-Module to fetch Patreon subscribers and admin users, used to determine command permissions.
-
-Written by Jeremy Noesen
+Module that fetches Patreon subscribers and admin users to grant them access.
 """
 
 from logging import getLogger

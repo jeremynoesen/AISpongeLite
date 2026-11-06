@@ -1,8 +1,5 @@
 """
-LLM module using OpenRouter for text generation.
-This is separate to allow for easy swapping of LLM providers.
-
-Written by Jeremy Noesen
+Module that uses OpenRouter for text generation.
 """
 
 from os import getenv

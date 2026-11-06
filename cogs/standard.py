@@ -1,7 +1,5 @@
 """
-Standard episode type, based on AI Sponge Rehydrated standard topics.
-
-Written by Jeremy Noesen
+Standard commands, based on AI Sponge Rehydrated standard topics.
 """
 
 from asyncio import sleep

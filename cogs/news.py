@@ -1,7 +1,5 @@
 """
-News episode type, based on AI Sponge Rehydrated news topics.
-
-Written by Jeremy Noesen
+News commands, based on AI Sponge Rehydrated news topics.
 """
 
 from asyncio import sleep
